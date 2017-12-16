@@ -71,6 +71,7 @@ https://www.onyphe.io/documentation/api
 	.EXAMPLE
 	C:\PS> Get-onypheinfo -fromcsv .\input.csv -multithreading
 	C:\PS> Get-onypheinfo -fromcsv .\input.csv
+	C:\PS> Get-onypheinfo -fromcsv .\input.csv -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 #>
 
  <#
