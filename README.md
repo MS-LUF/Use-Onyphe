@@ -1,2 +1,184 @@
 # Use-Onyphe
 Simple PowerShell module to use Onyphe.io API
+
+Some of the APIs required an API key. 
+To request it : https://www.onyphe.io/login
+
+More info about available APIs :
+https://www.onyphe.io/documentation/api
+
+<#
+	.SYNOPSIS 
+	commandline interface to use onyphe.io web service
+
+	.DESCRIPTION
+	use-onyphe.psm1 module provides a commandline interface to onyphe.io web service.
+	Require PoshRSJob PowerShell module to use multithreading option of get-onypheinfo function.
+	
+	.EXAMPLE
+	C:\PS> import-module use-onyphe.psm1
+#>
+
+ <#
+	.SYNOPSIS 
+	Get IP information from onyphe.io web service
+
+	.DESCRIPTION
+	get various ip data information from onyphe.io web service
+
+	.PARAMETER IP
+	-IP string
+	look for an ip address in onyphe database
+
+	.PARAMETER port
+	-Port string
+	look for an tcp or udp port in onyphe database. Could be used with other information (os and/or country)
+	
+	.PARAMETER os
+	-Port string
+	look for an OS in onyphe database. Must be be used with "port" parameter and could be used with "country" parameter
+	
+	.PARAMETER country
+	-Port string
+	look for an country in onyphe database. Must be be used with "port" parameter and could be used with "os" parameter
+	
+	.PARAMETER multithreading
+	-multithreading switch
+	 use .Net RunSpace to run invoke-webonypherequest in parallel to decrease execution time.
+	 warning : do not provide more than 10 requests in a csv using this option or some of your requests could be blocked by rate limiting feature of the web server.
+	
+	.OUTPUTS
+	TypeName: System.Management.Automation.PSCustomObject
+	
+	count   : 32
+	error   : 0
+	myip    : 127.0.0.1
+	results : {@{@category=geoloc; @timestamp=2017-12-16T12:12:00.000Z; @type=ip; asn=AS15169; city=; country=US;
+			  country_name=United States; geolocation=37.7510,-97.8220; ip=8.8.8.8; ipv6=false; latitude=37.7510;
+			  longitude=-97.8220; organization=Google LLC; subnet=8.8.0.0/19}, @{@category=inetnum;
+			  @timestamp=1970-01-01T00:00:00.000Z; @type=ip; country=US; information=System.Object[]; netname=Undisclosed;
+			  seen_date=1970-01-01; source=Undisclosed; subnet=Undisclosed}, @{@category=pastries;
+			  @timestamp=2017-12-16T11:29:53.000Z; @type=pastebin; domain=System.Object[]; hostname=System.Object[];
+			  ip=System.Object[]; key=fuMJJB9i; seen_date=2017-12-16}, @{@category=pastries;
+			  @timestamp=2017-12-16T08:37:28.000Z; @type=pastebin; domain=System.Object[]; hostname=System.Object[];
+			  ip=System.Object[]; key=UMbLWStd; seen_date=2017-12-16}...}
+	status  : ok
+	took    : 0.106
+	total   : 3607
+
+	count   : 1
+	error   : 0
+	myip    : 127.0.0.1
+	results : {@{@category=geoloc; @timestamp=2017-12-16T12:12:00.000Z; @type=ip; asn=; city=; country=US;
+			  country_name=United States; geolocation=37.7510,-97.8220; ip=7.7.7.7; ipv6=false; latitude=37.7510;
+			  longitude=-97.8220; organization=; subnet=7.0.0.0/11}}
+	status  : ok
+	took    : 0.001661
+	total   : 1
+
+	.EXAMPLE
+	C:\PS> Get-onypheinfo -fromcsv .\input.csv -multithreading
+	C:\PS> Get-onypheinfo -fromcsv .\input.csv
+#>
+
+ <#
+	.SYNOPSIS 
+	Get IP information from onyphe.io web service
+
+	.DESCRIPTION
+	send HTTP request to onyphe.io web service and convert back JSON information to an hashtable
+
+	.PARAMETER searchtype Geoloc
+	-IP string{IP} -searchtype Geoloc string{IP}
+	look for geoloc information about a specfic ip address in onyphe database
+
+	.PARAMETER myip
+	-Myip
+	look for information about my public IP
+	
+	.PARAMETER searchtype Inetnum
+	-IP string{IP} -searchtype Inetnum -APIKey string{APIKEY}
+	look for an ip address in onyphe database
+
+	.PARAMETER searchtype Threatlist
+	-IP string{IP} -searchtype Threatlist -APIKey string{APIKEY}
+	look for threat info about a specific IP in onyphe database.
+	
+	.PARAMETER searchtype Pastries
+	-IP string{IP} -searchtype Pastries -APIKey string{APIKEY}
+	look for an pastbin data about a specific IP in onyphe database.
+	
+	.PARAMETER searchtype Synscan
+	-IP string{IP} -searchtype Synscan -APIKey string{APIKEY}
+	look for open ports info for a specific IP in onyphe database.
+
+	.PARAMETER searchtype Reverse
+	-IP string{IP} -searchtype Reverse string{IP} -APIKey string{APIKEY}
+	look for xxx in onyphe database.
+
+	.PARAMETER searchtype Forward
+	-IP string{IP} -searchtype Forward -APIKey string{APIKEY}
+	look for xxx in onyphe database.
+	
+	.PARAMETER Datascan
+	-IP string{IP} -Datascan string -APIKey string{APIKEY}
+	look for an tcp service info for a specific IP in onyphe database.
+
+	.PARAMETER IP
+	-IP string{IP} -APIKey string{APIKEY}
+	get all information available for a specific IP in onyphe database.
+	
+	.PARAMETER APIKey
+	-APIKey string{APIKEY}
+	set your APIKEY to be able to use Onyphe API.
+	
+	.OUTPUTS
+	TypeName: System.Management.Automation.PSCustomObject
+	
+	count   : 32
+	error   : 0
+	myip    : 1.1.1.1
+	results : {@{@category=geoloc; @timestamp=2017-12-14T07:10:53.000Z; @type=ip; asn=AS15169; city=; country=US;
+			  country_name=United States; geolocation=37.7510,-97.8220; ip=8.8.8.8; ipv6=false; latitude=37.7510;
+			  longitude=-97.8220; organization=Google LLC; subnet=8.8.0.0/19}, @{@category=inetnum;
+			  @timestamp=1970-01-01T00:00:00.000Z; @type=ip; country=US; information=System.Object[]; netname=Undisclosed;
+			  seen_date=1970-01-01; source=Undisclosed; subnet=Undisclosed}, @{@category=pastries;
+			  @timestamp=2017-12-14T04:13:51.000Z; @type=pastebin; domain=System.Object[]; hostname=System.Object[];
+			  ip=System.Object[]; key=pNhLGvpT; seen_date=2017-12-14}, @{@category=pastries;
+			  @timestamp=2017-12-13T22:35:02.000Z; @type=pastebin; domain=System.Object[]; hostname=System.Object[];
+			  ip=System.Object[]; key=ViArHJ18; seen_date=2017-12-13}...}
+	status  : ok
+	took    : 0.154
+	total   : 3646
+
+	.EXAMPLE
+	C:\PS> Invoke-WebOnypheRequest -ip "192.168.1.5" -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	C:\PS> Invoke-WebOnypheRequest -myip
+	C:\PS> Invoke-WebOnypheRequest -ip "8.8.8.8" -searchtype Geoloc
+	C:\PS> Invoke-WebOnypheRequest -ip "8.8.8.8" -searchtype Reverse -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	C:\PS> Invoke-WebOnypheRequest -ip "8.8.8.8" -searchtype DataScan -datascanstring "IIS" -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+#>
+
+  <#
+	.SYNOPSIS 
+	set and remove onyphe API key as global variable
+
+	.DESCRIPTION
+	set and remove onyphe API key as global variable
+	
+	.PARAMETER APIKEY
+	-APIKey string{APIKEY}
+	Set APIKEY as global variable.
+	
+	.PARAMETER Remove
+	-Remove
+	Remove your current APIKEY from global variable.
+	
+	.OUTPUTS
+	none - write-host given apikey
+	
+	.EXAMPLE
+	C:\PS> Set-OnypheAPIKey -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	C:\PS> Set-OnypheAPIKey -remove
+
+  #>
