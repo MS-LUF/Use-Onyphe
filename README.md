@@ -21,26 +21,18 @@ https://www.onyphe.io/documentation/api
 
  <#
 	.SYNOPSIS 
-	Get IP information from onyphe.io web service
+	Get IP information from onyphe.io web service using as an input a CSV file containing all information
 
 	.DESCRIPTION
-	get various ip data information from onyphe.io web service
-
-	.PARAMETER IP
-	-IP string
-	look for an ip address in onyphe database
-
-	.PARAMETER port
-	-Port string
-	look for an tcp or udp port in onyphe database. Could be used with other information (os and/or country)
+	get various ip data information from onyphe.io web service using as an input a csv file (; separator)
 	
-	.PARAMETER os
-	-Port string
-	look for an OS in onyphe database. Must be be used with "port" parameter and could be used with "country" parameter
+	.PARAMETER fromcsv
+	-fromcsv string{full path to csv file}
+	automate onyphe.io request for multiple IP
 	
-	.PARAMETER country
-	-Port string
-	look for an country in onyphe database. Must be be used with "port" parameter and could be used with "os" parameter
+	.PARAMETER APIKey
+	-APIKey string{APIKEY}
+	set your APIKEY to be able to use Onyphe API.
 	
 	.PARAMETER multithreading
 	-multithreading switch
