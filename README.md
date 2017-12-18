@@ -176,4 +176,29 @@ https://www.onyphe.io/documentation/api
 	C:\PS> Set-OnypheAPIKey -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 	C:\PS> Set-OnypheAPIKey -remove
 
-  #>
+ #>
+  
+ <#
+	.SYNOPSIS 
+	Export psobject containing Onyphe info to files
+
+	.DESCRIPTION
+	Export psobject containing Onyphe info to files
+	One root folder is created and a dedicated csv file is created by category.
+	Note : for the datascan category, the data attribute content is exported in a separated text file to be more readable.
+	Note 2 : in this version, there is an issue if you pipe a psobject containing an array of onyphe result to the function. to be investigated.
+
+	.PARAMETER tofolder
+	-tofolcer string{target folder}
+	path to the target folder where you want to export onyphe data
+
+	.PARAMETER inputobject
+	-inputobject $obj{output of Invoke-WebOnypheRequest or Get-OnypheInfoFromCSV functions}
+	look for information about my public IP
+		
+	.OUTPUTS
+	none
+	
+	.EXAMPLE
+	C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -inputobject $onypheresult
+#>
