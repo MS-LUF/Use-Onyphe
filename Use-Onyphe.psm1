@@ -1,6 +1,7 @@
 #
 # Created by: lucas.cueff[at]lucas-cueff.com
 #
+# v0.3 : add a new function to export psobject content to files
 # Released on: 12/2017
 #
 #'(c) 2017 lucas-cueff.com - Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).'
@@ -19,7 +20,8 @@ function Get-OnypheInfoFromCSV {
   [cmdletbinding()]
   Param (
   [parameter(Mandatory=$true)]
-    $fromcsv,
+  [ValidateScript({test-path "$($_)"})]
+	$fromcsv,
   [parameter(Mandatory=$false)]
 	[switch]$multithreading,
   [parameter(Mandatory=$false)]
@@ -366,6 +368,93 @@ function Invoke-WebOnypheRequest {
 	}			
 }
 
+function Export-OnypheInfoToFile {
+  [cmdletbinding()]
+  Param (
+  [parameter(Mandatory=$true)]
+  [ValidateScript({test-path "$($_)"})]
+	$tofolder,
+  [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+  [ValidateScript({(($_ | Get-Member | Select-Object -ExpandProperty TypeName -Unique) -eq 'System.Management.Automation.PSCustomObject') -or (($_ | Get-Member | Select-Object -ExpandProperty TypeName -Unique) -eq 'Selected.RSJob')})]
+	$inputobject
+  )
+<#
+	.SYNOPSIS 
+	Export psobject containing Onyphe info to files
+
+	.DESCRIPTION
+	Export psobject containing Onyphe info to files
+	One root folder is created and a dedicated csv file is created by category.
+	Note : for the datascan category, the data attribute content is exported in a separated text file to be more readable.
+	Note 2 : in this version, there is an issue if you pipe a psobject containing an array of onyphe result to the function. to be investigated.
+
+	.PARAMETER tofolder
+	-tofolcer string{target folder}
+	path to the target folder where you want to export onyphe data
+
+	.PARAMETER inputobject
+	-inputobject $obj{output of Invoke-WebOnypheRequest or Get-OnypheInfoFromCSV functions}
+	look for information about my public IP
+		
+	.OUTPUTS
+	none
+	
+	.EXAMPLE
+	C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -inputobject $onypheresult
+#>
+
+  foreach ($result in $inputobject) {
+	$tempfolder = $null
+	$tempfolder = join-path $tofolder $((get-date).ticks)
+	md $tempfolder -force | out-null
+	$filterbaseobj = $result | select count,error,myip,status,took,total
+	$filterbaseobj | Export-Csv -NoTypeInformation -path "$($tempfolder)\request_info.csv" -delimiter ";"
+	If ($result.results.'@category' -eq 'geoloc') {
+		$filteredobj = $result.results | where {$_.'@category' -eq 'geoloc'} | select '@type',asn,city,country_name,country,geolocation,ip,ipv6,latitude,longitude,organization,subnet,'@timestamp'
+		$tempfilename = join-path $tempfolder "Geoloc.csv"
+		$filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter ";"
+	}
+	If ($result.results.'@category' -eq 'inetnum') {
+		$filteredobj = $result.results | where {$_.'@category' -eq 'inetnum'} | select seen_date,'@type',country,@{Name='information';Expression={[string]::join(",",($_.information))}},netname,source,subnet,'@timestamp'
+		$tempfilename = join-path $tempfolder "inetnum.csv"
+		$filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter ";"
+	}	
+ 	If ($result.results.'@category' -eq 'synscan') {
+		$filteredobj = $result.results | where {$_.'@category' -eq 'synscan'} | select seen_date,'@type',asn,country,ip,location,organization,os,port,'@timestamp'
+		$tempfilename = join-path $tempfolder "synscan.csv"
+		$filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter ";"
+	}
+	If ($result.results.'@category' -eq 'resolver') {
+		$filteredobj = $result.results | where {$_.'@category' -eq 'resolver'} | select seen_date,'@type',domain,forward,reverse,ip,ipv6,'@timestamp'
+		$tempfilename = join-path $tempfolder "resolver.csv"
+		$filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter ";"
+	}	
+	If ($result.results.'@category' -eq 'threatlist') {
+		$filteredobj = $result.results | where {$_.'@category' -eq 'threatlist'}
+		$tempfilename = join-path $tempfolder "threatlist.csv"
+		$filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter ";" | select seen_date,'@type',subnet,threatlist,ipv6,'@timestamp'
+	}
+	If ($result.results.'@category' -eq 'Pastries') {
+		$filteredobj = $result.results | where {$_.'@category' -eq 'pastries'} | select seen_date,'@type',@{Name='domain';Expression={[string]::join(",",($_.domain))}},@{Name='hostname';Expression={[string]::join(",",($_.hostname))}},@{Name='ip';Expression={[string]::join(",",($_.ip))}},key
+		$tempfilename = join-path $tempfolder "Pastries.csv"
+		$filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter ";"
+	}
+	If ($result.results.'@category' -eq 'datascan') {
+		$filteredobj = $result.results | where {$_.'@category' -eq 'datascan'} | select seen_date,'@type',ip,ipv6,port,protocol,product,productversion,os,asn,city,country,location,organization,'@timestamp'
+		$filteredobjfull = $result.results | where {$_.'@category' -eq 'datascan'} | select seen_date,'@type',ip,ipv6,port,protocol,product,data,productversion,os,asn,city,country,location,organization,'@timestamp'
+		$tempfilename = join-path $tempfolder "datascan.csv"
+		$filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter ";"
+		foreach ($dataresult in $filteredobjfull) {
+			$temptimestamp = $dataresult.'@timestamp' -replace ":","_"
+			$tempfiledataresult = "$($temptimestamp)_$($dataresult.port)_$($dataresult.protocol).txt"
+			$tempdataexportfile = join-path $tempfolder $tempfiledataresult
+			$dataresult.data | add-content -path $tempdataexportfile
+		}
+	}
+  }
+  
+}
+
 function Fix-JSONHash {
     [cmdletbinding()]
 	param(
@@ -449,4 +538,4 @@ Function Set-OnypheAPIKey {
   }
 }
 
-Export-ModuleMember -Function Invoke-WebonypheRequest, Fix-JSONHash, Get-OnypheInfoFromCSV, Get-ScriptDirectory, Set-OnypheAPIKey
+Export-ModuleMember -Function Invoke-WebonypheRequest, Fix-JSONHash, Get-OnypheInfoFromCSV, Get-ScriptDirectory, Set-OnypheAPIKey, Export-OnypheInfoToFile
