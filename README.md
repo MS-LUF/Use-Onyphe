@@ -9,6 +9,11 @@ To request it : https://www.onyphe.io/login
 More info about available APIs :
 https://www.onyphe.io/documentation/api
 
+You can easily install it from powershell gallery repository
+https://www.powershellgallery.com/packages/Use-Onyphe/
+using a simple powershell command and an internet access :-) 
+	Install-Module -Name Use-Onyphe
+
 <#
 	.SYNOPSIS 
 	commandline interface to use onyphe.io web service
