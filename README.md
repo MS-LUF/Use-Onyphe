@@ -76,7 +76,7 @@ https://www.onyphe.io/documentation/api
 	C:\PS> Get-onypheinfo -fromcsv .\input.csv -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 #>
 
- <#
+<#
 	.SYNOPSIS 
 	Get IP information from onyphe.io web service
 
@@ -115,8 +115,12 @@ https://www.onyphe.io/documentation/api
 	-IP string{IP} -searchtype Forward -APIKey string{APIKEY}
 	look for xxx in onyphe database.
 	
-	.PARAMETER Datascan
-	-IP string{IP} -Datascan string -APIKey string{APIKEY}
+	.PARAMETER searchtype DataScan
+	-IP string{IP} -searchtype DataScan -datascanstring string -APIKey string{APIKEY}
+	look for xxx in onyphe database.
+	
+	.PARAMETER datascanstring
+	-IP string{IP} -searchtype DataScan -datascanstring string -APIKey string{APIKEY}
 	look for an tcp service info for a specific IP in onyphe database.
 
 	.PARAMETER IP
@@ -130,21 +134,24 @@ https://www.onyphe.io/documentation/api
 	.OUTPUTS
 	TypeName: System.Management.Automation.PSCustomObject
 	
-	count   : 32
-	error   : 0
-	myip    : 1.1.1.1
-	results : {@{@category=geoloc; @timestamp=2017-12-14T07:10:53.000Z; @type=ip; asn=AS15169; city=; country=US;
-			  country_name=United States; geolocation=37.7510,-97.8220; ip=8.8.8.8; ipv6=false; latitude=37.7510;
-			  longitude=-97.8220; organization=Google LLC; subnet=8.8.0.0/19}, @{@category=inetnum;
-			  @timestamp=1970-01-01T00:00:00.000Z; @type=ip; country=US; information=System.Object[]; netname=Undisclosed;
-			  seen_date=1970-01-01; source=Undisclosed; subnet=Undisclosed}, @{@category=pastries;
-			  @timestamp=2017-12-14T04:13:51.000Z; @type=pastebin; domain=System.Object[]; hostname=System.Object[];
-			  ip=System.Object[]; key=pNhLGvpT; seen_date=2017-12-14}, @{@category=pastries;
-			  @timestamp=2017-12-13T22:35:02.000Z; @type=pastebin; domain=System.Object[]; hostname=System.Object[];
-			  ip=System.Object[]; key=ViArHJ18; seen_date=2017-12-13}...}
-	status  : ok
-	took    : 0.154
-	total   : 3646
+	count            : 32
+	error            : 0
+	myip             : 86.246.69.187
+	results          : {@{@category=geoloc; @timestamp=2017-12-20T13:43:12.000Z; @type=ip; asn=AS15169; city=; country=US;
+					   country_name=United States; geolocation=37.7510,-97.8220; ip=8.8.8.8; ipv6=false; latitude=37.7510;
+					   longitude=-97.8220; organization=Google LLC; subnet=8.8.0.0/19}, @{@category=inetnum;
+					   @timestamp=1970-01-01T00:00:00.000Z; @type=ip; country=US; information=System.Object[];
+					   netname=Undisclosed; seen_date=1970-01-01; source=Undisclosed; subnet=Undisclosed},
+					   @{@category=pastries; @timestamp=2017-12-20T12:21:40.000Z; @type=pastebin; domain=System.Object[];
+					   hostname=System.Object[]; ip=System.Object[]; key=cnRxq9LP; seen_date=2017-12-20},
+					   @{@category=pastries; @timestamp=2017-12-20T09:35:16.000Z; @type=pastebin; domain=System.Object[];
+					   hostname=System.Object[]; ip=System.Object[]; key=AjfnLBLE; seen_date=2017-12-20}...}
+	status           : ok
+	took             : 0.107
+	total            : 3556
+	cli-API_info     : ip
+	cli-API_input    : {8.8.8.8}
+	cli-key_required : True
 
 	.EXAMPLE
 	C:\PS> Invoke-WebOnypheRequest -ip "192.168.1.5" -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
