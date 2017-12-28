@@ -9,12 +9,14 @@ To request it : https://www.onyphe.io/login
 More info about available APIs :
 https://www.onyphe.io/documentation/api
 
+# install use-onyphe from PowerShell Gallery repository
 You can easily install it from powershell gallery repository
 https://www.powershellgallery.com/packages/Use-Onyphe/
 using a simple powershell command and an internet access :-) 
 	Install-Module -Name Use-Onyphe
 
-<#
+# import module from PowerShell 
+```
 	.SYNOPSIS 
 	commandline interface to use onyphe.io web service
 
@@ -24,9 +26,10 @@ using a simple powershell command and an internet access :-)
 	
 	.EXAMPLE
 	C:\PS> import-module use-onyphe.psm1
-#>
+```
 
- <#
+# module content : Get-onypheinfo function
+ ```
 	.SYNOPSIS 
 	Get IP information from onyphe.io web service using as an input a CSV file containing all information
 
@@ -79,9 +82,10 @@ using a simple powershell command and an internet access :-)
 	C:\PS> Get-onypheinfo -fromcsv .\input.csv -multithreading
 	C:\PS> Get-onypheinfo -fromcsv .\input.csv
 	C:\PS> Get-onypheinfo -fromcsv .\input.csv -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-#>
+```
 
-<#
+# module content : Invoke-WebOnypheRequest function
+ ```
 	.SYNOPSIS 
 	Get IP information from onyphe.io web service
 
@@ -164,9 +168,10 @@ using a simple powershell command and an internet access :-)
 	C:\PS> Invoke-WebOnypheRequest -ip "8.8.8.8" -searchtype Geoloc
 	C:\PS> Invoke-WebOnypheRequest -ip "8.8.8.8" -searchtype Reverse -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 	C:\PS> Invoke-WebOnypheRequest -ip "8.8.8.8" -searchtype DataScan -datascanstring "IIS" -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-#>
+ ```
 
-  <#
+# module content : Set-OnypheAPIKey function
+ ```
 	.SYNOPSIS 
 	set and remove onyphe API key as global variable
 
@@ -187,10 +192,10 @@ using a simple powershell command and an internet access :-)
 	.EXAMPLE
 	C:\PS> Set-OnypheAPIKey -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 	C:\PS> Set-OnypheAPIKey -remove
-
- #>
+```
   
- <#
+ # module content : Export-OnypheInfoToFile function
+ ```
 	.SYNOPSIS 
 	Export psobject containing Onyphe info to files
 
@@ -213,4 +218,4 @@ using a simple powershell command and an internet access :-)
 	
 	.EXAMPLE
 	C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -inputobject $onypheresult
-#>
+```
