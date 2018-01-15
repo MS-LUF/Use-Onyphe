@@ -9,7 +9,7 @@ To request it : https://www.onyphe.io/login
 More info about available APIs :
 https://www.onyphe.io/documentation/api
 
-# install use-onyphe from PowerShell Gallery repository
+## install use-onyphe from PowerShell Gallery repository
 You can easily install it from powershell gallery repository
 https://www.powershellgallery.com/packages/Use-Onyphe/
 using a simple powershell command and an internet access :-) 
@@ -17,7 +17,7 @@ using a simple powershell command and an internet access :-)
 	Install-Module -Name Use-Onyphe
 ```
 
-# import module from PowerShell 
+## import module from PowerShell 
 ```
 	.SYNOPSIS 
 	commandline interface to use onyphe.io web service
@@ -30,8 +30,8 @@ using a simple powershell command and an internet access :-)
 	C:\PS> import-module use-onyphe.psm1
 ```
 
-# module content
-**Get-OnypheInfoFromCSV function
+## module content
+### Get-OnypheInfoFromCSV function
 ```
 	.SYNOPSIS 
 	Get IP information from onyphe.io web service using as an input a CSV file containing all information
@@ -84,7 +84,7 @@ using a simple powershell command and an internet access :-)
 	C:\PS> Get-onypheinfo -fromcsv .\input.csv -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -csvdelimiter ","
 ```
 
-**Get-OnypheInfo function
+### Get-OnypheInfo function
 ```
 	.SYNOPSIS 
 	main function/cmdlet - Get IP information from onyphe.io web service using dedicated subfunctions by searchtype
@@ -201,7 +201,7 @@ using a simple powershell command and an internet access :-)
 	C:\PS> Get-OnypheInfo -ip "8.8.8.8" -searchtype SynScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
-**Invoke-APIOnypheInetnum function
+### Invoke-APIOnypheInetnum function
 ```
 	.SYNOPSIS 
 	create several input for Invoke-Onyphe function and then call it to get the inetnum info from inetnum API
@@ -263,7 +263,7 @@ using a simple powershell command and an internet access :-)
 	C:\PS> Invoke-APIOnypheInetnum -IP 93.184.208.0 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
   
-**Invoke-APIOnyphePastries function
+### Invoke-APIOnyphePastries function
 ```
 	.SYNOPSIS 
 	create several input for Invoke-Onyphe function and then call it to get the pastries (pastebin) info from pastries API
@@ -324,7 +324,7 @@ using a simple powershell command and an internet access :-)
 	C:\PS> Invoke-APIOnyphePastries -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
-**Invoke-APIOnypheSynScan function
+### Invoke-APIOnypheSynScan function
 ```
  	.SYNOPSIS 
 	create several input for Invoke-Onyphe function and then call it to get the syn scan info from synscan API
@@ -386,7 +386,7 @@ using a simple powershell command and an internet access :-)
 	C:\PS> Invoke-APIOnypheSynScan -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
  ```
  
- **Invoke-APIOnypheReverse function
+ ### Invoke-APIOnypheReverse function
  ```
  	.SYNOPSIS 
 	create several input for Invoke-Onyphe function and then call it to get the reverse dns info from reverse API
@@ -447,7 +447,7 @@ using a simple powershell command and an internet access :-)
 	C:\PS> Invoke-APIOnypheReverse -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
  ```
  
- **Invoke-APIOnypheForward function
+ ### Invoke-APIOnypheForward function
  ```
   	.SYNOPSIS 
 	create several input for Invoke-Onyphe function and then call it to get the dns forwarder info from forward API
@@ -511,7 +511,7 @@ using a simple powershell command and an internet access :-)
 	C:\PS> Invoke-APIOnypheForward -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
-**Invoke-APIOnypheThreatlist function
+### Invoke-APIOnypheThreatlist function
 ```
  	.SYNOPSIS 
 	create several input for Invoke-Onyphe function and then call it to get the threat info from threatlist API
@@ -573,7 +573,7 @@ using a simple powershell command and an internet access :-)
 	C:\PS> Invoke-APIOnypheThreatlist -IP 178.250.241.22 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
  ```
  
- **Invoke-APIOnypheDataScan function
+ ### Invoke-APIOnypheDataScan function
  ```
  	.SYNOPSIS 
 	create several input for Invoke-Onyphe function and then call it to get the data scan info from datascan API
@@ -649,7 +649,7 @@ using a simple powershell command and an internet access :-)
 	C:\PS> Invoke-APIOnypheDataScan -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
  ```
  
- **Invoke-APIOnypheIP function
+ ### Invoke-APIOnypheIP function
  ```
  	.SYNOPSIS 
 	create several input for Invoke-Onyphe function and then call it to get all info for an IP from IP API
@@ -712,7 +712,7 @@ using a simple powershell command and an internet access :-)
 	C:\PS> Invoke-APIOnypheIP -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
-**Invoke-APIOnypheMyIP function
+### Invoke-APIOnypheMyIP function
 ```
  	.SYNOPSIS 
 	create several input for Invoke-Onyphe function and then call it to get current public ip from MyIP API
@@ -749,7 +749,7 @@ using a simple powershell command and an internet access :-)
 	C:\PS> Invoke-APIOnypheMyIP
  ```
  
- **Invoke-APIOnypheGeoloc function
+ ### Invoke-APIOnypheGeoloc function
  ```
  	.SYNOPSIS 
 	create several input for Invoke-Onyphe function and then call it to get the Geoloc info from Geoloc API
@@ -798,7 +798,7 @@ using a simple powershell command and an internet access :-)
 	C:\PS> Invoke-APIOnypheGeoloc -IP 8.8.8.8
 ```
  
-**Export-OnypheInfoToFile function
+### Export-OnypheInfoToFile function
 ```
  	.SYNOPSIS 
 	Export psobject containing Onyphe info to files
