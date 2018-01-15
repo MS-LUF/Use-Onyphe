@@ -1,103 +1,109 @@
 #
-# Manifeste de module pour le module « PSGet_Use-Onyphe »
+# Manifeste de module pour le module ï¿½ï¿½PSGet_Use-Onypheï¿½ï¿½
 #
-# Généré par : LCU
+# Gï¿½nï¿½rï¿½ parï¿½: LCU
 #
-# Généré le : 22/12/2017
+# Gï¿½nï¿½rï¿½ leï¿½: 22/12/2017
 #
 
 @{
 
-# Module de script ou fichier de module binaire associé à ce manifeste
+# Module de script ou fichier de module binaire associï¿½ ï¿½ ce manifeste
 RootModule = 'use-onyphe.psm1'
 
-# Numéro de version de ce module.
-ModuleVersion = '0.6'
+# Numï¿½ro de version de ce module.
+ModuleVersion = '0.7'
 
-# Éditions PS prises en charge
+# ï¿½ditions PS prises en charge
 # CompatiblePSEditions = @()
 
-# ID utilisé pour identifier de manière unique ce module
+# ID utilisï¿½ pour identifier de maniï¿½re unique ce module
 GUID = '85722cd6-f4a3-46b0-9d66-001f818e9a13'
 
 # Auteur de ce module
 Author = 'LCU'
 
-# Société ou fournisseur de ce module
+# Sociï¿½tï¿½ ou fournisseur de ce module
 CompanyName = 'lucas-cueff.com'
 
-# Déclaration de copyright pour ce module
+# Dï¿½claration de copyright pour ce module
 Copyright = '(c) 2017 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).'
 
-# Description de la fonctionnalité fournie par ce module
+# Description de la fonctionnalitï¿½ fournie par ce module
 Description = 'Add few cmdlets to use API from onyphe.io through PowerShell interface'
 
 # Version minimale du moteur Windows PowerShell requise par ce module
 PowerShellVersion = '4.0'
 
-# Nom de l'hôte Windows PowerShell requis par ce module
+# Nom de l'hï¿½te Windows PowerShell requis par ce module
 # PowerShellHostName = ''
 
-# Version minimale de l'hôte Windows PowerShell requise par ce module
+# Version minimale de l'hï¿½te Windows PowerShell requise par ce module
 # PowerShellHostVersion = ''
 
 # Version minimale du Microsoft .NET Framework requise par ce module. Cette configuration requise est valide uniquement pour PowerShell Desktop Edition.
 # DotNetFrameworkVersion = ''
 
-# Version minimale de l’environnement CLR (Common Language Runtime) requise par ce module. Cette configuration requise est valide uniquement pour PowerShell Desktop Edition.
+# Version minimale de lï¿½environnement CLR (Common Language Runtime) requise par ce module. Cette configuration requise est valide uniquement pour PowerShell Desktop Edition.
 # CLRVersion = ''
 
 # Architecture de processeur (None, X86, Amd64) requise par ce module
 # ProcessorArchitecture = ''
 
-# Modules qui doivent être importés dans l'environnement global préalablement à l'importation de ce module
+# Modules qui doivent ï¿½tre importï¿½s dans l'environnement global prï¿½alablement ï¿½ l'importation de ce module
 # RequiredModules = @()
 
-# Assemblys qui doivent être chargés préalablement à l'importation de ce module
+# Assemblys qui doivent ï¿½tre chargï¿½s prï¿½alablement ï¿½ l'importation de ce module
 # RequiredAssemblies = @()
 
-# Fichiers de script (.ps1) exécutés dans l’environnement de l’appelant préalablement à l’importation de ce module
+# Fichiers de script (.ps1) exï¿½cutï¿½s dans lï¿½environnement de lï¿½appelant prï¿½alablement ï¿½ lï¿½importation de ce module
 # ScriptsToProcess = @()
 
-# Fichiers de types (.ps1xml) à charger lors de l'importation de ce module
+# Fichiers de types (.ps1xml) ï¿½ charger lors de l'importation de ce module
 # TypesToProcess = @()
 
-# Fichiers de format (.ps1xml) à charger lors de l'importation de ce module
+# Fichiers de format (.ps1xml) ï¿½ charger lors de l'importation de ce module
 # FormatsToProcess = @()
 
-# Modules à importer en tant que modules imbriqués du module spécifié dans RootModule/ModuleToProcess
+# Modules ï¿½ importer en tant que modules imbriquï¿½s du module spï¿½cifiï¿½ dans RootModule/ModuleToProcess
 # NestedModules = @()
 
-# Fonctions à exporter à partir de ce module. Pour de meilleures performances, n’utilisez pas de caractères génériques et ne supprimez pas l’entrée. Utilisez un tableau vide si vous n’avez aucune fonction à exporter.
-FunctionsToExport = 'Set-OnypheAPIKey', 'Export-OnypheInfoToFile', 
-               'Get-OnypheInfoFromCSV', 'Invoke-WebOnypheRequest', 
-               'Get-ScriptDirectory'
+# Fonctions ï¿½ exporter ï¿½ partir de ce module. Pour de meilleures performances, nï¿½utilisez pas de caractï¿½res gï¿½nï¿½riques et ne supprimez pas lï¿½entrï¿½e. Utilisez un tableau vide si vous nï¿½avez aucune fonction ï¿½ exporter.
+FunctionsToExport = 'Get-OnypheInfo', 'Get-OnypheInfoFromCSV', 
+					 'Get-ScriptDirectory', 'Set-OnypheAPIKey', 
+					 'Export-OnypheInfoToFile', 'Invoke-APIOnypheDataScan',
+					 'Invoke-APIOnypheForward', 'Invoke-APIOnypheGeoloc',
+					 'Invoke-APIOnypheIP', 'Invoke-APIOnypheInetnum', 'Invoke-APIOnypheMyIP',
+					 'Invoke-APIOnyphePastries', 'Invoke-APIOnypheReverse',
+					 'Invoke-APIOnypheSynScan', 'Invoke-APIOnypheThreatlist',
+					 'Invoke-Onyphe' 
 
-# Applets de commande à exporter à partir de ce module. Pour de meilleures performances, n’utilisez pas de caractères génériques et ne supprimez pas l’entrée. Utilisez un tableau vide si vous n’avez aucune applet de commande à exporter.
+
+# Applets de commande ï¿½ exporter ï¿½ partir de ce module. Pour de meilleures performances, nï¿½utilisez pas de caractï¿½res gï¿½nï¿½riques et ne supprimez pas lï¿½entrï¿½e. Utilisez un tableau vide si vous nï¿½avez aucune applet de commande ï¿½ exporter.
 CmdletsToExport = @()
 
-# Variables à exporter à partir de ce module
+# Variables ï¿½ exporter ï¿½ partir de ce module
 # VariablesToExport = @()
 
-# Alias à exporter à partir de ce module. Pour de meilleures performances, n’utilisez pas de caractères génériques et ne supprimez pas l’entrée. Utilisez un tableau vide si vous n’avez aucun alias à exporter.
+# Alias ï¿½ exporter ï¿½ partir de ce module. Pour de meilleures performances, nï¿½utilisez pas de caractï¿½res gï¿½nï¿½riques et ne supprimez pas lï¿½entrï¿½e. Utilisez un tableau vide si vous nï¿½avez aucun alias ï¿½ exporter.
 AliasesToExport = @()
 
-# Ressources DSC à exporter depuis ce module
+# Ressources DSC ï¿½ exporter depuis ce module
 # DscResourcesToExport = @()
 
-# Liste de tous les modules empaquetés avec ce module
+# Liste de tous les modules empaquetï¿½s avec ce module
 # ModuleList = @()
 
-# Liste de tous les fichiers empaquetés avec ce module
+# Liste de tous les fichiers empaquetï¿½s avec ce module
 FileList = 'use-onyphe.psm1'
 
-# Données privées à transmettre au module spécifié dans RootModule/ModuleToProcess. Cela peut également inclure une table de hachage PSData avec des métadonnées de modules supplémentaires utilisées par PowerShell.
+# Donnï¿½es privï¿½es ï¿½ transmettre au module spï¿½cifiï¿½ dans RootModule/ModuleToProcess. Cela peut ï¿½galement inclure une table de hachage PSData avec des mï¿½tadonnï¿½es de modules supplï¿½mentaires utilisï¿½es par PowerShell.
 PrivateData = @{
 
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = @('onyphe.io API','onyphe.io','onyphe','onyphe API','Use-Onyphe - Onyphe.io API with PowerShell')
+        Tags = @('API','onyphe.io','onyphe','shodan','search','engine')
 
         # A URL to the license for this module.
         # LicenseUri = ''
@@ -121,7 +127,7 @@ PrivateData = @{
 # URI HelpInfo de ce module
 # HelpInfoURI = ''
 
-# Le préfixe par défaut des commandes a été exporté à partir de ce module. Remplacez le préfixe par défaut à l’aide d’Import-Module -Prefix.
+# Le prï¿½fixe par dï¿½faut des commandes a ï¿½tï¿½ exportï¿½ ï¿½ partir de ce module. Remplacez le prï¿½fixe par dï¿½faut ï¿½ lï¿½aide dï¿½Import-Module -Prefix.
 # DefaultCommandPrefix = ''
 
 }
