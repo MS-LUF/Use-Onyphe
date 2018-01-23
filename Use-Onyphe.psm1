@@ -1,7 +1,8 @@
 #
 # Created by: lucas.cueff[at]lucas-cueff.com
 #
-# v0.7 : 
+# v0.71 : 
+# - add new functions Get-OnypheUserInfo and Invoke-APIOnypheUser to manage new user API
 # - split Invoke-WebonypheRequest into several sub functions to simplify evolutions : Invoke-APIOnypheDataScan, Invoke-APIOnypheForward, Invoke-APIOnypheGeoloc, Invoke-APIOnypheIP, Invoke-APIOnypheInetnum, Invoke-APIOnypheMyIP, Invoke-APIOnyphePastries, Invoke-APIOnypheReverse, Invoke-APIOnypheSynScan, Invoke-APIOnypheThreatlist, Invoke-Onyphe
 # - remove multithreading feature
 # - correct data scan bug : api can be used with IP or datastring now
@@ -190,13 +191,17 @@ function Get-OnypheInfo {
 	.PARAMETER APIKey
 	-APIKey string{APIKEY}
 	set your APIKEY to be able to use Onyphe API.
+
+    .PARAMETER Wait
+	-Wait int{second}
+	wait for x second before sending the request to manage rate limiting restriction
 	
 	.OUTPUTS
 	TypeName: System.Management.Automation.PSCustomObject
 	
 	count            : 32
 	error            : 0
-	myip             : 86.246.69.187
+	myip             : 90.245.80.180
 	results          : {@{@category=geoloc; @timestamp=2017-12-20T13:43:12.000Z; @type=ip; asn=AS15169; city=; country=US;
 					   country_name=United States; geolocation=37.7510,-97.8220; ip=8.8.8.8; ipv6=false; latitude=37.7510;
 					   longitude=-97.8220; organization=Google LLC; subnet=8.8.0.0/19}, @{@category=inetnum;
@@ -317,6 +322,154 @@ function Get-OnypheInfo {
 		return Invoke-APIOnypheMyIP
 	}
 }
+
+function Get-OnypheUserInfo {
+	<#
+	 .SYNOPSIS 
+	 main function/cmdlet - Get user account information (rate limiting status, requests remaining in pool...) from onyphe.io web service
+ 
+	 .DESCRIPTION
+	 main function/cmdlet - Get user account information (rate limiting status, requests remaining in pool...) from onyphe.io web service
+	 send HTTP request to onyphe.io web service and convert back JSON information to a powershell custom object
+ 	 
+	 .PARAMETER APIKey
+	 -APIKey string{APIKEY}
+	 set your APIKEY to be able to use Onyphe API.
+
+     .PARAMETER Wait
+	 -Wait int{second}
+	 wait for x second before sending the request to manage rate limiting restriction
+	 
+	 .OUTPUTS
+	 TypeName: System.Management.Automation.PSCustomObject
+	 
+	Name             MemberType   Definition
+	----             ----------   ----------
+	Equals           Method       bool Equals(System.Object obj)
+	GetHashCode      Method       int GetHashCode()
+	GetType          Method       type GetType()
+	ToString         Method       string ToString()
+	cli-API_info     NoteProperty string[] cli-API_info=System.String[]
+	cli-API_input    NoteProperty string[] cli-API_input=System.String[]
+	cli-key_required NoteProperty bool[] cli-key_required=System.Boolean[]
+	cli-Request_Date NoteProperty datetime cli-Request_Date=23/01/2018 11:33:17
+	count            NoteProperty int count=1
+	error            NoteProperty int error=0
+	myip             NoteProperty string myip=85.10.100.250
+	results          NoteProperty Object[] results=System.Object[]
+	status           NoteProperty string status=ok
+	took             NoteProperty string took=0.001
+	total            NoteProperty int total=1
+
+	.EXAMPLE
+	get user account info for api key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx and set the api key
+	C:\PS> Get-OnypheUserInfo -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+	.EXAMPLE
+	get user account info for api key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx already set as global variable
+	C:\PS> Get-OnypheUserInfo
+ #>
+   [cmdletbinding()]
+   Param (
+   [parameter(Mandatory=$false)]
+	 [ValidateLength(40,40)]
+	 [string[]]$APIKey,
+   [parameter(Mandatory=$false)]
+	 [int]$wait
+   )
+	if ($wait) {start-sleep -s $wait}
+	if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+	return Invoke-APIOnypheUser
+ }
+
+function Invoke-APIOnypheUser {
+	<#
+	  .SYNOPSIS 
+	  create several input for Invoke-Onyphe function and then call it to get the user account info from user API
+  
+	  .DESCRIPTION
+	  create several input for Invoke-Onyphe function and then call it to get the user account info from user API
+	  	  
+	  .PARAMETER APIKEY
+	  -APIKey string{APIKEY}
+	  Set APIKEY as global variable.
+	  
+	  .OUTPUTS
+		 TypeName : System.Management.Automation.PSCustomObject
+
+	    Name             MemberType   Definition
+		----             ----------   ----------
+		Equals           Method       bool Equals(System.Object obj)
+		GetHashCode      Method       int GetHashCode()
+		GetType          Method       type GetType()
+		ToString         Method       string ToString()
+		cli-API_info     NoteProperty string[] cli-API_info=System.String[]
+		cli-API_input    NoteProperty string[] cli-API_input=System.String[]
+		cli-key_required NoteProperty bool[] cli-key_required=System.Boolean[]
+		cli-Request_Date NoteProperty datetime cli-Request_Date=23/01/2018 11:33:17
+		count            NoteProperty int count=1
+		error            NoteProperty int error=0
+		myip             NoteProperty string myip=90.5.90.101
+		results          NoteProperty Object[] results=System.Object[]
+		status           NoteProperty string status=ok
+		took             NoteProperty string took=0.001
+		total            NoteProperty int total=1
+  
+	  .EXAMPLE
+	  get user account info for api key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx and set the api key
+	  C:\PS> Invoke-APIOnypheUser -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+	  .EXAMPLE
+	  get user account info for api key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx already set as global variable
+	  C:\PS> Invoke-APIOnypheUser
+	  
+	#>
+	[cmdletbinding()]
+	Param ( 
+	[parameter(Mandatory=$false)]
+	  [ValidateLength(40,40)]
+	  [string[]]$APIKey
+	)
+	  Begin {
+		  $script:DateRequest = get-date
+		  if (!$global:OnypheAPIKey) {
+			  if (!$APIKEY) {
+				  if ($debug -or $verbose) {
+					  write-warning "incorrect parameter - Please provide an APIKey with -APIKEY parameter"
+				  }
+				  $errorvalue = [PSCustomObject]@{
+								  Count = 0
+								  error = ""
+								  myip = 0
+								  results = ''
+								  'cli-error_results' = "Please provide an APIKey with -APIKEY parameter"
+								  status = "ko"
+								  took = 0
+								  total = 0
+								  'cli-API_info' = $APIInfo
+								  'cli-API_input' = $APIInput
+								  'cli-key_required' = $APIKeyrequired
+								  'cli-Request_Date' = $script:DateRequest
+								  }
+			  } Else {
+				  Set-OnypheAPIKey -APIKEY $APIKey | out-null
+			  }
+		  }
+	  } Process {
+			  if ($errorvalue) {
+				  return $errorvalue
+			  } Else {
+				  $request = "user/?apikey=$($global:OnypheAPIKey)"
+				  $APIInfo = "user"
+				  $APIInput = "none"
+				  $APIKeyrequired = $true
+			  }
+	  } End {
+		  if (!$errorvalue) {
+			  return Invoke-Onyphe -request $request -APIInfo $APIInfo -APIInput $APIInput -APIKeyrequired $APIKeyrequired
+		  }
+	  }
+  }
 
 function Invoke-APIOnypheInetnum {
   <#
@@ -1636,4 +1789,4 @@ Function Set-OnypheAPIKey {
   }
 }
 
-Export-ModuleMember -Function Get-OnypheInfo, Get-OnypheInfoFromCSV, Get-ScriptDirectory, Set-OnypheAPIKey, Export-OnypheInfoToFile,Invoke-APIOnypheDataScan, Invoke-APIOnypheForward, Invoke-APIOnypheGeoloc, Invoke-APIOnypheIP, Invoke-APIOnypheInetnum, Invoke-APIOnypheMyIP, Invoke-APIOnyphePastries, Invoke-APIOnypheReverse, Invoke-APIOnypheSynScan, Invoke-APIOnypheThreatlist, Invoke-Onyphe
+Export-ModuleMember -Function Get-OnypheUserInfo, Invoke-APIOnypheUser, Get-OnypheInfo, Get-OnypheInfoFromCSV, Get-ScriptDirectory, Set-OnypheAPIKey, Export-OnypheInfoToFile,Invoke-APIOnypheDataScan, Invoke-APIOnypheForward, Invoke-APIOnypheGeoloc, Invoke-APIOnypheIP, Invoke-APIOnypheInetnum, Invoke-APIOnypheMyIP, Invoke-APIOnyphePastries, Invoke-APIOnypheReverse, Invoke-APIOnypheSynScan, Invoke-APIOnypheThreatlist, Invoke-Onyphe

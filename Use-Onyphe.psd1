@@ -12,7 +12,7 @@
 RootModule = 'use-onyphe.psm1'
 
 # Num�ro de version de ce module.
-ModuleVersion = '0.7'
+ModuleVersion = '0.71'
 
 # �ditions PS prises en charge
 # CompatiblePSEditions = @()
@@ -27,7 +27,7 @@ Author = 'LCU'
 CompanyName = 'lucas-cueff.com'
 
 # D�claration de copyright pour ce module
-Copyright = '(c) 2017 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).'
+Copyright = '(c) 2018 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).'
 
 # Description de la fonctionnalit� fournie par ce module
 Description = 'Add few cmdlets to use API from onyphe.io through PowerShell interface'
@@ -76,7 +76,7 @@ FunctionsToExport = 'Get-OnypheInfo', 'Get-OnypheInfoFromCSV',
 					 'Invoke-APIOnypheIP', 'Invoke-APIOnypheInetnum', 'Invoke-APIOnypheMyIP',
 					 'Invoke-APIOnyphePastries', 'Invoke-APIOnypheReverse',
 					 'Invoke-APIOnypheSynScan', 'Invoke-APIOnypheThreatlist',
-					 'Invoke-Onyphe' 
+					 'Invoke-Onyphe','Get-OnypheUserInfo', 'Invoke-APIOnypheUser'
 
 
 # Applets de commande � exporter � partir de ce module. Pour de meilleures performances, n�utilisez pas de caract�res g�n�riques et ne supprimez pas l�entr�e. Utilisez un tableau vide si vous n�avez aucune applet de commande � exporter.
@@ -131,4 +131,3 @@ PrivateData = @{
 # DefaultCommandPrefix = ''
 
 }
-
