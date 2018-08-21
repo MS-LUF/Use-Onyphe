@@ -12,7 +12,7 @@
 RootModule = 'use-onyphe.psm1'
 
 # Numero de version de ce module.
-ModuleVersion = '0.9'
+ModuleVersion = '0.91'
 
 # editions PS prises en charge
 # CompatiblePSEditions = @()

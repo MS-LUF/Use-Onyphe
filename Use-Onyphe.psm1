@@ -1,7 +1,7 @@
 #
 # Created by: lucas.cueff[at]lucas-cueff.com
 #
-# v0.90 : 
+# v0.91 : 
 # - manage new search APIs
 # - code refactoring
 # - fix file export for new categories and properties
