@@ -11,7 +11,8 @@ https://www.onyphe.io/documentation/api
 
 (c) 2018 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
 
-## Notes version (0.91)
+## Notes version (0.92)
+- add tag filter
 - manage new search APIs
 - code refactoring
 - fix file export for new categories and properties

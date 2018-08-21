@@ -12,7 +12,7 @@
 RootModule = 'use-onyphe.psm1'
 
 # Numero de version de ce module.
-ModuleVersion = '0.91'
+ModuleVersion = '0.92'
 
 # editions PS prises en charge
 # CompatiblePSEditions = @()
@@ -118,7 +118,7 @@ PrivateData = @{
         IconUri = 'https://www.onyphe.io/img/logo-solo.png'
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'manage new search APIs, code refactoring, fix file export for new categories and properties, manage proxy connection, manage API key storage with encryption in a config file, add paging feature on search and info functions'
+        ReleaseNotes = 'add tag filter, manage new search APIs, code refactoring, fix file export for new categories and properties, manage proxy connection, manage API key storage with encryption in a config file, add paging feature on search and info functions'
         # External dependent modules of this module
         # ExternalModuleDependencies = ''
 

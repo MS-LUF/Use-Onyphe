@@ -20,3 +20,4 @@ Search;;;pastries;ip:195.29.70.0/24
 Search;;;resolver;ip:124.108.0.0/16
 Search;;;sniffer;ip:14.164.0.0/14
 Search;;;onionscan;data:market
+Search;;;threatlist;tag:mirai

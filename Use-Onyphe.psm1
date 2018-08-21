@@ -1,13 +1,14 @@
 #
 # Created by: lucas.cueff[at]lucas-cueff.com
 #
-# v0.91 : 
+# v0.92 : 
 # - manage new search APIs
 # - code refactoring
 # - fix file export for new categories and properties
 # - manage proxy connection
 # - manage API key storage with encryption in a config file
 # - add paging feature on search and info functions
+# - add tag filter
 # Released on: 08/2018
 #
 #'(c) 2018 lucas-cueff.com - Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).'
@@ -1777,7 +1778,7 @@ function Export-OnypheInfoToFile {
 			$filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
 		}
 		'inetnum' {
-			$filteredobj = $result.results | where-object {$_.'@category' -eq 'inetnum'} | sort-object -property seen_date | Select-Object *,@{Name='cli-information';Expression={[string]::join(",",($_.information))}} -ExcludeProperty information
+			$filteredobj = $result.results | where-object {$_.'@category' -eq 'inetnum'} | sort-object -property seen_date | Select-Object *,@{Name='cli-information';Expression={[string]::join(",",($_.information))}},@{Name='cli-tag';Expression={[string]::join(",",($_.tag))}} -ExcludeProperty tag,information
 			$tempfilename = join-path $tempfolder "$($ticks)_$($ip)_inetnum.csv"
 			$filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
 		}
@@ -1787,7 +1788,7 @@ function Export-OnypheInfoToFile {
 			$filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
 		}
 		'resolver'{
-			$filteredobj = $result.results | where-object {$_.'@category' -eq 'resolver'} | sort-object -property seen_date | Select-Object *,@{Name='cli-subdomains';Expression={[string]::join(",",($_.subdomains))}} -ExcludeProperty subdomains
+			$filteredobj = $result.results | where-object {$_.'@category' -eq 'resolver'} | sort-object -property seen_date | Select-Object *,@{Name='cli-subdomains';Expression={[string]::join(",",($_.subdomains))}},@{Name='cli-tag';Expression={[string]::join(",",($_.tag))}} -ExcludeProperty subdomains,tag
 			$tempfilename = join-path $tempfolder "$($ticks)_$($ip)_resolver.csv"
 			$filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
 		}
@@ -1797,7 +1798,7 @@ function Export-OnypheInfoToFile {
 			$filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
 		}
 		'pastries' {
-			$filteredobj = $result.results | where-object {$_.'@category' -eq 'pastries'} | sort-object -property seen_date | Select-Object *,@{Name='cli-tld';Expression={[string]::join(",",($_.tld))}},@{Name='cli-url';Expression={[string]::join(",",($_.url))}},@{Name='cli-subdomains';Expression={[string]::join(",",($_.subdomains))}},@{Name='cli-scheme';Expression={[string]::join(",",($_.scheme))}},@{Name='cli-Key';Expression={"https://pastebin.com/$($_.key)"}},@{Name='cli-domain';Expression={[string]::join(",",($_.domain))}},@{Name='cli-file';Expression={[string]::join(",",($_.file))}},@{Name='cli-host';Expression={[string]::join(",",($_.host))}},@{Name='cli-hostname';Expression={[string]::join(",",($_.hostname))}},@{Name='cli-ip';Expression={[string]::join(",",($_.ip))}} -ExcludeProperty ip,hostname,domain,scheme,subdomains,url,tld,host,file,content
+			$filteredobj = $result.results | where-object {$_.'@category' -eq 'pastries'} | sort-object -property seen_date | Select-Object *,@{Name='cli-tld';Expression={[string]::join(",",($_.tld))}},@{Name='cli-url';Expression={[string]::join(",",($_.url))}},@{Name='cli-subdomains';Expression={[string]::join(",",($_.subdomains))}},@{Name='cli-scheme';Expression={[string]::join(",",($_.scheme))}},@{Name='cli-Key';Expression={"https://pastebin.com/$($_.key)"}},@{Name='cli-domain';Expression={[string]::join(",",($_.domain))}},@{Name='cli-file';Expression={[string]::join(",",($_.file))}},@{Name='cli-host';Expression={[string]::join(",",($_.host))}},@{Name='cli-hostname';Expression={[string]::join(",",($_.hostname))}},@{Name='cli-ip';Expression={[string]::join(",",($_.ip))}},@{Name='cli-tag';Expression={[string]::join(",",($_.tag))}} -ExcludeProperty ip,hostname,domain,scheme,subdomains,url,tld,host,file,content,tag
 			$filteredobjfull = $result.results | where-object {$_.'@category' -eq 'pastries'} | sort-object -property seen_date
 			$tempfilename = join-path $tempfolder "$($ticks)_$($ip)_Pastries.csv"
 			$filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter

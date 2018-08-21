@@ -79,6 +79,7 @@
 	<filter>app.mongodb.productversion</filter>
 	<filter>app.mongodb.name</filter>
 	<filter>app.dns.versionbind</filter>
+	<filter>tag</filter>
 	<api>myip</api>
 	<api>geoloc</api>
 	<api>user</api>
