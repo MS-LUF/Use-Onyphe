@@ -20,6 +20,9 @@ https://www.onyphe.io/documentation/api
 - manage API key storage with encryption in a config file
 - add paging feature on search and info functions
 
+## How-to
+a new how-to is now available here : https://github.com/MS-LUF/Use-Onyphe/blob/master/README.md
+
 ## install use-onyphe from PowerShell Gallery repository
 You can easily install it from powershell gallery repository
 https://www.powershellgallery.com/packages/Use-Onyphe/
