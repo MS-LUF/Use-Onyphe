@@ -12,7 +12,7 @@
 RootModule = 'use-onyphe.psm1'
 
 # Numero de version de ce module.
-ModuleVersion = '0.92'
+ModuleVersion = '0.93'
 
 # editions PS prises en charge
 # CompatiblePSEditions = @()
@@ -79,7 +79,7 @@ FunctionsToExport = 'Get-OnypheInfo', 'Get-OnypheInfoFromCSV',
                      'Invoke-Onyphe','Get-OnypheUserInfo', 'Invoke-APIOnypheUser',
                      'Get-OnypheSearchFilters', 'Invoke-APIOnypheSearch', 'Get-OnypheSearchCategories',
                      'Search-OnypheInfo', 'Get-OnypheAPIName', 'Import-OnypheEncryptedIKey',
-                     'Set-OnypheProxy'
+                     'Set-OnypheProxy','Get-OnypheStatsFromObject','Get-OnypheCliFacets'
 
 
 # Applets de commande a exporter a partir de ce module. Pour de meilleures performances, neutilisez pas de caracteres generiques et ne supprimez pas l entree. Utilisez un tableau vide si vous neavez aucune applet de commande e exporter.
@@ -118,7 +118,7 @@ PrivateData = @{
         IconUri = 'https://www.onyphe.io/img/logo-solo.png'
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'add tag filter, manage new search APIs, code refactoring, fix file export for new categories and properties, manage proxy connection, manage API key storage with encryption in a config file, add paging feature on search and info functions'
+        ReleaseNotes = 'v0.93 add local stat function'
         # External dependent modules of this module
         # ExternalModuleDependencies = ''
 

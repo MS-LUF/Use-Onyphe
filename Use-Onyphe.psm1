@@ -9,6 +9,8 @@
 # - manage API key storage with encryption in a config file
 # - add paging feature on search and info functions
 # - add tag filter
+# v0.93 : 
+# - add local stat function
 # Released on: 08/2018
 #
 #'(c) 2018 lucas-cueff.com - Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).'
@@ -24,6 +26,144 @@
 	C:\PS> import-module use-onyphe.psm1
 #>
 
+function Get-OnypheStatsFromObject {
+ <#
+	.SYNOPSIS 
+	Get Some stats (count, total, min, max, average) for one or multiple properties of a onyphe result powershell object
+
+	.DESCRIPTION
+	Get Some stats (count, total, min, max, average) for one or multiple properties of a onyphe result powershell object
+	
+	.PARAMETER inputobject
+	-inputobject PSCustomObject{Onyphe result PSCustomObject}
+	Onyphe object used for the stat
+	
+	.PARAMETER AdvancedFacets
+	-AdvancedFacets ARRAY{list of onyphe objects' properties}
+	Onyphe result object's property requested for the stat (results = on object per property requested)
+
+	.PARAMETER Facets
+	-Facets string{onyphe objects' property}
+	Onyphe result object's property requested for the stat
+	
+	.OUTPUTS
+   	TypeName : System.Management.Automation.PSCustomObject
+
+	Name        MemberType   Definition
+	----        ----------   ----------
+	Equals      Method       bool Equals(System.Object obj)
+	GetHashCode Method       int GetHashCode()
+	GetType     Method       type GetType()
+	ToString    Method       string ToString()
+	Average     NoteProperty double Average=1
+	Count       NoteProperty int Count=10
+	Max         NoteProperty double Max=1
+	Min         NoteProperty double Min=1
+	Stats       NoteProperty Object[] Stats=System.Object[]
+	Sum         NoteProperty double Sum=10
+		
+	.EXAMPLE
+	Search SynScan info and request stats for 'ip','port','tag' and 'organization' properties
+	C:\PS> Search-OnypheInfo -AdvancedSearch @('country:FR','port:23','os:Linux') -SearchType synscan | Get-OnypheStatsFromObject -AdvancedFacets @('ip','port','tag','organization')
+
+	.EXAMPLE
+	Search SynScan info and request stats for 'ip' property
+	C:\PS> $onypheobj = Search-OnypheInfo -AdvancedSearch @('country:FR','port:23','os:Linux') -SearchType synscan
+	C:\PS> Get-OnypheStatsFromObject -Facets 'ip' -inputobject $onypheobj
+#>
+	[cmdletbinding()]
+	Param (
+		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+		[ValidateScript({(($_ | Get-Member | Select-Object -ExpandProperty TypeName -Unique) -eq 'System.Management.Automation.PSCustomObject')})]
+			$inputobject,
+		[parameter(Mandatory=$false)] 
+		[ValidateNotNullOrEmpty()]
+			[Array]$AdvancedFacets
+	)
+	DynamicParam
+	{		
+		$ParameterNameFilter = 'Facets'
+		$RuntimeParameterDictionary = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
+		$AttributeCollection2 = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
+		$ParameterAttribute2 = New-Object System.Management.Automation.ParameterAttribute
+		$ParameterAttribute2.ValueFromPipeline = $false
+		$ParameterAttribute2.ValueFromPipelineByPropertyName = $false
+		$ParameterAttribute2.Mandatory = $false
+		#$ParameterAttribute2.Position = 2
+		$AttributeCollection2.Add($ParameterAttribute2)
+		$arrSet =  Get-OnypheCliFacets
+		$ValidateSetAttribute2 = New-Object System.Management.Automation.ValidateSetAttribute($arrSet)
+		$AttributeCollection2.Add($ValidateSetAttribute2)
+		$RuntimeParameter2 = New-Object System.Management.Automation.RuntimeDefinedParameter($ParameterNameFilter, [string], $AttributeCollection2)
+		$RuntimeParameterDictionary.Add($ParameterNameFilter, $RuntimeParameter2)
+		
+		return $RuntimeParameterDictionary
+	}
+	Begin {
+		$Facets = $PsBoundParameters[$ParameterNameFilter]
+		if (!$Facets -and !$AdvancedFacets) {
+			Write-Verbose -Message "both AdvancedFacets and Facets options are empty, please use at least one of this parameter to set the facets to be used for the stats"
+			throw "Please provide a valid facets option"
+		}
+	} Process {
+		$script:results = @()
+		$script:TemplateFacetObject = new-object psobject
+		$TemplateFacetObject | Add-Member -MemberType NoteProperty -Name 'Onyphe-Facet' $null
+		$TemplateFacetObject | Add-Member -MemberType NoteProperty -Name 'Onyphe-Property-value' $null
+		$TemplateFacetObject | Add-Member -MemberType NoteProperty -Name 'Onyphe-Property-Count' $null
+		If ($AdvancedFacets) {
+			foreach ($facet in $AdvancedFacets) {
+				$tmp = $inputobject.results."$($Facet)" | sort-object | get-unique
+				$script:AllFacetObjects = @()
+				foreach ($object in $tmp) {
+					$tmpobj = $script:TemplateFacetObject | Select-Object *
+					$tmpobj.'Onyphe-Property-value' = $object
+					if (($inputobject.results | Where-Object {$_."$($Facet)" -eq "$($object)"}).count) {
+						$tmpobj.'Onyphe-Property-Count' = ($inputobject.results | Where-Object {$_."$($Facet)" -eq "$($object)"}).count
+					} Else {
+						$tmpobj.'Onyphe-Property-Count' = 1
+					}
+					$tmpobj.'Onyphe-Facet' = $facet
+					$script:AllFacetObjects += $tmpobj
+				}
+				$tmpmeasureobj = $script:AllFacetObjects.'Onyphe-Property-Count' | measure-object -Sum -Maximum -Minimum -Average
+				$script:results += New-Object psobject -Property @{
+					Stats = $script:AllFacetObjects
+					Count = $tmpmeasureobj.Count
+					Sum = $tmpmeasureobj.Sum
+					Min = $tmpmeasureobj.Minimum
+					Max = $tmpmeasureobj.Maximum
+					Average = $tmpmeasureobj.Average
+				}
+			}
+		} Else {
+			$script:AllFacetObjects = @()
+			$tmp = $inputobject.results."$($Facets)" | sort-object | get-unique
+			foreach ($object in $tmp) {
+				$tmpobj = $script:TemplateFacetObject | Select-Object *
+				$tmpobj.'Onyphe-Property-value' = $object
+				if (($inputobject.results | Where-Object {$_."$($Facets)" -eq "$($object)"}).count) {
+					$tmpobj.'Onyphe-Property-Count' = ($inputobject.results | Where-Object {$_."$($Facets)" -eq "$($object)"}).count
+				} Else {
+					$tmpobj.'Onyphe-Property-Count' = 1
+				}
+				$tmpobj.'Onyphe-Facet' = $Facets
+				$script:AllFacetObjects += $tmpobj
+			}
+			$tmpmeasureobj = $script:AllFacetObjects.'Onyphe-Property-Count' | measure-object -Sum -Maximum -Minimum -Average
+			$script:results = New-Object psobject -Property @{
+				Stats = $script:AllFacetObjects
+				Count = $tmpmeasureobj.Count
+				Sum = $tmpmeasureobj.Sum
+				Min = $tmpmeasureobj.Minimum
+				Max = $tmpmeasureobj.Maximum
+				Average = $tmpmeasureobj.Average
+			}
+		}
+	} End {
+		return $results
+	}
+}
 function Get-OnypheInfoFromCSV {
  <#
 	.SYNOPSIS 
@@ -1756,7 +1896,7 @@ function Export-OnypheInfoToFile {
   [ValidateScript({test-path "$($_)"})]
 	$tofolder,
   [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
-  [ValidateScript({(($_ | Get-Member | Select-Object -ExpandProperty TypeName -Unique) -eq 'System.Management.Automation.PSCustomObject') -or (($_ | Get-Member | Select-Object -ExpandProperty TypeName -Unique) -eq 'Selected.RSJob')})]
+  [ValidateScript({(($_ | Get-Member | Select-Object -ExpandProperty TypeName -Unique) -eq 'System.Management.Automation.PSCustomObject')})]
 	$inputobject,
   [parameter(Mandatory=$false)]
     $csvdelimiter
@@ -2058,6 +2198,28 @@ Function Get-OnypheSearchCategories {
 	  }
   }
 
+  Function Get-OnypheCliFacets {
+	<#
+	  .SYNOPSIS 
+	  Get facets available for stats on local Onyphe PS Object
+  
+	  .DESCRIPTION
+	  Get facets available for stats on local Onyphe PS Object
+	  
+	  .OUTPUTS
+	  facets as string
+	  
+	  .EXAMPLE
+	  Get facets available for stats on local Onyphe PS Object
+	  C:\PS> Get-OnypheCliFacets
+	#>
+	  $XMLFilePath = join-path (Get-ScriptDirectory) "Onyphe-Data-Model.xml"
+	  if (test-path $XMLFilePath) {
+		  [XML]$SearchFilters = get-content $XMLFilePath
+		  return $SearchFilters.'use-onyphe'.'data-model'.'cli-facet'
+	  }
+  }
+
   Function Get-OnypheAPIName {
 	<#
 	  .SYNOPSIS 
@@ -2336,4 +2498,4 @@ Function Invoke-APIOnypheSearch {
 	}
 }
 
-Export-ModuleMember -Function Set-OnypheProxy, Import-OnypheEncryptedIKey, Get-OnypheAPIName, Invoke-APIOnypheSearch, Get-OnypheSearchCategories, Get-OnypheSearchFilters, Get-OnypheUserInfo, Invoke-APIOnypheUser, Search-OnypheInfo, Get-OnypheInfo, Get-OnypheInfoFromCSV, Get-ScriptDirectory, Set-OnypheAPIKey, Export-OnypheInfoToFile,Invoke-APIOnypheDataScan, Invoke-APIOnypheForward, Invoke-APIOnypheGeoloc, Invoke-APIOnypheIP, Invoke-APIOnypheInetnum, Invoke-APIOnypheMyIP, Invoke-APIOnyphePastries, Invoke-APIOnypheReverse, Invoke-APIOnypheSynScan, Invoke-APIOnypheThreatlist, Invoke-Onyphe
+Export-ModuleMember -Function Get-OnypheCliFacets, Get-OnypheStatsFromObject, Set-OnypheProxy, Import-OnypheEncryptedIKey, Get-OnypheAPIName, Invoke-APIOnypheSearch, Get-OnypheSearchCategories, Get-OnypheSearchFilters, Get-OnypheUserInfo, Invoke-APIOnypheUser, Search-OnypheInfo, Get-OnypheInfo, Get-OnypheInfoFromCSV, Get-ScriptDirectory, Set-OnypheAPIKey, Export-OnypheInfoToFile,Invoke-APIOnypheDataScan, Invoke-APIOnypheForward, Invoke-APIOnypheGeoloc, Invoke-APIOnypheIP, Invoke-APIOnypheInetnum, Invoke-APIOnypheMyIP, Invoke-APIOnyphePastries, Invoke-APIOnypheReverse, Invoke-APIOnypheSynScan, Invoke-APIOnypheThreatlist, Invoke-Onyphe
