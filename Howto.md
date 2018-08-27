@@ -384,3 +384,41 @@ thank you, let me check... it seems the port is now closed... but need some inve
 
 Still easy, isn't it ;-)
 
+### Example 3
+Well, thanks onyphe but I am not very confortable with powershell and I have quite simple needs. Indeed, I am not a technical guy more a funtionnal one and I would like to do some simple stats related to several search.
+Starting v0.93 of Use-Onyphe module, a new function is now available "Get-OnypheStatsFromObject" that can do several simple stuff for you :-) you can do some basic stats (count, total, average, min, max) on all properties of Onyphe results based on Powershell Onyphe result object.
+
+For instance, let's take a CSO from Citrix company, he wants to have, everyweek, a quick overview of all opened ports regarding his organzation to update his security dashboard.
+
+First, retrieve all the results avaialable (all synscan objects linked to citrix organization) :
+```
+    C:\PS>$script:AllResults = @()
+    C:\PS>for ($i=1;$i -le ([int](Search-OnypheInfo -AdvancedSearch @('organization:Citrix') -SearchType synscan).max_page);$i++) {$script:AllResults += Search-OnypheInfo -AdvancedSearch @('organization:Citrix') -SearchType synscan -page $i -wait 3}
+```
+Then, do the stats 
+```
+    C:\PS>Get-OnypheStatsFromObject -Facets port -inputobject $AllResults
+
+    Sum     : 420
+    Count   : 5
+    Average : 84
+    Min     : 2
+    Max     : 269
+    Stats   : {@{Onyphe-Facet=port; Onyphe-Property-value=25; Onyphe-Property-Count=20}, @{Onyphe-Facet=port;
+            Onyphe-Property-value=443; Onyphe-Property-Count=269}, @{Onyphe-Facet=port; Onyphe-Property-value=53;
+            Onyphe-Property-Count=7}, @{Onyphe-Facet=port; Onyphe-Property-value=80; Onyphe-Property-Count=122}...}
+```
+420 objets found, 5 differents port opened, one port is opened 2 times (min), one port is opened 269 times (max)
+
+If you want to have the results by port, it's also simple, we just have to open property 'stats' of the object :
+```
+    C:\PS>(Get-OnypheStatsFromObject -Facets port -inputobject $AllResults).Stats
+
+    Onyphe-Facet Onyphe-Property-value Onyphe-Property-Count
+    ------------ --------------------- ---------------------
+    port         25                                       20
+    port         443                                     269
+    port         53                                        7
+    port         80                                      122
+    port         8080                                      2
+```
