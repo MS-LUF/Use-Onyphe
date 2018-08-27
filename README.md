@@ -11,6 +11,9 @@ https://www.onyphe.io/documentation/api
 
 (c) 2018 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
 
+## Notes version (0.93)
+- add statistics function
+
 ## Notes version (0.92)
 - add tag filter
 - manage new search APIs
@@ -38,13 +41,58 @@ using a simple powershell command and an internet access :-)
 
 	.DESCRIPTION
 	use-onyphe.psm1 module provides a commandline interface to onyphe.io web service.
-	Require PoshRSJob PowerShell module to use multithreading option of get-onypheinfo function.
 	
 	.EXAMPLE
 	C:\PS> import-module use-onyphe.psm1
 ```
 
 ## module content
+### Get-OnypheStatsFromObject function
+```
+	.SYNOPSIS 
+	Get Some stats (count, total, min, max, average) for one or multiple properties of a onyphe result powershell object
+
+	.DESCRIPTION
+	Get Some stats (count, total, min, max, average) for one or multiple properties of a onyphe result powershell object
+	
+	.PARAMETER inputobject
+	-inputobject PSCustomObject{Onyphe result PSCustomObject}
+	Onyphe object used for the stat
+	
+	.PARAMETER AdvancedFacets
+	-AdvancedFacets ARRAY{list of onyphe objects' properties}
+	Onyphe result object's property requested for the stat (results = on object per property requested)
+
+	.PARAMETER Facets
+	-Facets string{onyphe objects' property}
+	Onyphe result object's property requested for the stat
+	
+	.OUTPUTS
+   	TypeName : System.Management.Automation.PSCustomObject
+
+	Name        MemberType   Definition
+	----        ----------   ----------
+	Equals      Method       bool Equals(System.Object obj)
+	GetHashCode Method       int GetHashCode()
+	GetType     Method       type GetType()
+	ToString    Method       string ToString()
+	Average     NoteProperty double Average=1
+	Count       NoteProperty int Count=10
+	Max         NoteProperty double Max=1
+	Min         NoteProperty double Min=1
+	Stats       NoteProperty Object[] Stats=System.Object[]
+	Sum         NoteProperty double Sum=10
+		
+	.EXAMPLE
+	Search SynScan info and request stats for 'ip','port','tag' and 'organization' properties
+	C:\PS> Search-OnypheInfo -AdvancedSearch @('country:FR','port:23','os:Linux') -SearchType synscan | Get-OnypheStatsFromObject -AdvancedFacets @('ip','port','tag','organization')
+
+	.EXAMPLE
+	Search SynScan info and request stats for 'ip' property
+	C:\PS> $onypheobj = Search-OnypheInfo -AdvancedSearch @('country:FR','port:23','os:Linux') -SearchType synscan
+	C:\PS> Get-OnypheStatsFromObject -Facets 'ip' -inputobject $onypheobj
+```
+
 ### Get-OnypheInfoFromCSV function
 ```
 	.SYNOPSIS 
