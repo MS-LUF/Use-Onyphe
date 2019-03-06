@@ -53,7 +53,7 @@ using a simple powershell command and an internet access :-)
 ```
 
 ## module content
-documentation in markdown available here : https://github.com/MS-LUF/Use-Onyphe/docs
+documentation in markdown available here : https://github.com/MS-LUF/Use-Onyphe/tree/master/docs
 ### function
 - Export-OnypheInfoToFile
 - Get-OnypheAPIName
