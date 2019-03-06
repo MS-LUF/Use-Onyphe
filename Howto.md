@@ -64,9 +64,9 @@ sample output :
 ```
 For the rest, each key of the json output is converted into a powershell object property. the type of the property could be a string,integer,array,hash table
 
-object example for request Get-OnypheInfo -ip 9.9.9.9 (all info available for IP 9.9.9.9) :
+object example for request Get-OnypheInfo -searchvalue 9.9.9.9 (all info available for IP 9.9.9.9) :
 ```
-    C:\PS>Get-OnypheInfo -ip 9.9.9.9
+    C:\PS>Get-OnypheInfo -searchvalue 9.9.9.9 -searchtype ip
 
     count            : 41
     error            : 0
@@ -88,7 +88,7 @@ object example for request Get-OnypheInfo -ip 9.9.9.9 (all info available for IP
 ```
 all the results are hosted in the property "results", to open it directly :
 ```
-    C:\PS>(Get-OnypheInfo -ip 9.9.9.9).results
+    C:\PS>(Get-OnypheInfo -searchvalue 9.9.9.9 -searchtype ip).results
 
     ...(last 3 entries)
     @category    : datascan
@@ -132,7 +132,7 @@ all the results are hosted in the property "results", to open it directly :
 ```
 If you look at the type of "results" property you will see it's basically an array of other powershell objects
 ```
-    C:\PS>(Get-OnypheInfo -ip 9.9.9.9).results | get-member
+    C:\PS>(Get-OnypheInfo -searchvalue 9.9.9.9 -searchtype ip).results | get-member
 
     TypeName : System.Management.Automation.PSCustomObject
 
@@ -162,7 +162,7 @@ If you look at the type of "results" property you will see it's basically an arr
 you can pipe data to functions :-)
 for instance Get-OnypheInfo function will accept string as input for IP parameter
 ```
-    C:\PS>"9.9.9.9" | Get-OnypheInfo
+    C:\PS>"9.9.9.9" | Get-OnypheInfo -searchtype ip
 ```
 Search-OnypheInfo function will accept string as input for SimpleSearchValue parameter
 ```
@@ -170,7 +170,7 @@ Search-OnypheInfo function will accept string as input for SimpleSearchValue par
 ```
 you can use the "verbose" parameter to show several useful information (like full url requested etc...)
 ```
-    C:\PS>"9.9.9.9" | Get-OnypheInfo -verbose
+    C:\PS>"9.9.9.9" | -searchtype ip -verbose
 ```
 sample command line output :
 ```
@@ -180,7 +180,7 @@ sample command line output :
 ```
 if you don't want to store your API key and don't set it as global variable, you can use the parameter "APIKey" followed by your APIkey protected with double quotes on the main functions :
 ```
-    C:\PS>Get-OnypheInfo -IP "9.9.9.9" -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    C:\PS>Get-OnypheInfo -searchtype ip -searchvalue "9.9.9.9" -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
 ## Help on cmdlets / functions
@@ -203,7 +203,7 @@ API MyIP : return your client public IP address
 ```
 API Geoloc : Return geolocation * information for the given IPv{4,6} address
 ```
-    C:\PS>Get-OnypheInfo -IP 9.9.9.9 -searchtype Geoloc
+    C:\PS>Get-OnypheInfo -Searchvalue 9.9.9.9 -searchtype Geoloc
 ```
 API User : Return information about your user account
 ```
@@ -211,38 +211,54 @@ API User : Return information about your user account
 ```
 API IP : Return a summary of all information
 ```
-    C:\PS>Get-OnypheInfo -IP 93.184.216.34
+    C:\PS>Get-OnypheInfo -searchtype ip -searchvalue 93.184.216.34
 ```
 API Inetnum : Return inetnum information
 ```
-    C:\PS>Get-OnypheInfo -IP 93.184.208.1 -searchtype Inetnum
+    C:\PS>Get-OnypheInfo -searchvalue 93.184.208.1 -searchtype Inetnum
 ```
 API Threatlist : Return threatlist information
 ```
-    C:\PS>Get-OnypheInfo -IP 206.81.18.195 -searchtype threatlist
+    C:\PS>Get-OnypheInfo -searchvalue 206.81.18.195 -searchtype threatlist
 ```
 API Pastries : Return pastries information
 ```
-    C:\PS>Get-OnypheInfo -IP 93.184.216.34 -searchtype pastries
+    C:\PS>Get-OnypheInfo -searchvalue 93.184.216.34 -searchtype pastries
 ```
 API Synscan : Return synscan information
 ```
-    C:\PS>Get-OnypheInfo -IP 107.164.81.7 -searchtype SynScan
+    C:\PS>Get-OnypheInfo -searchvalue 107.164.81.7 -searchtype SynScan
 ```
 API Datascan : Return datascan information
 ```
-    C:\PS>Get-OnypheInfo -IP 107.164.81.7 -searchtype DataScan
+    C:\PS>Get-OnypheInfo -searchvalue 107.164.81.7 -searchtype DataScan
 ```
 ```
-    C:\PS>Get-OnypheInfo -DataScanString IIS -searchtype DataScan
+    C:\PS>Get-OnypheInfo -searchvalue IIS -searchtype DataScan
 ```
 API Reverse : Return reverse information
 ```
-    C:\PS>Get-OnypheInfo -IP 182.59.164.193 -searchtype Reverse
+    C:\PS>Get-OnypheInfo -searchvalue 182.59.164.193 -searchtype Reverse
 ```
 API Forward : Return forward information
 ```
-    C:\PS>Get-OnypheInfo -IP 2.22.52.73 -searchtype Reverse
+    C:\PS>Get-OnypheInfo -searchvalue 2.22.52.73 -searchtype Reverse
+```
+API CTL : Return CTL (Certificate) information
+```
+    C:\PS>Get-OnypheInfo -searchvalue fnac.com -searchtype ctl
+```
+API md5 : Return information linked to a onyphe hash
+```
+    C:\PS>Get-OnypheInfo -searchvalue 7a1f20cae067b75a52bc024b83ee4667 -searchtype md5
+```
+API sniffer : Return ip history information
+```
+    C:\PS>Get-OnypheInfo -searchvalue 8.8.8.8 -searchtype sniffer
+```
+API onionscan : Return information about an onion url
+```
+    C:\PS>Get-OnypheInfo -searchvalue mh7mkfvezts5j6yu.onion -searchtype onionscan
 ```
 API Search/DataScan : Return datascan information
 ```
@@ -281,6 +297,10 @@ API Search/sniffer : Return sniffer information
 API Search/onionscan : Return onionscan information
 ```
     C:\PS>Search-OnypheInfo -SimpleSearchValue market -SimpleSearchFilter data -SearchType onionscan
+```
+API Search/ctl : Return ctl information
+```
+    C:\PS>Search-OnypheInfo -SimpleSearchValue vpn -SimpleSearchFilter host -SearchType ctl
 ```
 
 ## paging and results
