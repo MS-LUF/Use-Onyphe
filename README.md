@@ -9,7 +9,7 @@ To request it : https://www.onyphe.io/login
 More info about available APIs :
 https://www.onyphe.io/documentation/api
 
-(c) 2018 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
+(c) 2018-2019 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
 
 ## Notes version (0.94) :
 - manage new apis (ctl, sniffer, onionscan, md5)
