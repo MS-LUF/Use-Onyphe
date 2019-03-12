@@ -2,6 +2,100 @@
 <helpItems schema="maml" xmlns="http://msh">
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
     <command:details>
+      <command:name>Export-OnypheDataShot</command:name>
+      <command:verb>Export</command:verb>
+      <command:noun>OnypheDataShot</command:noun>
+      <maml:description>
+        <maml:para>Export encoded base64 jpg file from a datashot category object</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Export encoded base64 jpg file from a datashot category object</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Export-OnypheDataShot</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+          <maml:name>tofolder</maml:name>
+          <maml:Description>
+            <maml:para>{{Fill tofolder Description}}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
+          <dev:type>
+            <maml:name>Object</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="2" aliases="none">
+          <maml:name>inputobject</maml:name>
+          <maml:Description>
+            <maml:para>{{Fill inputobject Description}}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
+          <dev:type>
+            <maml:name>Array</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+        <maml:name>tofolder</maml:name>
+        <maml:Description>
+          <maml:para>{{Fill tofolder Description}}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
+        <dev:type>
+          <maml:name>Object</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="2" aliases="none">
+        <maml:name>inputobject</maml:name>
+        <maml:Description>
+          <maml:para>{{Fill inputobject Description}}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
+        <dev:type>
+          <maml:name>Array</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>jpg file</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>Export all screenshots available in powershell object $temp into C:\temp folder</dev:code>
+        <dev:remarks>
+          <maml:para>C:\PS&gt; Export-OnypheDataShot -tofolder C:\temp -inputobject $temp</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
       <command:name>Export-OnypheInfoToFile</command:name>
       <command:verb>Export</command:verb>
       <command:noun>OnypheInfoToFile</command:noun>
@@ -32,9 +126,9 @@
           <maml:Description>
             <maml:para>-inputobject $obj{output of Get-OnypheInfo or Get-OnypheInfoFromCSV functions} look for information about my public IP</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
           <dev:type>
-            <maml:name>Object</maml:name>
+            <maml:name>Array</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -71,9 +165,9 @@
         <maml:Description>
           <maml:para>-inputobject $obj{output of Get-OnypheInfo or Get-OnypheInfoFromCSV functions} look for information about my public IP</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
         <dev:type>
-          <maml:name>Object</maml:name>
+          <maml:name>Array</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -292,7 +386,7 @@
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>SearchType</maml:name>
           <maml:Description>
-            <maml:para>{{Fill searchtype Description}}</maml:para>
+            <maml:para>{{Fill SearchType Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -367,7 +461,7 @@
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>SearchType</maml:name>
         <maml:Description>
-          <maml:para>{{Fill searchtype Description}}</maml:para>
+          <maml:para>{{Fill SearchType Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -405,7 +499,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>myip             : 90.245.80.180</maml:name>
+          <maml:name>myip             : 192.168.6.66</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -550,7 +644,7 @@
         <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
         <dev:code>Request all information available for ip 192.168.1.5</dev:code>
         <dev:remarks>
-          <maml:para>C:\PS&gt; Get-OnypheInfo -ip "192.168.1.5" -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -searchtype ip -SearchValue "192.168.1.5" -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
@@ -564,70 +658,70 @@
         <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
         <dev:code>Request geoloc information for ip 8.8.8.8</dev:code>
         <dev:remarks>
-          <maml:para>C:\PS&gt; Get-OnypheInfo -ip "8.8.8.8" -searchtype Geoloc</maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -searchtype Geoloc</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
         <dev:code>Request dns reverse information for ip 8.8.8.8</dev:code>
         <dev:remarks>
-          <maml:para>C:\PS&gt; Get-OnypheInfo -ip "8.8.8.8" -searchtype Reverse -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -searchtype Reverse -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 5 --------------------------</maml:title>
         <dev:code>request IIS keyword datascan information</dev:code>
         <dev:remarks>
-          <maml:para>C:\PS&gt; Get-OnypheInfo -searchtype DataScan -datascanstring "IIS" -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -searchtype DataScan -SearchValue "IIS" -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 6 --------------------------</maml:title>
         <dev:code>request datascan information for ip 8.8.8.8</dev:code>
         <dev:remarks>
-          <maml:para>C:\PS&gt; Get-OnypheInfo ip "8.8.8.8" -searchtype DataScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -searchtype DataScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 7 --------------------------</maml:title>
         <dev:code>Request pastebin content information for ip 8.8.8.8</dev:code>
         <dev:remarks>
-          <maml:para>C:\PS&gt; Get-OnypheInfo -ip "8.8.8.8" -searchtype Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -searchtype Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 8 --------------------------</maml:title>
         <dev:code>Request pastebin content information for ip 8.8.8.8 and see page 2 of results</dev:code>
         <dev:remarks>
-          <maml:para>C:\PS&gt; Get-OnypheInfo -ip "8.8.8.8" -searchtype Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -page "2"</maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -searchtype Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -page "2"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 9 --------------------------</maml:title>
         <dev:code>Request dns forward information for ip 8.8.8.8</dev:code>
         <dev:remarks>
-          <maml:para>C:\PS&gt; Get-OnypheInfo -ip "8.8.8.8" -searchtype Forward -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -searchtype Forward -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 10 --------------------------</maml:title>
         <dev:code>Request threatlist information for ip 8.8.8.8</dev:code>
         <dev:remarks>
-          <maml:para>C:\PS&gt; Get-OnypheInfo -ip "8.8.8.8" -searchtype Threatlist -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -searchtype Threatlist -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 11 --------------------------</maml:title>
         <dev:code>Request inetnum information for ip 8.8.8.8</dev:code>
         <dev:remarks>
-          <maml:para>C:\PS&gt; Get-OnypheInfo -ip "8.8.8.8" -searchtype Inetnum -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -searchtype Inetnum -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 12 --------------------------</maml:title>
         <dev:code>Request synscan information for ip 8.8.8.8</dev:code>
         <dev:remarks>
-          <maml:para>C:\PS&gt; Get-OnypheInfo -ip "8.8.8.8" -searchtype SynScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -searchtype SynScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -864,7 +958,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>cli-API_input    : {93.184.208.0}</maml:name>
+          <maml:name>cli-API_input    : {192.168.6.66}</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -1027,9 +1121,9 @@
           <maml:Description>
             <maml:para>{{Fill inputobject Description}}</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
           <dev:type>
-            <maml:name>Object</maml:name>
+            <maml:name>Array</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -1066,9 +1160,9 @@
         <maml:Description>
           <maml:para>{{Fill inputobject Description}}</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
         <dev:type>
-          <maml:name>Object</maml:name>
+          <maml:name>Array</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -1291,7 +1385,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>myip             NoteProperty string myip=85.10.100.250</maml:name>
+          <maml:name>myip             NoteProperty string myip=192.168.6.66</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -1454,6 +1548,427 @@
         <dev:code>set API Key as global variable using encrypted key hosted in local xml file previously generated with Set-OnypheAPIKey</dev:code>
         <dev:remarks>
           <maml:para>C:\PS&gt; Import-OnypheEncryptedIKey -MasterPassword (ConvertTo-SecureString -String "YourP@ssw0rd" -AsPlainText -Force)</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Invoke-APIOnypheCtl</command:name>
+      <command:verb>Invoke</command:verb>
+      <command:noun>APIOnypheCtl</command:noun>
+      <maml:description>
+        <maml:para>create several input for Invoke-Onyphe function and then call it to get the CTL (certificate transparancy) info from ctl API</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>create several input for Invoke-Onyphe function and then call it to get the CTL (certificate transparancy) info from ctl API</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Invoke-APIOnypheCtl</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+          <maml:name>Domain</maml:name>
+          <maml:Description>
+            <maml:para>-Domain string{Domain or FQDN} Domain or FQDN to be used for the ctl API usage</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>APIKey</maml:name>
+          <maml:Description>
+            <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+          <maml:name>Page</maml:name>
+          <maml:Description>
+            <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <maml:name>Domain</maml:name>
+        <maml:Description>
+          <maml:para>-Domain string{Domain or FQDN} Domain or FQDN to be used for the ctl API usage</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>APIKey</maml:name>
+        <maml:Description>
+          <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <maml:name>Page</maml:name>
+        <maml:Description>
+          <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>Name             MemberType   Definition</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>----             ----------   ----------</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>Equals           Method       bool Equals(System.Object obj)</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>GetHashCode      Method       int GetHashCode()</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>GetType          Method       type GetType()</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>ToString         Method       string ToString()</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-API_info     NoteProperty string[] cli-API_info=System.String[]</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-API_input    NoteProperty string[] cli-API_input=System.String[]</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-key_required NoteProperty bool[] cli-key_required=System.Boolean[]</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-Request_Date NoteProperty datetime cli-Request_Date=04/03/2019 22:04:40</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>count            NoteProperty long count=10</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>error            NoteProperty long error=0</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>max_page         NoteProperty long max_page=3</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>myip             NoteProperty string myip=192.168.6.66</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>page             NoteProperty long page=1</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>results          NoteProperty Object[] results=System.Object[]</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>status           NoteProperty string status=ok</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>took             NoteProperty string took=0.034</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>total            NoteProperty long total=28</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>count            : 1</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>error            : 0</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>max_page         : 1</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>myip             : 192.168.6.66</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>page             : 1</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>results          : {@{@category=ctl; @timestamp=15/02/2019 21:28:05; @type=doc; ca=false; country=FR;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							domain=fnac.com; extkeyusage=System.Object[]; fingerprint=; host=portaltv-int;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							hostname=System.Object[]; ip=80.12.18.251; issuer=; keyusage=System.Object[]; organization=Orange;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							publickey=; seen_date=2019-02-15; serial=01:81:e1:48:b1:9b:1e:4f:bc:5f:fc:99:e7:73:7d:da;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							signature=; source=Cloudflare Nimbus 2019; subdomains=q5ntv.orange.fr; subject=; tld=fr; validity=;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							version=v3; wildcard=false}}</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>status           : ok</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>took             : 0.024</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>total            : 1</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-API_info     : {ctl}</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-API_input    : {orange.fr}</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-key_required : {True}</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-Request_Date : 05/03/2019 15:31:48</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>get CTL info for fnac.com</dev:code>
+        <dev:remarks>
+          <maml:para>C:\PS&gt; Invoke-APIOnypheCtl -Domain fnac.com</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
+        <dev:code>get CTL info for fnac.com and set the api key</dev:code>
+        <dev:remarks>
+          <maml:para>C:\PS&gt; Invoke-APIOnypheCtl -Domain fnac.com -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -1730,7 +2245,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	data=HTTP/1.0 302 Moved Temporarily</maml:name>
+          <maml:name>			data=HTTP/1.0 302 Moved Temporarily</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -1738,7 +2253,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	Date: Sat, 06 Jan 2018 02:13:01 GMT</maml:name>
+          <maml:name>			Date: Sat, 06 Jan 2018 02:13:01 GMT</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -1746,7 +2261,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	Server: PanWeb Server/ -</maml:name>
+          <maml:name>			Server: PanWeb Server/ -</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -1754,7 +2269,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	ETag: "73829-130d-57651d79"</maml:name>
+          <maml:name>			ETag: "73829-130d-57651d79"</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -1762,7 +2277,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	Connection: close</maml:name>
+          <maml:name>			Connection: close</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -1770,7 +2285,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	Pragma: no-cache</maml:name>
+          <maml:name>			Pragma: no-cache</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -1778,7 +2293,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	Location: /php/login.php</maml:name>
+          <maml:name>			Location: /php/login.php</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -1786,7 +2301,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0</maml:name>
+          <maml:name>			Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -1794,7 +2309,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	Content-Length: 0</maml:name>
+          <maml:name>			Content-Length: 0</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -1802,7 +2317,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	Content-Type: text/html</maml:name>
+          <maml:name>			Content-Type: text/html</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -1810,7 +2325,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	Expires: Thu, 19 Nov 1981 08:52:00 GMT</maml:name>
+          <maml:name>			Expires: Thu, 19 Nov 1981 08:52:00 GMT</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -1818,7 +2333,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	X-FRAME-OPTIONS: SAMEORIGIN</maml:name>
+          <maml:name>			X-FRAME-OPTIONS: SAMEORIGIN</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -1826,7 +2341,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	Set-Cookie: PHPSESSID=73ebc70421adc9c46219dd68d722bb8b; path=/; HttpOnly</maml:name>
+          <maml:name>			Set-Cookie: PHPSESSID=73ebc70421adc9c46219dd68d722bb8b; path=/; HttpOnly</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -1834,7 +2349,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	; datamd5=beddae472d600e9e25787353ed4e5f21; ip=27.251.29.154; ipv6=false; location=20.0000,77.0000;</maml:name>
+          <maml:name>			; datamd5=beddae472d600e9e25787353ed4e5f21; ip=27.251.29.154; ipv6=false; location=20.0000,77.0000;</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -1842,7 +2357,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	organization=Dishnet Wireless Limited. Broadband Wireless; port=80; product=PanWeb Server;</maml:name>
+          <maml:name>			organization=Dishnet Wireless Limited. Broadband Wireless; port=80; product=PanWeb Server;</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -1850,7 +2365,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	productversion= - ; protocol=http; seen_date=2018-01-05}}</maml:name>
+          <maml:name>			productversion= - ; protocol=http; seen_date=2018-01-05}}</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -1923,21 +2438,21 @@
         <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
         <dev:code>get all data scan info for IP 27.251.29.154</dev:code>
         <dev:remarks>
-          <maml:para>C:\PS&gt; Invoke-APIOnypheDataScan -IP 27.251.29.154</maml:para>
+          <maml:para>C:\PS&gt; Invoke-APIOnypheDataScan -IPOrDataScanString 27.251.29.154</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
         <dev:code>get all info for info available for PanWeb web server</dev:code>
         <dev:remarks>
-          <maml:para>C:\PS&gt; Invoke-APIOnypheDataScan -DataScanString "PanWeb"</maml:para>
+          <maml:para>C:\PS&gt; Invoke-APIOnypheDataScan -IPOrDataScanString "PanWeb"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
         <dev:code>get all data scan info for IP 27.251.29.154 and set the api key</dev:code>
         <dev:remarks>
-          <maml:para>C:\PS&gt; Invoke-APIOnypheDataScan -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
+          <maml:para>C:\PS&gt; Invoke-APIOnypheDataScan -IPOrDataScanString 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -2214,7 +2729,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	forward=bot.nu; ip=8.8.8.8; ipv6=false; seen_date=2018-01-09}, @{@category=resolver;</maml:name>
+          <maml:name>			forward=bot.nu; ip=8.8.8.8; ipv6=false; seen_date=2018-01-09}, @{@category=resolver;</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -2222,7 +2737,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	@timestamp=2018-01-09T15:27:41.000Z; @type=forward; domain=bot.nu; forward=bot.nu; ip=8.8.8.8;</maml:name>
+          <maml:name>			@timestamp=2018-01-09T15:27:41.000Z; @type=forward; domain=bot.nu; forward=bot.nu; ip=8.8.8.8;</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -2230,7 +2745,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	ipv6=false; seen_date=2018-01-09}, @{@category=resolver; @timestamp=2018-01-03T16:20:06.000Z;</maml:name>
+          <maml:name>			ipv6=false; seen_date=2018-01-09}, @{@category=resolver; @timestamp=2018-01-03T16:20:06.000Z;</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -2238,7 +2753,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	@type=forward; domain=bot.nu; forward=bot.nu; ip=8.8.8.8; ipv6=0; seen_date=2018-01-03},</maml:name>
+          <maml:name>			@type=forward; domain=bot.nu; forward=bot.nu; ip=8.8.8.8; ipv6=0; seen_date=2018-01-03},</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -2246,7 +2761,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	@{@category=resolver; @timestamp=2018-01-03T16:20:06.000Z; @type=forward; domain=bot.nu;</maml:name>
+          <maml:name>			@{@category=resolver; @timestamp=2018-01-03T16:20:06.000Z; @type=forward; domain=bot.nu;</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -2254,7 +2769,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	forward=bot.nu; ip=8.8.8.8; ipv6=0; seen_date=2018-01-03}...}</maml:name>
+          <maml:name>			forward=bot.nu; ip=8.8.8.8; ipv6=0; seen_date=2018-01-03}...}</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -2563,7 +3078,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	country_name=United States; geolocation=37.7510,-97.8220; ip=8.8.8.8; ipv6=false; latitude=37.7510;</maml:name>
+          <maml:name>			country_name=United States; geolocation=37.7510,-97.8220; ip=8.8.8.8; ipv6=false; latitude=37.7510;</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -2571,7 +3086,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	longitude=-97.8220; organization=Google LLC; subnet=8.8.0.0/19}}</maml:name>
+          <maml:name>			longitude=-97.8220; organization=Google LLC; subnet=8.8.0.0/19}}</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -2849,7 +3364,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>myip             NoteProperty string myip=192.168.1.66</maml:name>
+          <maml:name>myip             NoteProperty string myip=192.168.6.66</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -2905,7 +3420,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>myip             : 192.168.1.66</maml:name>
+          <maml:name>myip             : 192.168.6.66</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -3334,7 +3849,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	country_name=United States; geolocation=37.7510,-97.8220; ip=8.8.8.8; ipv6=false; latitude=37.7510;</maml:name>
+          <maml:name>			country_name=United States; geolocation=37.7510,-97.8220; ip=8.8.8.8; ipv6=false; latitude=37.7510;</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -3342,7 +3857,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	longitude=-97.8220; organization=Google LLC; subnet=8.8.0.0/19}, @{@category=inetnum;</maml:name>
+          <maml:name>			longitude=-97.8220; organization=Google LLC; subnet=8.8.0.0/19}, @{@category=inetnum;</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -3350,7 +3865,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	@timestamp=1970-01-01T00:00:00.000Z; @type=ip; country=US; information=System.Object[];</maml:name>
+          <maml:name>			@timestamp=1970-01-01T00:00:00.000Z; @type=ip; country=US; information=System.Object[];</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -3358,7 +3873,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	netname=Undisclosed; seen_date=1970-01-01; source=Undisclosed; subnet=Undisclosed},</maml:name>
+          <maml:name>			netname=Undisclosed; seen_date=1970-01-01; source=Undisclosed; subnet=Undisclosed},</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -3366,7 +3881,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	@{@category=pastries; @timestamp=2018-01-13T00:05:30.000Z; @type=pastebin; domain=System.Object[];</maml:name>
+          <maml:name>			@{@category=pastries; @timestamp=2018-01-13T00:05:30.000Z; @type=pastebin; domain=System.Object[];</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -3374,7 +3889,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	hostname=System.Object[]; ip=System.Object[]; key=uL3KBwQb; seen_date=2018-01-13},</maml:name>
+          <maml:name>			hostname=System.Object[]; ip=System.Object[]; key=uL3KBwQb; seen_date=2018-01-13},</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -3382,7 +3897,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	@{@category=pastries; @timestamp=2018-01-12T23:38:24.000Z; @type=pastebin; domain=System.Object[];</maml:name>
+          <maml:name>			@{@category=pastries; @timestamp=2018-01-12T23:38:24.000Z; @type=pastebin; domain=System.Object[];</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -3390,7 +3905,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	hostname=System.Object[]; ip=System.Object[]; key=d08TpvqK; seen_date=2018-01-12}...}</maml:name>
+          <maml:name>			hostname=System.Object[]; ip=System.Object[]; key=d08TpvqK; seen_date=2018-01-12}...}</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -3471,6 +3986,595 @@
         <dev:code>get all info for IP 8.8.8.8 ans set the api key</dev:code>
         <dev:remarks>
           <maml:para>C:\PS&gt; Invoke-APIOnypheIP -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Invoke-APIOnypheMD5</command:name>
+      <command:verb>Invoke</command:verb>
+      <command:noun>APIOnypheMD5</command:noun>
+      <maml:description>
+        <maml:para>create several input for Invoke-Onyphe function and then call it to get info from onyphe md5 signature</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>create several input for Invoke-Onyphe function and then call it to get info from onyphe md5 signature</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Invoke-APIOnypheMD5</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+          <maml:name>MD5</maml:name>
+          <maml:Description>
+            <maml:para>-MD5 string{MD5 Hash} MD5 to be used for the md5 API usage</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>APIKey</maml:name>
+          <maml:Description>
+            <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+          <maml:name>Page</maml:name>
+          <maml:Description>
+            <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <maml:name>MD5</maml:name>
+        <maml:Description>
+          <maml:para>-MD5 string{MD5 Hash} MD5 to be used for the md5 API usage</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>APIKey</maml:name>
+        <maml:Description>
+          <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <maml:name>Page</maml:name>
+        <maml:Description>
+          <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>Name             MemberType   Definition</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>----             ----------   ----------</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>Equals           Method       bool Equals(System.Object obj)</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>GetHashCode      Method       int GetHashCode()</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>GetType          Method       type GetType()</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>ToString         Method       string ToString()</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-API_info     NoteProperty string[] cli-API_info=System.String[]</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-API_input    NoteProperty string[] cli-API_input=System.String[]</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-key_required NoteProperty bool[] cli-key_required=System.Boolean[]</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-Request_Date NoteProperty datetime cli-Request_Date=04/03/2019 22:04:40</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>count            NoteProperty long count=10</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>error            NoteProperty long error=0</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>max_page         NoteProperty long max_page=3</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>myip             NoteProperty string myip=192.168.6.66</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>page             NoteProperty long page=1</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>results          NoteProperty Object[] results=System.Object[]</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>status           NoteProperty string status=ok</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>took             NoteProperty string took=0.034</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>total            NoteProperty long total=28</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>count            : 10</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>error            : 0</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>max_page         : 1000</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>myip             : 192.168.6.66</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>page             : 1</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>results          : {@{@category=datascan; @timestamp=05/03/2019 13:25:40; @type=doc; app=; asn=AS36352; city=Buffalo;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							country=US; cpe=System.Object[]; data=SSH-2.0-OpenSSH_7.4\x0d</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							; datamd5=7a1f20cae067b75a52bc024b83ee4667; device=; domain=colocrossing.com;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							host=104-168-71-162-host; ip=104.168.71.162; ipv6=false; location=42.8864,-78.8781;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							organization=ColoCrossing; port=22; product=OpenSSH; productvendor=OpenBSD; productversion=7.4;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							protocol=ssh; protocolversion=2.0; reverse=104-168-71-162-host.colocrossing.com;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							seen_date=2019-03-05; source=sniffer; subnet=104.168.70.0/23; tag=System.Object[]; tld=com;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							tls=false; transport=tcp}, @{@category=datascan; @timestamp=05/03/2019 12:08:44; @type=doc; app=;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							asn=AS27715; country=BR; cpe=System.Object[]; data=SSH-2.0-OpenSSH_7.4\x0d</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							; datamd5=7a1f20cae067b75a52bc024b83ee4667; device=; domain=hospedagemdesites.ws; host=gagarin0303;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							hostname=System.Object[]; ip=191.252.118.55; ipv6=false; location=-22.8305,-43.2192;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							organization=Locaweb Serviços de Internet S/A; port=22; product=OpenSSH; productvendor=OpenBSD;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							productversion=7.4; protocol=ssh; protocolversion=2.0; reverse=gagarin0303.hospedagemdesites.ws;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							seen_date=2019-03-05; source=datascan; subnet=191.252.112.0/20; tag=System.Object[]; tld=ws;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							tls=false; transport=tcp}, @{@category=datascan; @timestamp=05/03/2019 12:08:44; @type=doc; app=;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							asn=AS45090; city=Beijing; country=CN; cpe=System.Object[]; data=SSH-2.0-OpenSSH_7.4\x0d</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							; datamd5=7a1f20cae067b75a52bc024b83ee4667; device=; ip=119.29.173.149; ipv6=false;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							location=39.9288,116.3889; organization=Shenzhen Tencent Computer Systems Company Limited; port=22;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							product=OpenSSH; productvendor=OpenBSD; productversion=7.4; protocol=ssh; protocolversion=2.0;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							seen_date=2019-03-05; source=datascan; subnet=119.29.128.0/17; tag=System.Object[]; tls=false;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							transport=tcp}, @{@category=datascan; @timestamp=05/03/2019 12:08:44; @type=doc; app=; asn=AS45090;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							country=CN; cpe=System.Object[]; data=SSH-2.0-OpenSSH_7.4\x0d</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							; datamd5=7a1f20cae067b75a52bc024b83ee4667; device=; ip=62.234.10.225; ipv6=false;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							location=39.9289,116.3883; organization=Shenzhen Tencent Computer Systems Company Limited; port=22;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							product=OpenSSH; productvendor=OpenBSD; productversion=7.4; protocol=ssh; protocolversion=2.0;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							seen_date=2019-03-05; source=datascan; subnet=62.234.0.0/16; tag=System.Object[]; tls=false;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							transport=tcp}...}</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>status           : ok</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>took             : 0.259</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>total            : 1942240</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-API_info     : {md5}</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-API_input    : {7a1f20cae067b75a52bc024b83ee4667}</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-key_required : {True}</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-Request_Date : 05/03/2019 16:48:12</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>get md5 info for 7a1f20cae067b75a52bc024b83ee4667 hash</dev:code>
+        <dev:remarks>
+          <maml:para>C:\PS&gt; Invoke-APIOnypheMd5 -MD5 7a1f20cae067b75a52bc024b83ee4667</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
+        <dev:code>get md5 info for 7a1f20cae067b75a52bc024b83ee4667 hash and set the api key</dev:code>
+        <dev:remarks>
+          <maml:para>C:\PS&gt; Invoke-APIOnypheMd5 -MD5 7a1f20cae067b75a52bc024b83ee4667 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -3626,7 +4730,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>myip             : 75.170.200.100</maml:name>
+          <maml:name>myip             : 192.168.6.66</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -3684,6 +4788,387 @@
         <dev:code>get your current public ip</dev:code>
         <dev:remarks>
           <maml:para>C:\PS&gt; Invoke-APIOnypheMyIP</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Invoke-APIOnypheOnionScan</command:name>
+      <command:verb>Invoke</command:verb>
+      <command:noun>APIOnypheOnionScan</command:noun>
+      <maml:description>
+        <maml:para>create several input for Invoke-Onyphe function and then call it to get info for a .onion link using OnionScan API</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>create several input for Invoke-Onyphe function and then call it to get info for a .onion link using OnionScan API</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Invoke-APIOnypheOnionScan</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+          <maml:name>Onion</maml:name>
+          <maml:Description>
+            <maml:para>-Onion string{Onion URL} Onion link to be used for the Onion API usage</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>APIKey</maml:name>
+          <maml:Description>
+            <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+          <maml:name>Page</maml:name>
+          <maml:Description>
+            <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <maml:name>Onion</maml:name>
+        <maml:Description>
+          <maml:para>-Onion string{Onion URL} Onion link to be used for the Onion API usage</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>APIKey</maml:name>
+        <maml:Description>
+          <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <maml:name>Page</maml:name>
+        <maml:Description>
+          <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>Name             MemberType   Definition</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>----             ----------   ----------</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>Equals           Method       bool Equals(System.Object obj)</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>GetHashCode      Method       int GetHashCode()</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>GetType          Method       type GetType()</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>ToString         Method       string ToString()</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-API_info     NoteProperty string[] cli-API_info=System.String[]</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-API_input    NoteProperty string[] cli-API_input=System.String[]</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-key_required NoteProperty bool[] cli-key_required=System.Boolean[]</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-Request_Date NoteProperty datetime cli-Request_Date=04/03/2019 22:04:40</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>count            NoteProperty long count=10</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>error            NoteProperty long error=0</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>max_page         NoteProperty long max_page=3</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>myip             NoteProperty string myip=192.168.6.66</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>page             NoteProperty long page=1</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>results          NoteProperty Object[] results=System.Object[]</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>status           NoteProperty string status=ok</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>took             NoteProperty string took=0.034</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>total            NoteProperty long total=28</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>count            : 10</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>error            : 0</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>max_page         : 1000</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>myip             : 192.168.6.66</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>page             : 1</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>results          : {}</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>status           : ok</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>took             : 0.259</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>total            : 1942240</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-API_info     : {OnionScan}</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-API_input    : {vlp4uw5ui22ljlg7.onion}</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-key_required : {True}</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-Request_Date : 05/03/2019 16:48:12</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>get md5 info for vlp4uw5ui22ljlg7.onion URL</dev:code>
+        <dev:remarks>
+          <maml:para>C:\PS&gt; Invoke-APIOnypheOnionScan -Onion "vlp4uw5ui22ljlg7.onion"</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
+        <dev:code>get md5 info for vlp4uw5ui22ljlg7.onion URL and set the api key</dev:code>
+        <dev:remarks>
+          <maml:para>C:\PS&gt; Invoke-APIOnypheOnionScan -Onion "vlp4uw5ui22ljlg7.onion" -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -4365,7 +5850,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	ip=8.8.8.8; ipv6=false; reverse=google-public-dns-a.google.com; seen_date=2018-01-13},</maml:name>
+          <maml:name>			ip=8.8.8.8; ipv6=false; reverse=google-public-dns-a.google.com; seen_date=2018-01-13},</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -4373,7 +5858,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	@{@category=resolver; @timestamp=2018-01-13T15:26:54.000Z; @type=reverse; domain=google.com;</maml:name>
+          <maml:name>			@{@category=resolver; @timestamp=2018-01-13T15:26:54.000Z; @type=reverse; domain=google.com;</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -4381,7 +5866,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	ip=8.8.8.8; ipv6=false; reverse=google-public-dns-a.google.com; seen_date=2018-01-13},</maml:name>
+          <maml:name>			ip=8.8.8.8; ipv6=false; reverse=google-public-dns-a.google.com; seen_date=2018-01-13},</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -4389,7 +5874,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	@{@category=resolver; @timestamp=2018-01-10T07:39:04.000Z; @type=reverse; domain=google.com;</maml:name>
+          <maml:name>			@{@category=resolver; @timestamp=2018-01-10T07:39:04.000Z; @type=reverse; domain=google.com;</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -4397,7 +5882,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	ip=8.8.8.8; ipv6=false; reverse=google-public-dns-a.google.com; seen_date=2018-01-10},</maml:name>
+          <maml:name>			ip=8.8.8.8; ipv6=false; reverse=google-public-dns-a.google.com; seen_date=2018-01-10},</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -4405,7 +5890,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	@{@category=resolver; @timestamp=2018-01-10T07:39:04.000Z; @type=reverse; domain=google.com;</maml:name>
+          <maml:name>			@{@category=resolver; @timestamp=2018-01-10T07:39:04.000Z; @type=reverse; domain=google.com;</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -4413,7 +5898,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	ip=8.8.8.8; ipv6=false; reverse=google-public-dns-a.google.com; seen_date=2018-01-10}...}</maml:name>
+          <maml:name>			ip=8.8.8.8; ipv6=false; reverse=google-public-dns-a.google.com; seen_date=2018-01-10}...}</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -4778,7 +6263,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>myip             NoteProperty string myip=90.92.236.55</maml:name>
+          <maml:name>myip             NoteProperty string myip=192.168.6.66</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -4850,7 +6335,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>myip             : 90.92.234.60</maml:name>
+          <maml:name>myip             : 192.168.6.66</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -5035,6 +6520,563 @@
         <dev:code>simple search with one filter/criteria</dev:code>
         <dev:remarks>
           <maml:para>Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists C:\PS&gt; Invoke-APIOnypheSearch -SimpleSearchValue RU -SearchType threatlist -SimpleSearchFilter country</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Invoke-APIOnypheSniffer</command:name>
+      <command:verb>Invoke</command:verb>
+      <command:noun>APIOnypheSniffer</command:noun>
+      <maml:description>
+        <maml:para>create several input for Invoke-Onyphe function and then call it to get the IP sniffer info from sniffer API</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>create several input for Invoke-Onyphe function and then call it to get the IP sniffer info from sniffer API</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Invoke-APIOnypheSniffer</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+          <maml:name>IP</maml:name>
+          <maml:Description>
+            <maml:para>-IP string{IP} IP to be used for the sniffer API usage</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>APIKey</maml:name>
+          <maml:Description>
+            <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+          <maml:name>Page</maml:name>
+          <maml:Description>
+            <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <maml:name>IP</maml:name>
+        <maml:Description>
+          <maml:para>-IP string{IP} IP to be used for the sniffer API usage</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>APIKey</maml:name>
+        <maml:Description>
+          <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <maml:name>Page</maml:name>
+        <maml:Description>
+          <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>Name             MemberType   Definition</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>----             ----------   ----------</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>Equals           Method       bool Equals(System.Object obj)</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>GetHashCode      Method       int GetHashCode()</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>GetType          Method       type GetType()</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>ToString         Method       string ToString()</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-API_info     NoteProperty string[] cli-API_info=System.String[]</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-API_input    NoteProperty string[] cli-API_input=System.String[]</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-key_required NoteProperty bool[] cli-key_required=System.Boolean[]</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-Request_Date NoteProperty datetime cli-Request_Date=04/03/2019 22:04:40</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>count            NoteProperty long count=10</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>error            NoteProperty long error=0</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>max_page         NoteProperty long max_page=3</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>myip             NoteProperty string myip=192.168.6.66</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>page             NoteProperty long page=1</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>results          NoteProperty Object[] results=System.Object[]</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>status           NoteProperty string status=ok</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>took             NoteProperty string took=0.034</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>total            NoteProperty long total=28</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>count            : 10</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>error            : 0</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>max_page         : 3</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>myip             : 192.168.6.66</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>page             : 1</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>results          : {@{@category=sniffer; @timestamp=04/03/2019 13:27:53; @type=doc; asn=AS20952; city=Witham;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							country=GB; data=\x1b\x81\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							CKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\x00\x00!\x00\x01; datamd5=70b95a08c5a052f5f8353bc75d1b7912;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							destport=137; ip=217.138.28.194; ipv6=false; location=51.8149,0.6454; organization=Venus Business</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							Communications Limited; seen_date=2019-03-04; srcport=137; subnet=217.138.28.128/25;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							tag=System.Object[]; transport=udp; type=udpdata}, @{@category=sniffer; @timestamp=02/03/2019</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							17:34:37; @type=doc; asn=AS20952; city=Witham; country=GB;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							data=Ni\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00 CKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\x00\x00!\x00\x01;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							datamd5=35191f8ac64683f9564b6b0fc6e27847; destport=137; ip=217.138.28.194; ipv6=false;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							location=51.8149,0.6454; organization=Venus Business Communications Limited; seen_date=2019-03-02;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							srcport=137; subnet=217.138.28.128/25; tag=System.Object[]; transport=udp; type=udpdata},</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							@{@category=sniffer; @timestamp=01/03/2019 23:52:39; @type=doc; asn=AS20952; city=Witham;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							country=GB; data=\x1e\xe8\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							CKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\x00\x00!\x00\x01; datamd5=9f8536314d5eafdb06c99897fffb8aa8;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							destport=137; ip=217.138.28.194; ipv6=false; location=51.8149,0.6454; organization=Venus Business</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							Communications Limited; seen_date=2019-03-01; srcport=137; subnet=217.138.28.128/25;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							tag=System.Object[]; transport=udp; type=udpdata}, @{@category=sniffer; @timestamp=28/02/2019</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							18:08:53; @type=doc; asn=AS20952; city=Witham; country=GB;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							data=\x18\x99\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							CKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\x00\x00!\x00\x01; datamd5=83a75a375d30691bc1cb164f2955f406;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							destport=137; ip=217.138.28.194; ipv6=false; location=51.8194,0.6718; organization=Venus Business</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							Communications Limited; seen_date=2019-02-28; srcport=137; subnet=217.138.0.0/16;</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>							tag=System.Object[]; transport=udp; type=udpdata}...}</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>status           : ok</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>took             : 0.011</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>total            : 28</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-API_info     : {sniffer}</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-API_input    : {217.138.28.194}</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-key_required : {True}</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>cli-Request_Date : 04/03/2019 22:05:23</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>get sniffer info for IP 217.138.28.194</dev:code>
+        <dev:remarks>
+          <maml:para>C:\PS&gt; Invoke-APIOnypheSniffer -IP 217.138.28.194</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
+        <dev:code>get sniffer info for IP 217.138.28.194 and set the api key</dev:code>
+        <dev:remarks>
+          <maml:para>C:\PS&gt; Invoke-APIOnypheSniffer -IP 217.138.28.194 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -5724,7 +7766,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	seen_date=2018-01-14; subnet=178.250.241.22/32; threatlist=Abuse.ch - Zeus bad IPs},</maml:name>
+          <maml:name>			seen_date=2018-01-14; subnet=178.250.241.22/32; threatlist=Abuse.ch - Zeus bad IPs},</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -5732,7 +7774,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	@{@category=threatlist; @timestamp=2018-01-14T07:45:15.000Z; @type=ip; ipv6=false;</maml:name>
+          <maml:name>			@{@category=threatlist; @timestamp=2018-01-14T07:45:15.000Z; @type=ip; ipv6=false;</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -5740,7 +7782,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	seen_date=2018-01-14; subnet=178.250.241.22/32; threatlist=Abuse.ch - Zeus IPs},</maml:name>
+          <maml:name>			seen_date=2018-01-14; subnet=178.250.241.22/32; threatlist=Abuse.ch - Zeus IPs},</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -5748,7 +7790,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	@{@category=threatlist; @timestamp=2018-01-14T07:45:15.000Z; @type=ip; ipv6=false;</maml:name>
+          <maml:name>			@{@category=threatlist; @timestamp=2018-01-14T07:45:15.000Z; @type=ip; ipv6=false;</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -5756,7 +7798,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	seen_date=2018-01-14; subnet=178.250.241.22/32; threatlist=EmergingThreats - Spamhaus, DShield and</maml:name>
+          <maml:name>			seen_date=2018-01-14; subnet=178.250.241.22/32; threatlist=EmergingThreats - Spamhaus, DShield and</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -5764,7 +7806,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	Abuse.ch}, @{@category=threatlist; @timestamp=2018-01-13T07:45:13.000Z; @type=ip; ipv6=false;</maml:name>
+          <maml:name>			Abuse.ch}, @{@category=threatlist; @timestamp=2018-01-13T07:45:13.000Z; @type=ip; ipv6=false;</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -5772,7 +7814,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	seen_date=2018-01-13; subnet=178.250.241.22/32; threatlist=EmergingThreats - Spamhaus, DShield and</maml:name>
+          <maml:name>			seen_date=2018-01-13; subnet=178.250.241.22/32; threatlist=EmergingThreats - Spamhaus, DShield and</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -5780,7 +7822,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>	Abuse.ch}...}</maml:name>
+          <maml:name>			Abuse.ch}...}</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -6017,7 +8059,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>myip             NoteProperty string myip=90.5.90.101</maml:name>
+          <maml:name>myip             NoteProperty string myip=192.168.6.66</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -6469,7 +8511,7 @@
       </command:returnValue>
       <command:returnValue>
         <dev:type>
-          <maml:name>myip             : 90.245.80.180</maml:name>
+          <maml:name>myip             : 192.168.6.66</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -6974,6 +9016,76 @@
         <dev:code>Set Internet Proxy and with no authentication</dev:code>
         <dev:remarks>
           <maml:para>C:\PS&gt; Set-OnypheProxy -Proxy "http://myproxy:8080" -AnonymousProxy</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Update-OnypheFacetsFilters</command:name>
+      <command:verb>Update</command:verb>
+      <command:noun>OnypheFacetsFilters</command:noun>
+      <maml:description>
+        <maml:para>Update Onyphe-Data-Model.xml local file containing a cache of available APIs, functions, filters from user API</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Update Onyphe-Data-Model.xml local file containing a cache of available APIs, functions, filters from user API</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Update-OnypheFacetsFilters</maml:name>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+          <maml:name>APIKey</maml:name>
+          <maml:Description>
+            <maml:para>{{Fill APIKey Description}}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+        <maml:name>APIKey</maml:name>
+        <maml:Description>
+          <maml:para>{{Fill APIKey Description}}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>none</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>Update Onyphe-Data-Model.xml local file containing a cache of available APIs, functions, filters from user API</dev:code>
+        <dev:remarks>
+          <maml:para>C:\PS&gt; Update-OnypheFacetsFilters</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
