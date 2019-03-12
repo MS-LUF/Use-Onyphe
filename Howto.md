@@ -9,7 +9,7 @@ To request it : https://www.onyphe.io/login
 More info about available APIs :
 https://www.onyphe.io/documentation/api
 
-(c) 2018 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
+(c) 2018-2019 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
 
 ## Intro Use-Onyphe
 Hello Guys,
@@ -244,14 +244,6 @@ API Forward : Return forward information
 ```
     C:\PS>Get-OnypheInfo -searchvalue 2.22.52.73 -searchtype Reverse
 ```
-API CTL : Return CTL (Certificate) information
-```
-    C:\PS>Get-OnypheInfo -searchvalue fnac.com -searchtype ctl
-```
-API md5 : Return information linked to a onyphe hash
-```
-    C:\PS>Get-OnypheInfo -searchvalue 7a1f20cae067b75a52bc024b83ee4667 -searchtype md5
-```
 API sniffer : Return ip history information
 ```
     C:\PS>Get-OnypheInfo -searchvalue 8.8.8.8 -searchtype sniffer
@@ -259,6 +251,14 @@ API sniffer : Return ip history information
 API onionscan : Return information about an onion url
 ```
     C:\PS>Get-OnypheInfo -searchvalue mh7mkfvezts5j6yu.onion -searchtype onionscan
+```
+API ctl : return information about SSL/TLS certificates related to a domain or fqn
+```
+    C:\PS>Get-OnypheInfo -searchvalue fnac.com -searchtype ctl
+```
+API md5 : return information on a onyphe md5 pattern / signature (SSH version...)
+```
+    C:\PS>Get-OnypheInfo -searchvalue 7a1f20cae067b75a52bc024b83ee4667 -searchtype md5
 ```
 API Search/DataScan : Return datascan information
 ```
@@ -301,6 +301,10 @@ API Search/onionscan : Return onionscan information
 API Search/ctl : Return ctl information
 ```
     C:\PS>Search-OnypheInfo -SimpleSearchValue vpn -SimpleSearchFilter host -SearchType ctl
+```
+API Search/datashot : Return datashot information
+```
+    C:\PS>Search-OnypheInfo -SimpleSearchValue rdp -SimpleSearchFilter protocol -SearchType datashot
 ```
 
 ## paging and results
@@ -358,13 +362,13 @@ First, retrieve the results (all threatlist objects tagged with mirai) :
 Then, play with the objects :-)
 how many unique ip ?
 ```
-    C:\PS>($AllResults.results.subnet | sort-object | Get-Unique).count
+    C:\PS>($AllResults.results.subnet | sort-object -Unique).count
     978
 ```
 
 The ip list itself ?
 ```
-    C:\PS>$AllResults.results.subnet | sort-object | Get-Unique
+    C:\PS>$AllResults.results.subnet | sort-object -Unique
     ...
     95.5.2.125/32
     95.9.177.76/32
@@ -385,7 +389,7 @@ First, retrieve all the results avaialable (all synscan objects linked to Quad9 
 Then, play with the objects :-)
 What are the open ports ?
 ```
-    C:\PS>$AllResults.results.port | sort-object | get-unique
+    C:\PS>$AllResults.results.port | sort-object -unique
     3389
     443
     53
@@ -396,7 +400,7 @@ can you please tell me what is the ip related to this port ?
 
 of course !
 ```
-    C:\PS>($AllResults.results | Where-Object {$_.port -eq 3389}).ip | sort-object | get-unique
+    C:\PS>($AllResults.results | Where-Object {$_.port -eq 3389}).ip | sort-object -unique
     9.9.9.9
 ```
 
@@ -441,4 +445,17 @@ If you want to have the results by port, it's also simple, we just have to open 
     port         53                                        7
     port         80                                      122
     port         8080                                      2
+```
+
+### Example 4
+Please Onyphe, I am a in charge of following security KPIs and my boss wants to have an overview of external RDP server in front of internet.
+
+First, retrieve all the results avaialable (all synscan objects linked to your organization, here for instance OVH SAS) :
+```
+    C:\PS>$script:AllResults = @()
+    C:\PS>for ($i=1;$i -le ([int](Search-OnypheInfo -AdvancedSearch @('organization:OVH SAS','protocol:rdp') -SearchType datashot).max_page);$i++) {$script:AllResults += Search-OnypheInfo -AdvancedSearch @('organization:Citrix') -SearchType synscan -page $i -wait 3}
+```
+Then, export the screenshot of the home RDP login page for more information :)
+```
+    C:\PS>$allresults | Export-OnypheDataShot -tofolder .\temp\
 ```
