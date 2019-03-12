@@ -12,7 +12,7 @@
 RootModule = 'use-onyphe.psm1'
 
 # Numero de version de ce module.
-ModuleVersion = '0.94'
+ModuleVersion = '0.95'
 
 # editions PS prises en charge
 # CompatiblePSEditions = @()
@@ -80,7 +80,7 @@ FunctionsToExport = 'Get-OnypheInfo', 'Get-OnypheInfoFromCSV',
                      'Get-OnypheSearchFilters', 'Invoke-APIOnypheSearch', 'Get-OnypheSearchCategories',
                      'Search-OnypheInfo', 'Get-OnypheAPIName', 'Import-OnypheEncryptedIKey',
                      'Set-OnypheProxy','Get-OnypheStatsFromObject','Get-OnypheCliFacets', 'Update-OnypheFacetsFilters',
-                     'Invoke-APIOnypheCtl', 'Invoke-APIOnypheSniffer', 'Invoke-APIOnypheOnionScan', 'Invoke-APIOnypheMD5'
+                     'Invoke-APIOnypheCtl', 'Invoke-APIOnypheSniffer', 'Invoke-APIOnypheOnionScan', 'Invoke-APIOnypheMD5', 'Export-OnypheDataShot'
 
 
 # Applets de commande a exporter a partir de ce module. Pour de meilleures performances, neutilisez pas de caracteres generiques et ne supprimez pas l entree. Utilisez un tableau vide si vous neavez aucune applet de commande e exporter.
@@ -119,7 +119,7 @@ PrivateData = @{
         IconUri = 'https://www.onyphe.io/img/logo-solo.png'
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'v0.94 add local stat function'
+        ReleaseNotes = 'v0.95 : fix HTTP error on invoke-onyphe when no network is available, add datashot management, add function to export datashot to picture file, fix Get-OnypheInfoFromCSV, update Export-OnypheInfoToFile'
         # External dependent modules of this module
         # ExternalModuleDependencies = ''
 

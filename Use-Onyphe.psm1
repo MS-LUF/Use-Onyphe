@@ -17,6 +17,12 @@
 # - use userinfos API to collect APIs and search filters
 # - rewrite get-onyphe info function to simplify the code
 # - update invoke-apionyphedatascan with only a single parameter
+# v0.95 :
+# - fix HTTP error on invoke-onyphe when no network is available
+# - add datashot management
+# - add function to export datashot to picture file
+# - fix Get-OnypheInfoFromCSV
+# - update Export-OnypheInfoToFile
 #
 #'(c) 2018-2019 lucas-cueff.com - Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).'
 
@@ -80,7 +86,7 @@
 	Param (
 		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
 		[ValidateScript({(($_ | Get-Member | Select-Object -ExpandProperty TypeName -Unique) -eq 'System.Management.Automation.PSCustomObject')})]
-			$inputobject,
+			[array]$inputobject,
 		[parameter(Mandatory=$false)] 
 		[ValidateNotNullOrEmpty()]
 			[Array]$AdvancedFacets
@@ -241,7 +247,7 @@
 		$FromcsvType = $fromcsv | Get-Member | Select-Object -ExpandProperty TypeName -Unique
 		if (($FromcsvType -eq 'System.String') -and (test-path $fromcsv)) {
 				$csvcontent = import-csv $fromcsv -delimiter $csvdelimiter
-		} ElseIf (($FromcsvType -eq 'System.Management.Automation.PSCustomObject') -and $fromcsv.'API-Input-IP') {
+		} ElseIf (($FromcsvType -eq 'System.Management.Automation.PSCustomObject') -and $fromcsv.'API-Input') {
 			$csvcontent = $fromcsv
 		} Else {
 			write-verbose -message "provide a valid csv file as input or valid System.Management.Automation.PSCustomObject object"
@@ -250,28 +256,16 @@
 		}
 		$APISearchEntries = $csvcontent | where-object {$_.API -eq "Search"}
 		foreach ($entry in $APISearchEntries) {
-			$tmparray = $entry.'Search-Request'.split("+")
-			$Script:Result += Search-OnypheInfo -AdvancedSearch $tmparray -SearchType $entry.'Search-Type' -wait 3
-		}
-		$APIOtherEntriesDataScan = $csvcontent | where-object {($_.API -ne "Search") -and ($_.API -eq "DataScan")}
-		foreach ($entry in $APIOtherEntriesDataScan) {
-			if ($entry.'API-Input-IP') {
-				write-debug -message "Get-OnypheInfo -IP $($entry.'API-Input-IP') -searchtype &($entry.API) -wait 3"
-				$Script:Result += Get-OnypheInfo -IP $entry.'API-Input-IP' -searchtype $entry.API -wait 3
-			} 
-			if ($entry.'API-Input-Other') {
-				$Script:Result += Get-OnypheInfo -searchtype $entry.API -datascanstring $entry.'API-Input-Other' -wait 3
+			if ($entry.'Search-Request' -contains "+") {
+				$tmparray = $entry.'Search-Request'.split("+")
+				$Script:Result += Search-OnypheInfo -AdvancedSearch $tmparray -SearchType $entry.'Search-Type' -wait 3
+			} else {
+				$Script:Result += Search-OnypheInfo -AdvancedSearch @($entry.'Search-Request') -SearchType $entry.'Search-Type' -wait 3
 			}
 		}
-		$APIOtherEntries = $csvcontent | where-object {($_.API -ne "Search") -and ($_.API -ne "DataScan")}
-		foreach ($entry in $APIOtherEntries) {
-			If (($entry.API -ne "Ip") -and ($entry.'API-Input-IP')) {
-				$Script:Result += Get-OnypheInfo -IP $entry.'API-Input-IP' -searchtype $entry.API -wait 3
-			} Else {
-				If ($entry.'API-Input-IP') {
-					$Script:Result += Get-OnypheInfo -IP $entry.'API-Input-IP' -wait 3
-				}
-			}
+		$APIEntries = $csvcontent | where-object {$_.API -ne "Search"}
+		foreach ($entry in $APIEntries) {
+				$Script:Result += Get-OnypheInfo -searchtype $entry.API -SearchValue $entry.'API-Input' -wait 3
 		}
 		$Script:Result
 	}
@@ -2068,11 +2062,11 @@
 			write-verbose -message "HTTP error code:$($_.Exception.Response.StatusCode.Value__)"
 			write-verbose -message "HTTP error message:$($_.Exception.Response.StatusDescription)"
 			$errorcode = $_.Exception.Response.StatusCode.value__
-			$result = $_.Exception.Response.GetResponseStream()
-			$reader = New-Object System.IO.StreamReader($result)
-			$reader.BaseStream.Position = 0
-			$httpbody = $reader.ReadToEnd()
 			if (($errorcode -eq 429) -or ($errorcode -eq 200)) {
+				$result = $_.Exception.Response.GetResponseStream()
+				$reader = New-Object System.IO.StreamReader($result)
+				$reader.BaseStream.Position = 0
+				$httpbody = $reader.ReadToEnd()
 				$errorvalue = $httpbody | Convertfrom-Json
 				$errorvalue | add-member -MemberType NoteProperty -Name 'cli-API_info' -Value $APIInfo
 				$errorvalue | add-member -MemberType NoteProperty -Name 'cli-API_input' -Value $APIInput
@@ -2109,7 +2103,6 @@
 				write-verbose -message "unable to convert result into a powershell object - json error"
 				write-verbose -message "Error Type: $($_.Exception.GetType().FullName)"
 				write-verbose -message "Error Message: $($_.Exception.Message)"
-				#$errorvalue = @()
 				$errorvalue = [PSCustomObject]@{
 					Count = 0
 					error = ""
@@ -2170,25 +2163,30 @@
   [cmdletbinding()]
   Param (
   [parameter(Mandatory=$true)]
-  [ValidateScript({test-path "$($_)"})]
-	$tofolder,
+  	[ValidateScript({test-path "$($_)"})]
+		$tofolder,
   [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
-  [ValidateScript({(($_ | Get-Member | Select-Object -ExpandProperty TypeName -Unique) -eq 'System.Management.Automation.PSCustomObject')})]
-	$inputobject,
+  	[ValidateScript({(($_ | Get-Member | Select-Object -ExpandProperty TypeName -Unique) -eq 'System.Management.Automation.PSCustomObject') -or (($_ | Get-Member | Select-Object -ExpandProperty TypeName -Unique) -eq 'Deserialized.System.Management.Automation.PSCustomObject')})]
+		[array]$inputobject,
   [parameter(Mandatory=$false)]
     $csvdelimiter
   )
   process {
 	if (!$csvdelimiter) {$csvdelimiter = ";"}
+	$ticks = (get-date).ticks.ToString()
+	If (($inputobject | Get-Member | Select-Object -ExpandProperty TypeName -Unique) -eq 'System.Management.Automation.PSCustomObject') {
+		export-clixml -depth 1000 -path "$($env:temp)\$($ticks).xml" -InputObject $inputobject
+		$inputobject = Import-Clixml -Path "$($env:temp)\$($ticks).xml"
+		Remove-Item "$($env:temp)\$($ticks).xml" -Force
+	}
 	foreach ($result in $inputobject) {
 	  $tempfolder = $null
-	  $filterbaseobj = $result | Select-Object *,@{Name='cli-API_input_mod';Expression={[string]::join(",",($_.'cli-API_input'))}} -ExcludeProperty results,'cli-API_input','cli-API_info','cli-key_required'
-	  $tempattrib = $filterbaseobj.'cli-API_input_mod' -replace ("[{0}]"-f (([System.IO.Path]::GetInvalidFileNameChars() | ForEach-Object {[regex]::Escape($_)}) -join '|')),'_'
+	  $tempattrib = $result.'cli-API_input' -replace ("[{0}]"-f (([System.IO.Path]::GetInvalidFileNameChars() | ForEach-Object {[regex]::Escape($_)}) -join '|')),'_'
 	  $tempfolder = "Onyphe-result-$($tempattrib)"
 	  $tempfolder = join-path $tofolder $tempfolder
 	  if (!(test-path $tempfolder)) {mkdir $tempfolder -force | out-null}
 	  $ticks = (get-date).ticks.ToString()
-	  $filterbaseobj | Export-Csv -NoTypeInformation -path "$($tempfolder)\$($ticks)_request_info.csv" -delimiter $csvdelimiter
+	  $result | Export-Csv -NoTypeInformation -path "$($tempfolder)\$($ticks)_request_info.csv" -delimiter $csvdelimiter
 	  switch ($result.results.'@category') {
 		  'geoloc' {
 			  $filteredobj = $result.results | where-object {$_.'@category' -eq 'geoloc'} | sort-object -property country
@@ -2196,42 +2194,40 @@
 			  $filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
 		  }
 		  'inetnum' {
-			  $filteredobj = $result.results | where-object {$_.'@category' -eq 'inetnum'} | sort-object -property seen_date | Select-Object *,@{Name='cli-information';Expression={[string]::join(",",($_.information))}},@{Name='cli-tag';Expression={[string]::join(",",($_.tag))}} -ExcludeProperty tag,information
-			  $tempfilename = join-path $tempfolder "$($ticks)_$($ip)_inetnum.csv"
+				$filteredobj = $result.results | where-object {$_.'@category' -eq 'inetnum'} | sort-object -property seen_date
+				$tempfilename = join-path $tempfolder "$($ticks)_$($ip)_inetnum.csv"
 			  $filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
 		  }
 		  'synscan' {
-			  $filteredobj = $result.results | where-object {$_.'@category' -eq 'synscan'} | sort-object -property seen_date | Select-Object *,@{Name='cli-tag';Expression={[string]::join(",",($_.tag))}} -ExcludeProperty tag
-			  $tempfilename = join-path $tempfolder "$($ticks)_$($ip)_synscan.csv"
+				$filteredobj = $result.results | where-object {$_.'@category' -eq 'synscan'} | sort-object -property seen_date
+				$tempfilename = join-path $tempfolder "$($ticks)_$($ip)_synscan.csv"
 			  $filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
 		  }
 		  'resolver'{
-			  $filteredobj = $result.results | where-object {$_.'@category' -eq 'resolver'} | sort-object -property seen_date | Select-Object *,@{Name='cli-subdomains';Expression={[string]::join(",",($_.subdomains))}},@{Name='cli-tag';Expression={[string]::join(",",($_.tag))}} -ExcludeProperty subdomains,tag
-			  $tempfilename = join-path $tempfolder "$($ticks)_$($ip)_resolver.csv"
+				$filteredobj = $result.results | where-object {$_.'@category' -eq 'resolver'} | sort-object -property seen_date
+				$tempfilename = join-path $tempfolder "$($ticks)_$($ip)_resolver.csv"
 			  $filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
 		  }
 		  'threatlist' {
-			  $filteredobj = $result.results | where-object {$_.'@category' -eq 'threatlist'} | sort-object -property seen_date | Select-Object *,@{Name='cli-tag';Expression={[string]::join(",",($_.tag))}} -ExcludeProperty tag
-			  $tempfilename = join-path $tempfolder "$($ticks)_$($ip)_threatlist.csv"
+				$filteredobj = $result.results | where-object {$_.'@category' -eq 'threatlist'} | sort-object -property seen_date
+				$tempfilename = join-path $tempfolder "$($ticks)_$($ip)_threatlist.csv"
 			  $filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
 		  }
 		  'pastries' {
-			  $filteredobj = $result.results | where-object {$_.'@category' -eq 'pastries'} | sort-object -property seen_date | Select-Object *,@{Name='cli-tld';Expression={[string]::join(",",($_.tld))}},@{Name='cli-url';Expression={[string]::join(",",($_.url))}},@{Name='cli-subdomains';Expression={[string]::join(",",($_.subdomains))}},@{Name='cli-scheme';Expression={[string]::join(",",($_.scheme))}},@{Name='cli-Key';Expression={"https://pastebin.com/$($_.key)"}},@{Name='cli-domain';Expression={[string]::join(",",($_.domain))}},@{Name='cli-file';Expression={[string]::join(",",($_.file))}},@{Name='cli-host';Expression={[string]::join(",",($_.host))}},@{Name='cli-hostname';Expression={[string]::join(",",($_.hostname))}},@{Name='cli-ip';Expression={[string]::join(",",($_.ip))}},@{Name='cli-tag';Expression={[string]::join(",",($_.tag))}} -ExcludeProperty ip,hostname,domain,scheme,subdomains,url,tld,host,file,content,tag
-			  $filteredobjfull = $result.results | where-object {$_.'@category' -eq 'pastries'} | sort-object -property seen_date
+			  $filteredobj = $result.results | where-object {$_.'@category' -eq 'pastries'} | sort-object -property seen_date
 			  $tempfilename = join-path $tempfolder "$($ticks)_$($ip)_Pastries.csv"
 			  $filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
-			  foreach ($contentresult in $filteredobjfull) {
+			  foreach ($contentresult in $filteredobj) {
 				  if ($contentresult.ip.count -gt 1) {
 					  $ip = "multips-$($contentresult.ip[0].Replace(":","-"))"
 					  $allip = $contentresult.ip -join ","
 				  } else {
 					  $ip = $contentresult.ip
 				  }
-				  $temptimestamp = $contentresult.'@timestamp' -replace ":","_"
-				  $tempfilecontentresult = "$($ticks)_$($temptimestamp)_$($ip)_pastries_$($contentresult.key).txt"
-				  $tempcontentexportfile = join-path $tempfolder $tempfilecontentresult
+				  $tempfilecontentresult = "$($ticks)_$($ip)_pastries_$($contentresult.key).txt"
+					$tempcontentexportfile = join-path $tempfolder $tempfilecontentresult
 				  if ($allip) {
-					  add-content -path $tempcontentexportfile -value "########### info ip ###########"
+					  set-content -path $tempcontentexportfile -value "########### info ip ###########"
 					  add-content -path $tempcontentexportfile -value $allip
 					  add-content -path $tempcontentexportfile -value "########### info ip ###########"
 				  }
@@ -2239,27 +2235,25 @@
 			  }
 		  }
 		  'sniffer' {
-			  $filteredobj = $result.results | where-object {$_.'@category' -eq 'sniffer'} | sort-object -property seen_date | Select-Object *,@{Name='cli-tag';Expression={[string]::join(",",($_.tag))}} -ExcludeProperty tag
-			  $tempfilename = join-path $tempfolder "$($ticks)_$($ip)_Sniffer.csv"
+				$filteredobj = $result.results | where-object {$_.'@category' -eq 'sniffer'} | sort-object -property seen_date
+				$tempfilename = join-path $tempfolder "$($ticks)_$($ip)_Sniffer.csv"
 			  $filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
 		  }
 		  'datascan' {
-			  $filteredobjfull = $result.results | where-object {$_.'@category' -eq 'datascan'} | sort-object -property seen_date
-			  $filteredobj = $result.results | where-object {$_.'@category' -eq 'datascan'} | sort-object -property seen_date | Select-Object *,@{Name='cli-tag';Expression={[string]::join(",",($_.tag))}},@{Name='cli-app';Expression={[string]::join(",",($_.app))}} -ExcludeProperty data,app,tag
+			  $filteredobj = $result.results | where-object {$_.'@category' -eq 'datascan'} | sort-object -property seen_date
 			  $tempfilename = join-path $tempfolder "$($ticks)_$($ip)_datascan.csv"
 			  $filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
-			  foreach ($dataresult in $filteredobjfull) {
+			  foreach ($dataresult in $filteredobj) {
 				  if ($dataresult.ip.count -gt 1) {
 					  $ip = "multips-$($dataresult.ip[0].Replace(":","-"))"
 					  $allip = $dataresult.ip -join ","
 				  } else {
 					  $ip = $dataresult.ip
 				  }
-				  $temptimestamp = $dataresult.'@timestamp' -replace ":","_"
-				  $tempfiledataresult = "$($ticks)_$($temptimestamp)_$($ip)_$($dataresult.port)_$($dataresult.protocol).txt"
-				  $tempdataexportfile = join-path $tempfolder $tempfiledataresult
+				  $tempfiledataresult = "$($ticks)_$($ip)_$($dataresult.port)_$($dataresult.protocol).txt"
+					$tempdataexportfile = join-path $tempfolder $tempfiledataresult
 				  if ($allip) {
-					  add-content -path $tempdataexportfile -value "########### info ip ###########"
+					  set-content -path $tempdataexportfile -value "########### info ip ###########"
 					  add-content -path $tempdataexportfile -value $allip
 					  add-content -path $tempdataexportfile -value "########### info ip ###########"
 				  }
@@ -2267,22 +2261,20 @@
 			  }
 		  }
 		  'onionscan' {
-			  $filteredobjfull = $result.results | where-object {$_.'@category' -eq 'onionscan'} | sort-object -property seen_date
-			  $filteredobj = $result.results | where-object {$_.'@category' -eq 'onionscan'} | sort-object -property seen_date | Select-Object *,@{Name='cli-tag';Expression={[string]::join(",",($_.tag))}} -ExcludeProperty data,tag
+			  $filteredobj = $result.results | where-object {$_.'@category' -eq 'onionscan'} | sort-object -property seen_date
 			  $tempfilename = join-path $tempfolder "$($ticks)_$($ip)_onionscan.csv"
 			  $filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
-			  foreach ($dataresult in $filteredobjfull) {
+			  foreach ($dataresult in $filteredobj) {
 				  if ($dataresult.ip.count -gt 1) {
 					  $ip = "multips-$($dataresult.ip[0].Replace(":","-"))"
 					  $allip = $dataresult.ip -join ","
 				  } else {
 					  $ip = $dataresult.ip
 				  }
-				  $temptimestamp = $dataresult.'@timestamp' -replace ":","_"
-				  $tempfiledataresult = "$($ticks)_$($temptimestamp)$($ip)__$($dataresult.port)_$($dataresult.protocol).txt"
+				  $tempfiledataresult = "$($ticks)_$($ip)_$($dataresult.port)_$($dataresult.protocol).txt"
 				  $tempdataexportfile = join-path $tempfolder $tempfiledataresult
-				  if ($allip) {
-					  add-content -path $tempdataexportfile -value "########### info ip ###########"
+					if ($allip) {
+					  set-content -path $tempdataexportfile -value "########### info ip ###########"
 					  add-content -path $tempdataexportfile -value $allip
 					  add-content -path $tempdataexportfile -value "########### info ip ###########"
 				  }
@@ -2290,9 +2282,15 @@
 			  }
 			}
 			'ctl' {
-				$filteredobj = $result.results | where-object {$_.'@category' -eq 'ctl'} | sort-object -property seen_date | Select-Object *,@{Name='cli-basicconstraints';Expression={[string]::join(",",($_.basicconstraints))}},@{Name='cli-extkeyusage';Expression={[string]::join(",",($_.extkeyusage))}},@{Name='cli-hostname';Expression={[string]::join(",",($_.hostname))}},@{Name='cli-keyusage';Expression={[string]::join(",",($_.keyusage))}},@{Name='cli-commonname';Expression={[string]::join(",",($_.subject.commonname))}},@{Name='cli-altname';Expression={[string]::join(",",($_.subject.altname))}} -ExcludeProperty basicconstraints,extkeyusage,hostname,keyusage,subject
-			  $tempfilename = join-path $tempfolder "$($ticks)_$($ip)ctl.csv"
+				$filteredobj = $result.results | where-object {$_.'@category' -eq 'ctl'} | sort-object -property seen_date
+				$tempfilename = join-path $tempfolder "$($ticks)_$($ip)ctl.csv"
 			  $filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
+			}
+			'datashot' {
+				$filteredobj = $result.results | where-object {$_.'@category' -eq 'datashot'} | sort-object -property seen_date
+				$tempfilename = join-path $tempfolder "$($ticks)_$($ip)_datashot.csv"
+				$filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
+				Export-OnypheDataShot -tofolder $tempfolder -inputobject $result
 			}
 	  }
 	}
@@ -2305,6 +2303,7 @@
 
 		.DESCRIPTION
 		retrieve current script directory
+
 	#>
 	Split-Path -Parent $PSCommandPath
 	}
@@ -2820,13 +2819,55 @@
 				(Get-OnypheUserInfo).results | Select-Object -Property apis,filters,functions | Export-Clixml -Force -Path $XMLFilePath
 			}
 		}
-  }
+	}
+	Function Export-OnypheDataShot {
+	<#
+	  .SYNOPSIS 
+	  Export encoded base64 jpg file from a datashot category object
+  
+	  .DESCRIPTION
+	  Export encoded base64 jpg file from a datashot category object
+	  
+	  .OUTPUTS
+	  jpg file
+	  
+	  .EXAMPLE
+	  Export all screenshots available in powershell object $temp into C:\temp folder
+	  C:\PS> Export-OnypheDataShot -tofolder C:\temp -inputobject $temp
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(Mandatory=$true)]
+				[ValidateScript({test-path "$($_)"})]
+				$tofolder,
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[ValidateScript({(($_ | Get-Member | Select-Object -ExpandProperty TypeName -Unique) -eq 'System.Management.Automation.PSCustomObject') -or (($_ | Get-Member | Select-Object -ExpandProperty TypeName -Unique) -eq 'Deserialized.System.Management.Automation.PSCustomObject')})]
+				[array]$inputobject
+			)
+			Process {
+				$ticks = (get-date).ticks.ToString()
+				foreach ($result in $inputobject) {
+					$datashotsfilter = $result.results | Where-Object {$_.'@category' -eq 'datashot'}
+					foreach ($datashot in $datashotsfilter) {
+						if ($datashot.app.screenshot.image) {
+							$file = "$($ticks)_$($datashot.ip.Replace(".","-"))_$($datashot.port).jpg"
+							$fullfilepath = join-path $tofolder $file
+							if ($host.Version.Major -ge 6) {
+								[System.Convert]::FromBase64String($datashot.app.screenshot.image) | Set-Content $fullfilepath -AsByteStream -Force
+							} else {
+								[System.Convert]::FromBase64String($datashot.app.screenshot.image) | Set-Content $fullfilepath -Encoding Byte -Force
+							}
+						}
+					}
+				}
+			}
+		}
 
 	New-Alias -Name Update-OnypheLocalData -value Update-OnypheFacetsFilters
 	New-Alias -Name Get-Onyphe -Value Get-OnypheInfo
 	New-Alias -Name Search-Onyphe -Value Search-OnypheInfo
 
-	Export-ModuleMember -Function  Get-OnypheUserInfo, Search-OnypheInfo, Get-OnypheInfo, Get-OnypheInfoFromCSV, Export-OnypheInfoToFile,
+	Export-ModuleMember -Function  Get-OnypheUserInfo, Search-OnypheInfo, Get-OnypheInfo, Get-OnypheInfoFromCSV, Export-OnypheInfoToFile, Export-OnypheDataShot,
 															Invoke-APIOnypheMD5, Invoke-APIOnypheOnionScan, Invoke-APIOnypheCtl, Invoke-APIOnypheSniffer, Invoke-APIOnypheUser, Invoke-APIOnypheSearch, Invoke-APIOnypheDataScan, Invoke-APIOnypheForward, Invoke-APIOnypheGeoloc, Invoke-APIOnypheIP, Invoke-APIOnypheInetnum, Invoke-APIOnypheMyIP, Invoke-APIOnyphePastries, Invoke-APIOnypheReverse, Invoke-APIOnypheSynScan, Invoke-APIOnypheThreatlist, Invoke-Onyphe,
 															Get-OnypheSearchCategories, Get-OnypheSearchFilters, Get-ScriptDirectory, Set-OnypheAPIKey, Update-OnypheFacetsFilters, Get-OnypheCliFacets, Get-OnypheStatsFromObject, Set-OnypheProxy, Import-OnypheEncryptedIKey, Get-OnypheAPIName
 	Export-ModuleMember -Alias Update-OnypheLocalData, Get-Onyphe, Search-Onyphe
