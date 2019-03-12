@@ -11,6 +11,13 @@ https://www.onyphe.io/documentation/api
 
 (c) 2018-2019 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
 
+## Notes version (0.95) :
+- fix HTTP error on invoke-onyphe when no network is available
+- add datashot management
+- add function to export datashot to picture file
+- fix Get-OnypheInfoFromCSV
+- update Export-OnypheInfoToFile
+
 ## Notes version (0.94) :
 - manage new apis (ctl, sniffer, onionscan, md5)
 - use userinfos API to collect APIs and search filters
@@ -56,6 +63,7 @@ using a simple powershell command and an internet access :-)
 documentation in markdown available here : https://github.com/MS-LUF/Use-Onyphe/tree/master/docs
 ### function
 - Export-OnypheInfoToFile
+- Export-OnypheDataShot
 - Get-OnypheAPIName
 - Get-OnypheCliFacets
 - Get-OnypheInfo
