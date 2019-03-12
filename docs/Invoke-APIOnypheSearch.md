@@ -135,7 +135,8 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
+For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
@@ -155,7 +156,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ### count            NoteProperty int count=10
 ### error            NoteProperty int error=0
 ### max_page         NoteProperty decimal max_page=1000,0
-### myip             NoteProperty string myip=90.92.236.55
+### myip             NoteProperty string myip=192.168.6.66
 ### page             NoteProperty int page=1000
 ### results          NoteProperty Object[] results=System.Object[]
 ### status           NoteProperty string status=ok
@@ -164,7 +165,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ### count            : 10
 ### error            : 0
 ### max_page         : 1000,0
-### myip             : 90.92.234.60
+### myip             : 192.168.6.66
 ### page             : 1000
 ### results          : {@{@category=inetnum; @timestamp=2018-08-12T01:35:21.000Z; @type=ip; asn=AS16276; country=GB;
 ### 	information=System.Object[]; ipv6=false; location=51.4964,-0.1224; netname=reduk2; organization=OVH

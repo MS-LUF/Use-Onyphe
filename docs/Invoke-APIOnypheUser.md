@@ -54,14 +54,15 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
+For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
 ## OUTPUTS
 
 ### TypeName : System.Management.Automation.PSCustomObject
-### Name             MemberType   Definition
+###   Name             MemberType   Definition
 ### ----             ----------   ----------
 ### Equals           Method       bool Equals(System.Object obj)
 ### GetHashCode      Method       int GetHashCode()
@@ -73,7 +74,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ### cli-Request_Date NoteProperty datetime cli-Request_Date=23/01/2018 11:33:17
 ### count            NoteProperty int count=1
 ### error            NoteProperty int error=0
-### myip             NoteProperty string myip=90.5.90.101
+### myip             NoteProperty string myip=192.168.6.66
 ### results          NoteProperty Object[] results=System.Object[]
 ### status           NoteProperty string status=ok
 ### took             NoteProperty string took=0.001

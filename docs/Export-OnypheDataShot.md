@@ -5,29 +5,45 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-OnypheStatsFromObject
+# Export-OnypheDataShot
 
 ## SYNOPSIS
-commandline interface to use onyphe.io web service
+Export encoded base64 jpg file from a datashot category object
 
 ## SYNTAX
 
 ```
-Get-OnypheStatsFromObject [-inputobject] <Array> [[-AdvancedFacets] <Array>] [-Facets <String>]
- [<CommonParameters>]
+Export-OnypheDataShot [-tofolder] <Object> [-inputobject] <Array> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-use-onyphe.psm1 module provides a commandline interface to onyphe.io web service.
+Export encoded base64 jpg file from a datashot category object
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-import-module use-onyphe.psm1
+Export all screenshots available in powershell object $temp into C:\temp folder
 ```
 
+C:\PS\> Export-OnypheDataShot -tofolder C:\temp -inputobject $temp
+
 ## PARAMETERS
+
+### -tofolder
+{{Fill tofolder Description}}
+
+```yaml
+Type: Object
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: 1
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
 
 ### -inputobject
 {{Fill inputobject Description}}
@@ -38,39 +54,9 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 1
-Default value: None
-Accept pipeline input: True (ByPropertyName, ByValue)
-Accept wildcard characters: False
-```
-
-### -AdvancedFacets
-{{Fill AdvancedFacets Description}}
-
-```yaml
-Type: Array
-Parameter Sets: (All)
-Aliases:
-
-Required: False
 Position: 2
 Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Facets
-{{Fill Facets Description}}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
+Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```
 
@@ -82,6 +68,7 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 ## OUTPUTS
 
+### jpg file
 ## NOTES
 
 ## RELATED LINKS

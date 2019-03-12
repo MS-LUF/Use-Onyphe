@@ -86,7 +86,8 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
+For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
@@ -105,14 +106,14 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ### cli-Request_Date NoteProperty datetime cli-Request_Date=14/01/2018 20:47:39
 ### count            NoteProperty int count=1
 ### error            NoteProperty int error=0
-### myip             NoteProperty string myip=192.168.1.66
+### myip             NoteProperty string myip=192.168.6.66
 ### results          NoteProperty Object[] results=System.Object[]
 ### status           NoteProperty string status=ok
 ### took             NoteProperty string took=0.001305
 ### total            NoteProperty int total=1
 ### count            : 28
 ### error            : 0
-### myip             : 192.168.1.66
+### myip             : 192.168.6.66
 ### results          : {@{@category=inetnum; @timestamp=2018-01-14T02:37:32.000Z; @type=ip; country=US; ipv6=false;
 ### 	netname=EU-EDGECASTEU-20080602; seen_date=2018-01-14; source=RIPE; subnet=93.184.208.0/20},
 ### 	@{@category=inetnum; @timestamp=2018-01-14T02:37:32.000Z; @type=ip; country=EU;

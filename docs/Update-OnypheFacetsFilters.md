@@ -5,44 +5,43 @@ online version:
 schema: 2.0.0
 ---
 
-# Import-OnypheEncryptedIKey
+# Update-OnypheFacetsFilters
 
 ## SYNOPSIS
-import onyphe API key as global variable from encrypted local config file
+Update Onyphe-Data-Model.xml local file containing a cache of available APIs, functions, filters from user API
 
 ## SYNTAX
 
 ```
-Import-OnypheEncryptedIKey [-MasterPassword] <SecureString> [<CommonParameters>]
+Update-OnypheFacetsFilters [[-APIKey] <String[]>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-import onyphe API key as global variable from encrypted local config file
+Update Onyphe-Data-Model.xml local file containing a cache of available APIs, functions, filters from user API
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-set API Key as global variable using encrypted key hosted in local xml file previously generated with Set-OnypheAPIKey
+Update Onyphe-Data-Model.xml local file containing a cache of available APIs, functions, filters from user API
 ```
 
-C:\PS\> Import-OnypheEncryptedIKey -MasterPassword (ConvertTo-SecureString -String "YourP@ssw0rd" -AsPlainText -Force)
+C:\PS\> Update-OnypheFacetsFilters
 
 ## PARAMETERS
 
-### -MasterPassword
--MasterPassword SecureString{Password}
-Use a passphrase for encryption purpose.
+### -APIKey
+{{Fill APIKey Description}}
 
 ```yaml
-Type: SecureString
+Type: String[]
 Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
 Position: 1
 Default value: None
-Accept pipeline input: True (ByPropertyName)
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 

@@ -28,7 +28,7 @@ send HTTP request to onyphe.io web service and convert back JSON information to 
 Request all information available for ip 192.168.1.5
 ```
 
-C:\PS\> Get-OnypheInfo -ip "192.168.1.5" -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+C:\PS\> Get-OnypheInfo -searchtype ip -SearchValue "192.168.1.5" -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 ### EXAMPLE 2
 ```
@@ -42,70 +42,70 @@ C:\PS\> Get-OnypheInfo -myip
 Request geoloc information for ip 8.8.8.8
 ```
 
-C:\PS\> Get-OnypheInfo -ip "8.8.8.8" -searchtype Geoloc
+C:\PS\> Get-OnypheInfo -SearchValue "8.8.8.8" -searchtype Geoloc
 
 ### EXAMPLE 4
 ```
 Request dns reverse information for ip 8.8.8.8
 ```
 
-C:\PS\> Get-OnypheInfo -ip "8.8.8.8" -searchtype Reverse -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+C:\PS\> Get-OnypheInfo -SearchValue "8.8.8.8" -searchtype Reverse -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 ### EXAMPLE 5
 ```
 request IIS keyword datascan information
 ```
 
-C:\PS\> Get-OnypheInfo -searchtype DataScan -datascanstring "IIS" -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+C:\PS\> Get-OnypheInfo -searchtype DataScan -SearchValue "IIS" -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 ### EXAMPLE 6
 ```
 request datascan information for ip 8.8.8.8
 ```
 
-C:\PS\> Get-OnypheInfo ip "8.8.8.8" -searchtype DataScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+C:\PS\> Get-OnypheInfo -SearchValue "8.8.8.8" -searchtype DataScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 ### EXAMPLE 7
 ```
 Request pastebin content information for ip 8.8.8.8
 ```
 
-C:\PS\> Get-OnypheInfo -ip "8.8.8.8" -searchtype Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+C:\PS\> Get-OnypheInfo -SearchValue "8.8.8.8" -searchtype Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 ### EXAMPLE 8
 ```
 Request pastebin content information for ip 8.8.8.8 and see page 2 of results
 ```
 
-C:\PS\> Get-OnypheInfo -ip "8.8.8.8" -searchtype Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -page "2"
+C:\PS\> Get-OnypheInfo -SearchValue "8.8.8.8" -searchtype Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -page "2"
 
 ### EXAMPLE 9
 ```
 Request dns forward information for ip 8.8.8.8
 ```
 
-C:\PS\> Get-OnypheInfo -ip "8.8.8.8" -searchtype Forward -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+C:\PS\> Get-OnypheInfo -SearchValue "8.8.8.8" -searchtype Forward -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 ### EXAMPLE 10
 ```
 Request threatlist information for ip 8.8.8.8
 ```
 
-C:\PS\> Get-OnypheInfo -ip "8.8.8.8" -searchtype Threatlist -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+C:\PS\> Get-OnypheInfo -SearchValue "8.8.8.8" -searchtype Threatlist -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 ### EXAMPLE 11
 ```
 Request inetnum information for ip 8.8.8.8
 ```
 
-C:\PS\> Get-OnypheInfo -ip "8.8.8.8" -searchtype Inetnum -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+C:\PS\> Get-OnypheInfo -SearchValue "8.8.8.8" -searchtype Inetnum -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 ### EXAMPLE 12
 ```
 Request synscan information for ip 8.8.8.8
 ```
 
-C:\PS\> Get-OnypheInfo -ip "8.8.8.8" -searchtype SynScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+C:\PS\> Get-OnypheInfo -SearchValue "8.8.8.8" -searchtype SynScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 ## PARAMETERS
 
@@ -189,7 +189,7 @@ Accept wildcard characters: False
 ```
 
 ### -SearchType
-{{Fill searchtype Description}}
+{{Fill SearchType Description}}
 
 ```yaml
 Type: String
@@ -204,7 +204,8 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
+For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
@@ -213,7 +214,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ### TypeName: System.Management.Automation.PSCustomObject
 ### count            : 32
 ### error            : 0
-### myip             : 90.245.80.180
+### myip             : 192.168.6.66
 ### results          : {@{@category=geoloc; @timestamp=2017-12-20T13:43:12.000Z; @type=ip; asn=AS15169; city=; country=US;
 ### 				   country_name=United States; geolocation=37.7510,-97.8220; ip=8.8.8.8; ipv6=false; latitude=37.7510;
 ### 				   longitude=-97.8220; organization=Google LLC; subnet=8.8.0.0/19}, @{@category=inetnum;

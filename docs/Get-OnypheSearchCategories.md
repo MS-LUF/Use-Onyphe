@@ -13,7 +13,7 @@ Get category available for search APIs of Onyphe
 ## SYNTAX
 
 ```
-Get-OnypheSearchCategories [<CommonParameters>]
+Get-OnypheSearchCategories
 ```
 
 ## DESCRIPTION
@@ -29,9 +29,6 @@ Get category available for search APIs of Onyphe
 C:\PS\> Get-OnypheSearchCategories
 
 ## PARAMETERS
-
-### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

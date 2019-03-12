@@ -13,7 +13,7 @@ Export psobject containing Onyphe info to files
 ## SYNTAX
 
 ```
-Export-OnypheInfoToFile [-tofolder] <Object> [-inputobject] <Object> [[-csvdelimiter] <Object>]
+Export-OnypheInfoToFile [-tofolder] <Object> [-inputobject] <Array> [[-csvdelimiter] <Object>]
  [<CommonParameters>]
 ```
 
@@ -63,7 +63,7 @@ Accept wildcard characters: False
 look for information about my public IP
 
 ```yaml
-Type: Object
+Type: Array
 Parameter Sets: (All)
 Aliases:
 
@@ -92,7 +92,8 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
+For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

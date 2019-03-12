@@ -5,41 +5,41 @@ online version:
 schema: 2.0.0
 ---
 
-# Invoke-APIOnypheReverse
+# Invoke-APIOnypheOnionScan
 
 ## SYNOPSIS
-create several input for Invoke-Onyphe function and then call it to get the reverse dns info from reverse API
+create several input for Invoke-Onyphe function and then call it to get info for a .onion link using OnionScan API
 
 ## SYNTAX
 
 ```
-Invoke-APIOnypheReverse [-IP] <String[]> [[-APIKey] <String[]>] [[-Page] <String[]>] [<CommonParameters>]
+Invoke-APIOnypheOnionScan [-Onion] <String[]> [[-APIKey] <String[]>] [[-Page] <String[]>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-create several input for Invoke-Onyphe function and then call it to get the reverse dns info from reverse API
+create several input for Invoke-Onyphe function and then call it to get info for a .onion link using OnionScan API
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-get reverse dns info info for IP 8.8.8.8
+get md5 info for vlp4uw5ui22ljlg7.onion URL
 ```
 
-C:\PS\> Invoke-APIOnypheReverse -IP 8.8.8.8
+C:\PS\> Invoke-APIOnypheOnionScan -Onion "vlp4uw5ui22ljlg7.onion"
 
 ### EXAMPLE 2
 ```
-get reverse dns info info for IP 8.8.8.8 ans set the api key
+get md5 info for vlp4uw5ui22ljlg7.onion URL and set the api key
 ```
 
-C:\PS\> Invoke-APIOnypheReverse -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+C:\PS\> Invoke-APIOnypheOnionScan -Onion "vlp4uw5ui22ljlg7.onion" -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 ## PARAMETERS
 
-### -IP
--IP string{IP}
-IP to be used for the reverse API usage
+### -Onion
+-Onion string{Onion URL}
+Onion link to be used for the Onion API usage
 
 ```yaml
 Type: String[]
@@ -103,32 +103,29 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 ### cli-API_info     NoteProperty string[] cli-API_info=System.String[]
 ### cli-API_input    NoteProperty string[] cli-API_input=System.String[]
 ### cli-key_required NoteProperty bool[] cli-key_required=System.Boolean[]
-### cli-Request_Date NoteProperty datetime cli-Request_Date=14/01/2018 20:47:39
-### count            NoteProperty int count=1
-### error            NoteProperty int error=0
+### cli-Request_Date NoteProperty datetime cli-Request_Date=04/03/2019 22:04:40
+### count            NoteProperty long count=10
+### error            NoteProperty long error=0
+### max_page         NoteProperty long max_page=3
 ### myip             NoteProperty string myip=192.168.6.66
+### page             NoteProperty long page=1
 ### results          NoteProperty Object[] results=System.Object[]
 ### status           NoteProperty string status=ok
-### took             NoteProperty string took=0.001305
-### total            NoteProperty int total=1
-### count            : 59
+### took             NoteProperty string took=0.034
+### total            NoteProperty long total=28
+### count            : 10
 ### error            : 0
+### max_page         : 1000
 ### myip             : 192.168.6.66
-### results          : {@{@category=resolver; @timestamp=2018-01-13T15:26:54.000Z; @type=reverse; domain=google.com;
-### 			ip=8.8.8.8; ipv6=false; reverse=google-public-dns-a.google.com; seen_date=2018-01-13},
-### 			@{@category=resolver; @timestamp=2018-01-13T15:26:54.000Z; @type=reverse; domain=google.com;
-### 			ip=8.8.8.8; ipv6=false; reverse=google-public-dns-a.google.com; seen_date=2018-01-13},
-### 			@{@category=resolver; @timestamp=2018-01-10T07:39:04.000Z; @type=reverse; domain=google.com;
-### 			ip=8.8.8.8; ipv6=false; reverse=google-public-dns-a.google.com; seen_date=2018-01-10},
-### 			@{@category=resolver; @timestamp=2018-01-10T07:39:04.000Z; @type=reverse; domain=google.com;
-### 			ip=8.8.8.8; ipv6=false; reverse=google-public-dns-a.google.com; seen_date=2018-01-10}...}
+### page             : 1
+### results          : {}
 ### status           : ok
-### took             : 0.056
-### total            : 59
-### cli-API_info     : {reverse}
-### cli-API_input    : {8.8.8.8}
+### took             : 0.259
+### total            : 1942240
+### cli-API_info     : {OnionScan}
+### cli-API_input    : {vlp4uw5ui22ljlg7.onion}
 ### cli-key_required : {True}
-### cli-Request_Date : 14/01/2018 20:45:08
+### cli-Request_Date : 05/03/2019 16:48:12
 ## NOTES
 
 ## RELATED LINKS
