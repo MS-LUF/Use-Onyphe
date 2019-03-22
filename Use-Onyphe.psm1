@@ -23,7 +23,13 @@
 # - add function to export datashot to picture file
 # - fix Get-OnypheInfoFromCSV
 # - update Export-OnypheInfoToFile
-#
+# v0.96 :
+# - add new filtering function for search request
+# - add Get-OnypheSearchFunctions function
+# - update Invoke-APIOnypheSearch and Search-OnypheInfo functions
+# - replace SimpleSearchfilter parameter with SimpleSearchfilter
+# - replace SimpleSearchValue parameter with SearchValue
+# - add FunctionFilter and FunctionValue parameters
 #'(c) 2018-2019 lucas-cueff.com - Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).'
 
 <#
@@ -234,7 +240,7 @@
 		  $fromcsv,
   	[parameter(Mandatory=$false)]
 	[ValidateLength(40,40)]
-		[string[]]$APIKey,
+		[string]$APIKey,
 	[parameter(Mandatory=$false)]
     	$csvdelimiter
 	)
@@ -256,12 +262,21 @@
 		}
 		$APISearchEntries = $csvcontent | where-object {$_.API -eq "Search"}
 		foreach ($entry in $APISearchEntries) {
-			if ($entry.'Search-Request' -contains "+") {
+			$params = @{
+				SearchType = $entry.'Search-Type'
+				Wait = 3
+			 }
+			if ($entry.'Search-Request'.contains("+")) {
 				$tmparray = $entry.'Search-Request'.split("+")
-				$Script:Result += Search-OnypheInfo -AdvancedSearch $tmparray -SearchType $entry.'Search-Type' -wait 3
+				$params.add('AdvancedSearch',$tmparray)
 			} else {
-				$Script:Result += Search-OnypheInfo -AdvancedSearch @($entry.'Search-Request') -SearchType $entry.'Search-Type' -wait 3
+				$params.add('AdvancedSearch',@($entry.'Search-Request'))
 			}
+			if ($entry.'Filter-Function' -and $entry.'Function-Input') {
+				$params.add('FilterFunction', $entry.'Filter-Function')
+				$params.add('FilterValue',$entry.'Function-Input')
+			}
+			$Script:Result += Search-OnypheInfo @params
 		}
 		$APIEntries = $csvcontent | where-object {$_.API -ne "Search"}
 		foreach ($entry in $APIEntries) {
@@ -283,17 +298,25 @@
 	 -AdvancedSearch ARRAY{filter:value,filter:value}
 	 Search with multiple criterias
  
-	 .PARAMETER SimpleSearchValue
-	 -SimpleSearchValue STRING{value}
-	 string to be searched with -SimpleSearchFilter parameter
+	 .PARAMETER SearchValue
+	 -SearchValue STRING{value}
+	 string to be searched with -SearchFilter parameter
  
-	 .PARAMETER SimpleSearchFilter
-	 -SimpleSearchFilter STRING{Get-OnypheSearchFilters}
-	 Filter to be used with string set with SimpleSearchValue parameter
+	 .PARAMETER SearchFilter
+	 -SearchFilter STRING{Get-OnypheSearchFilters}
+	 Filter to be used with string set with SearchValue parameter
  
 	 .PARAMETER SearchType
 	 -SearchType STRING{Get-OnypheSearchCategories}
 	 Search Type or Category
+
+	 .PARAMETER FilterFunction
+	 -FilterFunction String{Get-OnypheSearchFunctions}
+	 Filter search function
+
+	 .PARAMETER FilterValue
+	 -FilterValue String
+	 value to use as input for FilterFunction
 	 
 	 .PARAMETER APIKey
 	 -APIKey string{APIKEY}
@@ -338,7 +361,7 @@
 	 .EXAMPLE
 	 simple search with one filter/criteria
 	 Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
-	 C:\PS> Search-OnypheInfo -SimpleSearchValue RU -SearchType threatlist -SimpleSearchFilter country
+	 C:\PS> Search-OnypheInfo -SearchValue RU -SearchType threatlist -SearchFilter country
  
 	 .EXAMPLE
 	 AdvancedSearch with multiple criteria/filters and set the API key
@@ -348,23 +371,31 @@
 	 .EXAMPLE
 	 simple search with one filter/criteria and request page 2 of the results
 	 Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
-	 C:\PS> Search-OnypheInfo -SimpleSearchValue RU -SearchType threatlist -SimpleSearchFilter country -page "2"
+	 C:\PS> Search-OnypheInfo -SearchValue RU -SearchType threatlist -SearchFilter country -page "2"
+
+	 .EXAMPLE
+	 simple search with one filter/criteria and use a server filter to retrieve only objects indexed since 2 month
+	 Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
+	 C:\PS> Search-OnypheInfo -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2"
  #>
 	 [cmdletbinding()]
 	 param(
-		 [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$false,Position=4)]
+		 [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$false,Position=2)]
 		 [ValidateNotNullOrEmpty()]  
-			 [string]$SimpleSearchValue,
-		 [parameter(Mandatory=$false,Position=1)] 
+			 [string]$SearchValue,
+		 [parameter(Mandatory=$false,Position=5)] 
+		 [ValidateNotNullOrEmpty()]
+		   [string]$FilterValue,
+		 [parameter(Mandatory=$false,Position=6)] 
 		 [ValidateNotNullOrEmpty()]
 		     [Array]$AdvancedSearch,
-		 [parameter(Mandatory=$false)]
+		 [parameter(Mandatory=$false,Position=8)]
 		 [ValidateLength(40,40)]
-		     [string[]]$APIKey,
-		 [parameter(Mandatory=$false)]
+		     [string]$APIKey,
+		 [parameter(Mandatory=$false,Position=9)]
 		 [ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
 			 [string[]]$Page,
-		 [parameter(Mandatory=$false)]
+		 [parameter(Mandatory=$false,Position=7)]
 			 [int]$wait
 	 )
 	 DynamicParam
@@ -376,7 +407,7 @@
 		 $ParameterAttribute.ValueFromPipeline = $false
 		 $ParameterAttribute.ValueFromPipelineByPropertyName = $false
 		 $ParameterAttribute.Mandatory = $true
-		 $ParameterAttribute.Position = 2
+		 $ParameterAttribute.Position = 1
 		 $AttributeCollection.Add($ParameterAttribute)
 		 $arrSet = Get-OnypheSearchCategories
 		 $ValidateSetAttribute = New-Object System.Management.Automation.ValidateSetAttribute($arrSet)
@@ -384,7 +415,7 @@
 		 $RuntimeParameter = New-Object System.Management.Automation.RuntimeDefinedParameter($ParameterNameType, [string], $AttributeCollection)
 		 $RuntimeParameterDictionary.Add($ParameterNameType, $RuntimeParameter)
 		 
-		 $ParameterNameFilter = 'SimpleSearchFilter'
+		 $ParameterNameFilter = 'SearchFilter'
 		 $AttributeCollection2 = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
 		 $ParameterAttribute2 = New-Object System.Management.Automation.ParameterAttribute
 		 $ParameterAttribute2.ValueFromPipeline = $false
@@ -397,14 +428,35 @@
 		 $AttributeCollection2.Add($ValidateSetAttribute2)
 		 $RuntimeParameter2 = New-Object System.Management.Automation.RuntimeDefinedParameter($ParameterNameFilter, [string], $AttributeCollection2)
 		 $RuntimeParameterDictionary.Add($ParameterNameFilter, $RuntimeParameter2)
+
+		 $ParameterNameFunction = 'FilterFunction'
+		 $AttributeCollection3 = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
+		 $ParameterAttribute3 = New-Object System.Management.Automation.ParameterAttribute
+		 $ParameterAttribute3.ValueFromPipeline = $false
+		 $ParameterAttribute3.ValueFromPipelineByPropertyName = $false
+		 $ParameterAttribute3.Mandatory = $false
+		 $ParameterAttribute3.Position = 4
+		 $AttributeCollection3.Add($ParameterAttribute3)
+		 $arrSet =  Get-OnypheSearchFunctions
+		 $ValidateSetAttribute3 = New-Object System.Management.Automation.ValidateSetAttribute($arrSet)
+		 $AttributeCollection3.Add($ValidateSetAttribute3)
+		 $RuntimeParameter3 = New-Object System.Management.Automation.RuntimeDefinedParameter($ParameterNameFunction, [string], $AttributeCollection3)
+		 $RuntimeParameterDictionary.Add($ParameterNameFunction, $RuntimeParameter3)
 		 
 		 return $RuntimeParameterDictionary
 	}
 	Process {
 		$SearchType = $PsBoundParameters[$ParameterNameType]
 		$SearchFilter = $PsBoundParameters[$ParameterNameFilter]
+		$SearchFunction = $PsBoundParameters[$ParameterNameFunction]
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
 		if ($wait) {start-sleep -s $wait}
+		if ($SearchFilter -and !($SearchValue)) {
+			throw "please use the SearchValue parameter when using SearchFilter parameter or used AdvancedSearch instead"
+		}
+		if ($SearchFunction -and !($FilterValue)) {
+			throw "please use the FilterValue parameter when using FilterFunction parameter"
+		}
 		if ($AdvancedSearch) {
 			 $params = @{
 				AdvancedSearch = $AdvancedSearch
@@ -412,10 +464,14 @@
 			 }
 		} else {
 			$params = @{
-				SimpleSearchValue = $SimpleSearchValue
+				SearchValue = $SearchValue
 				SearchType = $SearchType
-				SimpleSearchFilter = $SearchFilter
+				SearchFilter = $SearchFilter
 			}
+		}
+		if ($SearchFunction) {
+			$params.add('FilterFunction', $SearchFunction)
+			$params.add('FilterValue',$FilterValue)
 		}
 		if ($Page) {
 			$params.add('Page', $page)
@@ -540,7 +596,7 @@
 		[switch]$MyIP,
 	[parameter(Mandatory=$false)]
 		[ValidateLength(40,40)]
-		[string[]]$APIKey,
+		[string]$APIKey,
 	[parameter(Mandatory=$false)]
 	[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
 		[string[]]$Page,
@@ -638,7 +694,7 @@
    Param (
 	[parameter(Mandatory=$false)]
 		[ValidateLength(40,40)]
-		[string[]]$APIKey,
+		[string]$APIKey,
 	[parameter(Mandatory=$false)]
 		[int]$wait
    )
@@ -693,7 +749,7 @@
 	Param ( 
 	[parameter(Mandatory=$false)]
 	  [ValidateLength(40,40)]
-	  [string[]]$APIKey
+	  [string]$APIKey
 	)  
 	  Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -783,7 +839,7 @@
     [string[]]$IP, 
   [parameter(Mandatory=$false)]
 	[ValidateLength(40,40)]
-	[string[]]$APIKey,
+	[string]$APIKey,
   [parameter(Mandatory=$false)]
   [ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
 	[string[]]$Page
@@ -876,7 +932,7 @@
     [string[]]$IP, 
   [parameter(Mandatory=$false)]
 	[ValidateLength(40,40)]
-	[string[]]$APIKey,
+	[string]$APIKey,
   [parameter(Mandatory=$false)]
   [ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
 	[string[]]$Page
@@ -970,7 +1026,7 @@
     [string[]]$IP, 
   [parameter(Mandatory=$false)]
 	[ValidateLength(40,40)]
-	[string[]]$APIKey,
+	[string]$APIKey,
   [parameter(Mandatory=$false)]
   [ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
 	[string[]]$Page
@@ -1082,7 +1138,7 @@
 			[string[]]$IP, 
 		[parameter(Mandatory=$false)]
 		[ValidateLength(40,40)]
-		[string[]]$APIKey,
+		[string]$APIKey,
 		[parameter(Mandatory=$false)]
 		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
 		[string[]]$Page
@@ -1177,7 +1233,7 @@
 			[string[]]$Domain, 
 		[parameter(Mandatory=$false)]
 		[ValidateLength(40,40)]
-		[string[]]$APIKey,
+		[string]$APIKey,
 		[parameter(Mandatory=$false)]
 		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
 		[string[]]$Page
@@ -1293,7 +1349,7 @@
 			[string[]]$MD5, 
 		[parameter(Mandatory=$false)]
 		[ValidateLength(40,40)]
-		[string[]]$APIKey,
+		[string]$APIKey,
 		[parameter(Mandatory=$false)]
 		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
 		[string[]]$Page
@@ -1383,7 +1439,7 @@
 			[string[]]$Onion, 
 		[parameter(Mandatory=$false)]
 		[ValidateLength(40,40)]
-		[string[]]$APIKey,
+		[string]$APIKey,
 		[parameter(Mandatory=$false)]
 		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
 		[string[]]$Page
@@ -1476,7 +1532,7 @@
     [string[]]$IP, 
   [parameter(Mandatory=$false)]
 	[ValidateLength(40,40)]
-	[string[]]$APIKey,
+	[string]$APIKey,
   [parameter(Mandatory=$false)]
   [ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
 	[string[]]$Page
@@ -1568,7 +1624,7 @@
     [string[]]$IP, 
   [parameter(Mandatory=$false)]
 	[ValidateLength(40,40)]
-	[string[]]$APIKey,
+	[string]$APIKey,
   [parameter(Mandatory=$false)]
   [ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
 	[string[]]$Page
@@ -1662,7 +1718,7 @@
     [string[]]$IP, 
   [parameter(Mandatory=$false)]
 	[ValidateLength(40,40)]
-	[string[]]$APIKey,
+	[string]$APIKey,
   [parameter(Mandatory=$false)]
   [ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
 	[string[]]$Page
@@ -1771,7 +1827,7 @@
     [string[]]$IPOrDataScanString,
   [parameter(Mandatory=$false)]
 	[ValidateLength(40,40)]
-	  [string[]]$APIKey,
+	  [string]$APIKey,
   [parameter(Mandatory=$false)]
   [ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
 	  [string[]]$Page
@@ -1866,7 +1922,7 @@
     [string[]]$IP, 
   [parameter(Mandatory=$false)]
 	[ValidateLength(40,40)]
-	[string[]]$APIKey,
+	[string]$APIKey,
 	[parameter(Mandatory=$false)]
 	[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
 	   [string[]]$Page
@@ -2481,7 +2537,28 @@
 		  $SearchFilters = Import-Clixml -Path $XMLFilePath
 		  ($SearchFilters.apis | Where-Object {$_ -like "*/search/*"}) -replace "/api/search/",""
 	  }
-  }
+	}
+	Function Get-OnypheSearchFunctions {
+		<#
+			.SYNOPSIS 
+			Get search functions available for search APIs of Onyphe
+		
+			.DESCRIPTION
+			Get search functions available for search APIs of Onyphe (like time filterring etc...)
+			
+			.OUTPUTS
+			functions as string
+			
+			.EXAMPLE
+			Get category available for search APIs of Onyphe
+			C:\PS> Get-OnypheSearchFunctions
+		#>
+			$XMLFilePath = join-path (Get-ScriptDirectory) "Onyphe-Data-Model.xml"
+			if (test-path $XMLFilePath) {
+				$SearchFilters = Import-Clixml -Path $XMLFilePath
+				($SearchFilters.functions | Where-Object {$_ -like "-*"}) -replace "-",""
+			}
+		}
 	Function Get-OnypheCliFacets {
 	<#
 	  .SYNOPSIS 
@@ -2616,17 +2693,25 @@
 	  -AdvancedSearch ARRAY{filter:value,filter:value}
 	  Search with multiple criterias
 
-	  .PARAMETER SimpleSearchValue
-	  -SimpleSearchValue STRING{value}
-	  string to be searched with -SimpleSearchFilter parameter
+	  .PARAMETER SearchValue
+	  -SearchValue STRING{value}
+	  string to be searched with -SearchFilter parameter
 
-	  .PARAMETER SimpleSearchFilter
-	  -SimpleSearchFilter STRING{Get-OnypheSearchFilters}
-	  Filter to be used with string set with SimpleSearchValue parameter
+	  .PARAMETER SearchFilter
+	  -SearchFilter STRING{Get-OnypheSearchFilters}
+	  Filter to be used with string set with SearchValue parameter
 
 	  .PARAMETER SearchType
 	  -SearchType STRING{Get-OnypheSearchCategories}
-	  Search Type or Category
+		Search Type or Category
+		
+		.PARAMETER FilterFunction
+	  -FilterFunction String{Get-OnypheSearchFunctions}
+	  Filter search function
+
+	  .PARAMETER FilterValue
+	  -FilterValue String
+	  value to use as input for FilterFunction
 
 	  .PARAMETER APIKEY
 	  -APIKey string{APIKEY}
@@ -2692,59 +2777,38 @@
 	  .EXAMPLE
 	  simple search with one filter/criteria
 	  Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
-	  C:\PS> Invoke-APIOnypheSearch -SimpleSearchValue RU -SearchType threatlist -SimpleSearchFilter country
+	  C:\PS> Invoke-APIOnypheSearch -SearchValue RU -SearchType threatlist -SearchFilter country
 	#>
 	[cmdletbinding()]
     param(
-        [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$false,Position=4)]
-		[ValidateNotNullOrEmpty()]  
-			[string]$SimpleSearchValue,
-        [parameter(Mandatory=$false,Position=1)] 
-        [ValidateNotNullOrEmpty()]
-		   [Array]$AdvancedSearch,
-		[parameter(Mandatory=$false)]
-		[ValidateLength(40,40)]
-		   [string[]]$APIKey,
-		[parameter(Mandatory=$false)]
-		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
-		   [string[]]$Page
+			[parameter(Mandatory=$false,Position=1)]
+			[ValidateNotNullOrEmpty()]
+				[string]$SearchType,  
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$false,Position=2)]
+			[ValidateNotNullOrEmpty()]  
+				[string]$SearchValue,
+			[parameter(Mandatory=$false,Position=3)]
+			[ValidateNotNullOrEmpty()]
+				[string]$SearchFilter,
+			[parameter(Mandatory=$false,Position=4)]
+			[ValidateNotNullOrEmpty()]
+				[string]$FilterFunction,    
+			[parameter(Mandatory=$false,Position=5)] 
+			[ValidateNotNullOrEmpty()]
+				[string]$FilterValue,
+			[parameter(Mandatory=$false,Position=6)] 
+			[ValidateNotNullOrEmpty()]
+				[Array]$AdvancedSearch,
+			[parameter(Mandatory=$false,Position=8)]
+			[ValidateLength(40,40)]
+				[string]$APIKey,
+			[parameter(Mandatory=$false,Position=9)]
+			[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+				[string[]]$Page,
+			[parameter(Mandatory=$false,Position=7)]
+				[int]$wait
     )
-	DynamicParam
-    {
-		$ParameterNameType = 'SearchType'
-        $RuntimeParameterDictionary = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
-        $AttributeCollection = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
-        $ParameterAttribute = New-Object System.Management.Automation.ParameterAttribute
-        $ParameterAttribute.ValueFromPipeline = $false
-        $ParameterAttribute.ValueFromPipelineByPropertyName = $false
-        $ParameterAttribute.Mandatory = $true
-        $ParameterAttribute.Position = 2
-        $AttributeCollection.Add($ParameterAttribute)
-        $arrSet = Get-OnypheSearchCategories
-        $ValidateSetAttribute = New-Object System.Management.Automation.ValidateSetAttribute($arrSet)
-        $AttributeCollection.Add($ValidateSetAttribute)
-        $RuntimeParameter = New-Object System.Management.Automation.RuntimeDefinedParameter($ParameterNameType, [string], $AttributeCollection)
-        $RuntimeParameterDictionary.Add($ParameterNameType, $RuntimeParameter)
-        
-        $ParameterNameFilter = 'SimpleSearchFilter'
-        $AttributeCollection2 = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
-        $ParameterAttribute2 = New-Object System.Management.Automation.ParameterAttribute
-        $ParameterAttribute2.ValueFromPipeline = $false
-        $ParameterAttribute2.ValueFromPipelineByPropertyName = $false
-        $ParameterAttribute2.Mandatory = $false
-        $ParameterAttribute2.Position = 3
-        $AttributeCollection2.Add($ParameterAttribute2)
-        $arrSet =  Get-OnypheSearchFilters
-        $ValidateSetAttribute2 = New-Object System.Management.Automation.ValidateSetAttribute($arrSet)
-        $AttributeCollection2.Add($ValidateSetAttribute2)
-        $RuntimeParameter2 = New-Object System.Management.Automation.RuntimeDefinedParameter($ParameterNameFilter, [string], $AttributeCollection2)
-        $RuntimeParameterDictionary.Add($ParameterNameFilter, $RuntimeParameter2)
-        
-        return $RuntimeParameterDictionary
-	}
     Process {		
-		$SearchType = $PsBoundParameters[$ParameterNameType]
-		$SearchFilter = $PsBoundParameters[$ParameterNameFilter]
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
 		if ($AdvancedSearch) {
 			for ($i=0; $i -lt $AdvancedSearch.length; $i++) {
@@ -2754,21 +2818,27 @@
 				$AdvancedSearch[$i] = $tmp -join ":"
 			}
 			$tmpvalue = $AdvancedSearch -join " "
+			if ($FilterFunction) {
+				$tmpvalue = "$($tmpvalue) -$($FilterFunction):$($FilterValue)"
+			}
 			$tmpvaluemd = [System.Uri]::EscapeURIString($tmpvalue)
 			$params = @{
 				request = "search/$($SearchType)/$($tmpvaluemd)"
 				APIInput = @("$($tmpvalue)")
 			}
 		} Else {
-			if ($SimpleSearchValue -match "\s"){
-				$SimpleSearchValue = "`"$($SimpleSearchValue)`""
-				$SimpleSearchValuemd = [System.Uri]::EscapeURIString($SimpleSearchValue)
+			if ($SearchValue -match "(\s)"){
+				$SearchValue = "`"$($SearchValue)`""
+				$SearchValuemd = [System.Uri]::EscapeURIString($SearchValue)
 			} Else {
-				$SimpleSearchValuemd = $SimpleSearchValue
+				$SearchValuemd = $SearchValue
+			}
+			if ($FilterFunction) {
+				$SearchValuemd = "$($SearchValuemd) -$($FilterFunction):$($FilterValue)"
 			}
 			$params = @{
-				request = "search/$($SearchType)/$($SearchFilter):$($SimpleSearchValuemd)"
-				APIInput = @("$($SearchFilter):$($SimpleSearchValue)")
+				request = "search/$($SearchType)/$($SearchFilter):$($SearchValuemd)"
+				APIInput = @("$($SearchFilter):$($SearchValue)")
 			}
 		}
 		$params.add('APIInfo',"search/$($SearchType)")
@@ -2797,7 +2867,7 @@
 	Param ( 
 	[parameter(Mandatory=$false)]
 	  [ValidateLength(40,40)]
-	  [string[]]$APIKey
+	  [string]$APIKey
 	)  
 	  Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -2865,9 +2935,10 @@
 
 	New-Alias -Name Update-OnypheLocalData -value Update-OnypheFacetsFilters
 	New-Alias -Name Get-Onyphe -Value Get-OnypheInfo
+	New-Alias -Name Get-OnypheFromCSV -Value Get-OnypheInfoFromCSV
 	New-Alias -Name Search-Onyphe -Value Search-OnypheInfo
 
 	Export-ModuleMember -Function  Get-OnypheUserInfo, Search-OnypheInfo, Get-OnypheInfo, Get-OnypheInfoFromCSV, Export-OnypheInfoToFile, Export-OnypheDataShot,
 															Invoke-APIOnypheMD5, Invoke-APIOnypheOnionScan, Invoke-APIOnypheCtl, Invoke-APIOnypheSniffer, Invoke-APIOnypheUser, Invoke-APIOnypheSearch, Invoke-APIOnypheDataScan, Invoke-APIOnypheForward, Invoke-APIOnypheGeoloc, Invoke-APIOnypheIP, Invoke-APIOnypheInetnum, Invoke-APIOnypheMyIP, Invoke-APIOnyphePastries, Invoke-APIOnypheReverse, Invoke-APIOnypheSynScan, Invoke-APIOnypheThreatlist, Invoke-Onyphe,
-															Get-OnypheSearchCategories, Get-OnypheSearchFilters, Get-ScriptDirectory, Set-OnypheAPIKey, Update-OnypheFacetsFilters, Get-OnypheCliFacets, Get-OnypheStatsFromObject, Set-OnypheProxy, Import-OnypheEncryptedIKey, Get-OnypheAPIName
-	Export-ModuleMember -Alias Update-OnypheLocalData, Get-Onyphe, Search-Onyphe
+															Get-OnypheSearchFunctions, Get-OnypheSearchCategories, Get-OnypheSearchFilters, Get-ScriptDirectory, Set-OnypheAPIKey, Update-OnypheFacetsFilters, Get-OnypheCliFacets, Get-OnypheStatsFromObject, Set-OnypheProxy, Import-OnypheEncryptedIKey, Get-OnypheAPIName
+	Export-ModuleMember -Alias Update-OnypheLocalData, Get-Onyphe, Search-Onyphe, Get-OnypheFromCSV

@@ -12,7 +12,7 @@
 RootModule = 'use-onyphe.psm1'
 
 # Numero de version de ce module.
-ModuleVersion = '0.95'
+ModuleVersion = '0.96'
 
 # editions PS prises en charge
 # CompatiblePSEditions = @()
@@ -77,7 +77,7 @@ FunctionsToExport = 'Get-OnypheInfo', 'Get-OnypheInfoFromCSV',
 					 'Invoke-APIOnyphePastries', 'Invoke-APIOnypheReverse',
 					 'Invoke-APIOnypheSynScan', 'Invoke-APIOnypheThreatlist',
                      'Invoke-Onyphe','Get-OnypheUserInfo', 'Invoke-APIOnypheUser',
-                     'Get-OnypheSearchFilters', 'Invoke-APIOnypheSearch', 'Get-OnypheSearchCategories',
+                     'Get-OnypheSearchFilters', 'Invoke-APIOnypheSearch', 'Get-OnypheSearchCategories', 'Get-OnypheSearchFunctions',
                      'Search-OnypheInfo', 'Get-OnypheAPIName', 'Import-OnypheEncryptedIKey',
                      'Set-OnypheProxy','Get-OnypheStatsFromObject','Get-OnypheCliFacets', 'Update-OnypheFacetsFilters',
                      'Invoke-APIOnypheCtl', 'Invoke-APIOnypheSniffer', 'Invoke-APIOnypheOnionScan', 'Invoke-APIOnypheMD5', 'Export-OnypheDataShot'
@@ -90,7 +90,7 @@ CmdletsToExport = @()
 # VariablesToExport = @()
 
 # Alias a exporter a partir de ce module. Pour de meilleures performances, neutilisez pas de caracteres generiques et ne supprimez pas leentree. Utilisez un tableau vide si vous n avez aucun alias a exporter.
-AliasesToExport = @('Update-OnypheLocalData','Get-Onyphe', 'Search-Onyphe')
+AliasesToExport = @('Update-OnypheLocalData','Get-Onyphe', 'Search-Onyphe','Get-OnypheFromCSV')
 
 # Ressources DSC a exporter depuis ce module
 # DscResourcesToExport = @()
@@ -119,7 +119,7 @@ PrivateData = @{
         IconUri = 'https://www.onyphe.io/img/logo-solo.png'
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'v0.95 : fix HTTP error on invoke-onyphe when no network is available, add datashot management, add function to export datashot to picture file, fix Get-OnypheInfoFromCSV, update Export-OnypheInfoToFile'
+        ReleaseNotes = 'v0.96 : add new filtering function for search request : add new filtering function for search request - add Get-OnypheSearchFunctions function, update Invoke-APIOnypheSearch and Search-OnypheInfo functions, replace SimpleSearchfilter parameter with SimpleSearchfilter, replace SimpleSearchValue parameter with SearchValue, add FunctionFilter and FunctionValue parameters'
         # External dependent modules of this module
         # ExternalModuleDependencies = ''
 
