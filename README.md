@@ -107,5 +107,6 @@ documentation in markdown available here : https://github.com/MS-LUF/Use-Onyphe/
 - Update-OnypheFacetsFilters
 ### alias
 - Get-Onyphe
+- Get-OnypheFromCSV
 - Search-Onyphe
 - Update-OnypheLocalData
