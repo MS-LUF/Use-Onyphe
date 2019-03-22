@@ -11,6 +11,16 @@ https://www.onyphe.io/documentation/api
 
 (c) 2018-2019 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
 
+## Notes versions (0.96) :
+- add new filtering function for search request
+- add Get-OnypheSearchFunctions function
+- update Invoke-APIOnypheSearch and Search-OnypheInfo functions
+- replace SimpleSearchfilter parameter with SimpleSearchfilter
+- replace SimpleSearchValue parameter with SearchValue
+- add FunctionFilter and FunctionValue parameters
+- update Get-OnypheInfoFromCSV to manage new filter function in search request
+- add new alias Get-OnypheInfoFromCSV
+
 ## Notes version (0.95) :
 - fix HTTP error on invoke-onyphe when no network is available
 - add datashot management
