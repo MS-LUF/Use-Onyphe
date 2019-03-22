@@ -30,6 +30,9 @@
 # - replace SimpleSearchfilter parameter with SimpleSearchfilter
 # - replace SimpleSearchValue parameter with SearchValue
 # - add FunctionFilter and FunctionValue parameters
+# - update Get-OnypheInfoFromCSV to manage new filter function in search request
+# - add new alias Get-OnypheInfoFromCSV
+#
 #'(c) 2018-2019 lucas-cueff.com - Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).'
 
 <#

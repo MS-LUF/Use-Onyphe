@@ -119,7 +119,7 @@ PrivateData = @{
         IconUri = 'https://www.onyphe.io/img/logo-solo.png'
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'v0.96 : add new filtering function for search request : add new filtering function for search request - add Get-OnypheSearchFunctions function, update Invoke-APIOnypheSearch and Search-OnypheInfo functions, replace SimpleSearchfilter parameter with SimpleSearchfilter, replace SimpleSearchValue parameter with SearchValue, add FunctionFilter and FunctionValue parameters'
+        ReleaseNotes = 'v0.96 : add new filtering function for search request : add new filtering function for search request - add Get-OnypheSearchFunctions function, update Invoke-APIOnypheSearch and Search-OnypheInfo functions, replace SimpleSearchfilter parameter with SimpleSearchfilter, replace SimpleSearchValue parameter with SearchValue, add FunctionFilter and FunctionValue parameters, update Get-OnypheInfoFromCSV to manage new filter function in search request, add new alias Get-OnypheInfoFromCSV'
         # External dependent modules of this module
         # ExternalModuleDependencies = ''
 
