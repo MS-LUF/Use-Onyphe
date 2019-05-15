@@ -1,4 +1,4 @@
-![image](https://pbs.twimg.com/profile_images/899555153019383809/H_4EX1t7_400x400.jpg)
+![image](https://www.onyphe.io/img/logo-solo.png)
 # Use-Onyphe
 Simple PowerShell module to use Onyphe.io API
 
