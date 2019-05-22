@@ -11,6 +11,13 @@ https://www.onyphe.io/documentation/api
 
 (c) 2018-2019 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
 
+## Notes versions (0.97) :
+ - code improvement
+ - add beta switch to use beta interface of onyphe instead of production one
+ - improve paging parameters
+ - add advancedfilter option to Search-onyphe to manage multiple filter functions input
+ - add onionshot category to datashot export function
+
 ## Notes versions (0.96) :
 - add new filtering function for search request
 - add Get-OnypheSearchFunctions function
