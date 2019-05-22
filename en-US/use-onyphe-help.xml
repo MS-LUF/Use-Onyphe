@@ -341,9 +341,9 @@
           <maml:Description>
             <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -427,9 +427,9 @@
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -759,9 +759,9 @@
           <maml:Description>
             <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -798,9 +798,9 @@
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -1103,6 +1103,51 @@
   </command:command>
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
     <command:details>
+      <command:name>Get-OnypheSearchFunctions</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>OnypheSearchFunctions</command:noun>
+      <maml:description>
+        <maml:para>Get search functions available for search APIs of Onyphe</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Get search functions available for search APIs of Onyphe (like time filterring etc...)</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Get-OnypheSearchFunctions</maml:name>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters />
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>functions as string</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>Get category available for search APIs of Onyphe</dev:code>
+        <dev:remarks>
+          <maml:para>C:\PS&gt; Get-OnypheSearchFunctions</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
       <command:name>Get-OnypheStatsFromObject</command:name>
       <command:verb>Get</command:verb>
       <command:noun>OnypheStatsFromObject</command:noun>
@@ -1230,9 +1275,9 @@
           <maml:Description>
             <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -1249,6 +1294,17 @@
           </dev:type>
           <dev:defaultValue>0</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>UseBetaFeatures</maml:name>
+          <maml:Description>
+            <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
+          </maml:Description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
@@ -1257,9 +1313,9 @@
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -1275,6 +1331,18 @@
           <maml:uri />
         </dev:type>
         <dev:defaultValue>0</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>UseBetaFeatures</maml:name>
+        <maml:Description>
+          <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
+        </maml:Description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
     </command:parameters>
     <command:inputTypes />
@@ -1568,7 +1636,7 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Invoke-APIOnypheCtl</maml:name>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
           <maml:name>Domain</maml:name>
           <maml:Description>
             <maml:para>-Domain string{Domain or FQDN} Domain or FQDN to be used for the ctl API usage</maml:para>
@@ -1585,9 +1653,9 @@
           <maml:Description>
             <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -1607,7 +1675,7 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
         <maml:name>Domain</maml:name>
         <maml:Description>
           <maml:para>-Domain string{Domain or FQDN} Domain or FQDN to be used for the ctl API usage</maml:para>
@@ -1624,9 +1692,9 @@
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -1989,7 +2057,7 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Invoke-APIOnypheDataScan</maml:name>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
           <maml:name>IPOrDataScanString</maml:name>
           <maml:Description>
             <maml:para>-IPOrDataScanString string{IP} IP to be used for the DataScan API usage -IPOrDataScanString string string to be used for the DataScan API usage</maml:para>
@@ -2006,9 +2074,9 @@
           <maml:Description>
             <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -2028,7 +2096,7 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
         <maml:name>IPOrDataScanString</maml:name>
         <maml:Description>
           <maml:para>-IPOrDataScanString string{IP} IP to be used for the DataScan API usage -IPOrDataScanString string string to be used for the DataScan API usage</maml:para>
@@ -2045,9 +2113,9 @@
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -2473,7 +2541,7 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Invoke-APIOnypheForward</maml:name>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
           <maml:name>IP</maml:name>
           <maml:Description>
             <maml:para>-IP string{IP} IP to be used for the forward API usage</maml:para>
@@ -2490,9 +2558,9 @@
           <maml:Description>
             <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -2512,7 +2580,7 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
         <maml:name>IP</maml:name>
         <maml:Description>
           <maml:para>-IP string{IP} IP to be used for the forward API usage</maml:para>
@@ -2529,9 +2597,9 @@
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -2870,7 +2938,7 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Invoke-APIOnypheGeoloc</maml:name>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
           <maml:name>IP</maml:name>
           <maml:Description>
             <maml:para>-IP string{IP} IP to be used for the geoloc API usage</maml:para>
@@ -2885,7 +2953,7 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
         <maml:name>IP</maml:name>
         <maml:Description>
           <maml:para>-IP string{IP} IP to be used for the geoloc API usage</maml:para>
@@ -3180,7 +3248,7 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Invoke-APIOnypheInetnum</maml:name>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
           <maml:name>IP</maml:name>
           <maml:Description>
             <maml:para>-IP string{IP} IP to be used for the geoloc API usage</maml:para>
@@ -3197,9 +3265,9 @@
           <maml:Description>
             <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -3219,7 +3287,7 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
         <maml:name>IP</maml:name>
         <maml:Description>
           <maml:para>-IP string{IP} IP to be used for the geoloc API usage</maml:para>
@@ -3236,9 +3304,9 @@
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -3593,7 +3661,7 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Invoke-APIOnypheIP</maml:name>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
           <maml:name>IP</maml:name>
           <maml:Description>
             <maml:para>-IP string{IP} IP to be used for the IP API usage</maml:para>
@@ -3610,9 +3678,9 @@
           <maml:Description>
             <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -3632,7 +3700,7 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
         <maml:name>IP</maml:name>
         <maml:Description>
           <maml:para>-IP string{IP} IP to be used for the IP API usage</maml:para>
@@ -3649,9 +3717,9 @@
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -4006,7 +4074,7 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Invoke-APIOnypheMD5</maml:name>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
           <maml:name>MD5</maml:name>
           <maml:Description>
             <maml:para>-MD5 string{MD5 Hash} MD5 to be used for the md5 API usage</maml:para>
@@ -4023,9 +4091,9 @@
           <maml:Description>
             <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -4045,7 +4113,7 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
         <maml:name>MD5</maml:name>
         <maml:Description>
           <maml:para>-MD5 string{MD5 Hash} MD5 to be used for the md5 API usage</maml:para>
@@ -4062,9 +4130,9 @@
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -4808,7 +4876,7 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Invoke-APIOnypheOnionScan</maml:name>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
           <maml:name>Onion</maml:name>
           <maml:Description>
             <maml:para>-Onion string{Onion URL} Onion link to be used for the Onion API usage</maml:para>
@@ -4825,9 +4893,9 @@
           <maml:Description>
             <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -4847,7 +4915,7 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
         <maml:name>Onion</maml:name>
         <maml:Description>
           <maml:para>-Onion string{Onion URL} Onion link to be used for the Onion API usage</maml:para>
@@ -4864,9 +4932,9 @@
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -5189,7 +5257,7 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Invoke-APIOnyphePastries</maml:name>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
           <maml:name>IP</maml:name>
           <maml:Description>
             <maml:para>-IP string{IP} IP to be used for the pastries API usage</maml:para>
@@ -5206,9 +5274,9 @@
           <maml:Description>
             <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -5228,7 +5296,7 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
         <maml:name>IP</maml:name>
         <maml:Description>
           <maml:para>-IP string{IP} IP to be used for the pastries API usage</maml:para>
@@ -5245,9 +5313,9 @@
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -5594,7 +5662,7 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Invoke-APIOnypheReverse</maml:name>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
           <maml:name>IP</maml:name>
           <maml:Description>
             <maml:para>-IP string{IP} IP to be used for the reverse API usage</maml:para>
@@ -5611,9 +5679,9 @@
           <maml:Description>
             <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -5633,7 +5701,7 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
         <maml:name>IP</maml:name>
         <maml:Description>
           <maml:para>-IP string{IP} IP to be used for the reverse API usage</maml:para>
@@ -5650,9 +5718,9 @@
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -5999,43 +6067,7 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Invoke-APIOnypheSearch</maml:name>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
-          <maml:name>AdvancedSearch</maml:name>
-          <maml:Description>
-            <maml:para>-AdvancedSearch ARRAY{filter:value,filter:value} Search with multiple criterias</maml:para>
-          </maml:Description>
-          <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
-          <dev:type>
-            <maml:name>Array</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="5" aliases="none">
-          <maml:name>SimpleSearchValue</maml:name>
-          <maml:Description>
-            <maml:para>-SimpleSearchValue STRING{value} string to be searched with -SimpleSearchFilter parameter</maml:para>
-          </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>APIKey</maml:name>
-          <maml:Description>
-            <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable</maml:para>
-          </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
-          <dev:type>
-            <maml:name>String[]</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="10" aliases="none">
           <maml:name>Page</maml:name>
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
@@ -6047,10 +6079,33 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="11" aliases="none">
+          <maml:name>UseBetaFeatures</maml:name>
+          <maml:Description>
+            <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
+          </maml:Description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="12" aliases="none">
+          <maml:name>AdvancedFilter</maml:name>
+          <maml:Description>
+            <maml:para>-AdvancedFilter ARRAY{filter:value,filter:value} Filter with multiple criterias</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
+          <dev:type>
+            <maml:name>Array</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
           <maml:name>SearchType</maml:name>
           <maml:Description>
-            <maml:para>{{Fill SearchType Description}}</maml:para>
+            <maml:para>-SearchType STRING{Get-OnypheSearchCategories} Search Type or Category</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -6059,10 +6114,82 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>SimpleSearchFilter</maml:name>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="3" aliases="none">
+          <maml:name>SearchValue</maml:name>
           <maml:Description>
-            <maml:para>{{Fill SimpleSearchFilter Description}}</maml:para>
+            <maml:para>-SearchValue STRING{value} string to be searched with -SearchFilter parameter</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>SearchFilter</maml:name>
+          <maml:Description>
+            <maml:para>-SearchFilter STRING{Get-OnypheSearchFilters} Filter to be used with string set with SearchValue parameter</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="5" aliases="none">
+          <maml:name>FilterFunction</maml:name>
+          <maml:Description>
+            <maml:para>-FilterFunction String{Get-OnypheSearchFunctions} Filter search function</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="6" aliases="none">
+          <maml:name>FilterValue</maml:name>
+          <maml:Description>
+            <maml:para>-FilterValue String value to use as input for FilterFunction</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="7" aliases="none">
+          <maml:name>AdvancedSearch</maml:name>
+          <maml:Description>
+            <maml:para>-AdvancedSearch ARRAY{filter:value,filter:value} Search with multiple criterias</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
+          <dev:type>
+            <maml:name>Array</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="8" aliases="none">
+          <maml:name>wait</maml:name>
+          <maml:Description>
+            <maml:para>{{Fill wait Description}}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+          <dev:type>
+            <maml:name>Int32</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>0</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="9" aliases="none">
+          <maml:name>APIKey</maml:name>
+          <maml:Description>
+            <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -6074,10 +6201,10 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="5" aliases="none">
-        <maml:name>SimpleSearchValue</maml:name>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>SearchType</maml:name>
         <maml:Description>
-          <maml:para>-SimpleSearchValue STRING{value} string to be searched with -SimpleSearchFilter parameter</maml:para>
+          <maml:para>-SearchType STRING{Get-OnypheSearchCategories} Search Type or Category</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -6086,7 +6213,55 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="3" aliases="none">
+        <maml:name>SearchValue</maml:name>
+        <maml:Description>
+          <maml:para>-SearchValue STRING{value} string to be searched with -SearchFilter parameter</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>SearchFilter</maml:name>
+        <maml:Description>
+          <maml:para>-SearchFilter STRING{Get-OnypheSearchFilters} Filter to be used with string set with SearchValue parameter</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="5" aliases="none">
+        <maml:name>FilterFunction</maml:name>
+        <maml:Description>
+          <maml:para>-FilterFunction String{Get-OnypheSearchFunctions} Filter search function</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="6" aliases="none">
+        <maml:name>FilterValue</maml:name>
+        <maml:Description>
+          <maml:para>-FilterValue String value to use as input for FilterFunction</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="7" aliases="none">
         <maml:name>AdvancedSearch</maml:name>
         <maml:Description>
           <maml:para>-AdvancedSearch ARRAY{filter:value,filter:value} Search with multiple criterias</maml:para>
@@ -6098,19 +6273,19 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="9" aliases="none">
         <maml:name>APIKey</maml:name>
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="10" aliases="none">
         <maml:name>Page</maml:name>
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
@@ -6122,26 +6297,38 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-        <maml:name>SearchType</maml:name>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="8" aliases="none">
+        <maml:name>wait</maml:name>
         <maml:Description>
-          <maml:para>{{Fill SearchType Description}}</maml:para>
+          <maml:para>{{Fill wait Description}}</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
         <dev:type>
-          <maml:name>String</maml:name>
+          <maml:name>Int32</maml:name>
           <maml:uri />
         </dev:type>
-        <dev:defaultValue>None</dev:defaultValue>
+        <dev:defaultValue>0</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-        <maml:name>SimpleSearchFilter</maml:name>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="11" aliases="none">
+        <maml:name>UseBetaFeatures</maml:name>
         <maml:Description>
-          <maml:para>{{Fill SimpleSearchFilter Description}}</maml:para>
+          <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
         <dev:type>
-          <maml:name>String</maml:name>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="12" aliases="none">
+        <maml:name>AdvancedFilter</maml:name>
+        <maml:Description>
+          <maml:para>-AdvancedFilter ARRAY{filter:value,filter:value} Filter with multiple criterias</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
+        <dev:type>
+          <maml:name>Array</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -6519,7 +6706,7 @@
         <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
         <dev:code>simple search with one filter/criteria</dev:code>
         <dev:remarks>
-          <maml:para>Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists C:\PS&gt; Invoke-APIOnypheSearch -SimpleSearchValue RU -SearchType threatlist -SimpleSearchFilter country</maml:para>
+          <maml:para>Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists C:\PS&gt; Invoke-APIOnypheSearch -SearchValue RU -SearchType threatlist -SearchFilter country</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -6540,7 +6727,7 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Invoke-APIOnypheSniffer</maml:name>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
           <maml:name>IP</maml:name>
           <maml:Description>
             <maml:para>-IP string{IP} IP to be used for the sniffer API usage</maml:para>
@@ -6557,9 +6744,9 @@
           <maml:Description>
             <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -6579,7 +6766,7 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
         <maml:name>IP</maml:name>
         <maml:Description>
           <maml:para>-IP string{IP} IP to be used for the sniffer API usage</maml:para>
@@ -6596,9 +6783,9 @@
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -7097,7 +7284,7 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Invoke-APIOnypheSynScan</maml:name>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
           <maml:name>IP</maml:name>
           <maml:Description>
             <maml:para>-IP string{IP} IP to be used for the geoloc API usage</maml:para>
@@ -7114,9 +7301,9 @@
           <maml:Description>
             <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -7136,7 +7323,7 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
         <maml:name>IP</maml:name>
         <maml:Description>
           <maml:para>-IP string{IP} IP to be used for the geoloc API usage</maml:para>
@@ -7153,9 +7340,9 @@
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -7510,7 +7697,7 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Invoke-APIOnypheThreatlist</maml:name>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
           <maml:name>IP</maml:name>
           <maml:Description>
             <maml:para>-IP string{IP} IP to be used for the threatlist API usage</maml:para>
@@ -7527,9 +7714,9 @@
           <maml:Description>
             <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -7549,7 +7736,7 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
         <maml:name>IP</maml:name>
         <maml:Description>
           <maml:para>-IP string{IP} IP to be used for the threatlist API usage</maml:para>
@@ -7566,9 +7753,9 @@
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -7923,14 +8110,25 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Invoke-APIOnypheUser</maml:name>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="11" aliases="none">
+          <maml:name>UseBetaFeatures</maml:name>
+          <maml:Description>
+            <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
+          </maml:Description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>APIKey</maml:name>
           <maml:Description>
             <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -7938,17 +8136,29 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>APIKey</maml:name>
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="11" aliases="none">
+        <maml:name>UseBetaFeatures</maml:name>
+        <maml:Description>
+          <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
+        </maml:Description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
     </command:parameters>
     <command:inputTypes />
@@ -8196,6 +8406,17 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>UseBetaFeatures</maml:name>
+          <maml:Description>
+            <maml:para>{{Fill UseBetaFeatures Description}}</maml:para>
+          </maml:Description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
@@ -8259,6 +8480,18 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>UseBetaFeatures</maml:name>
+        <maml:Description>
+          <maml:para>{{Fill UseBetaFeatures Description}}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
     </command:parameters>
     <command:inputTypes>
       <command:inputType>
@@ -8311,43 +8544,7 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Search-OnypheInfo</maml:name>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
-          <maml:name>AdvancedSearch</maml:name>
-          <maml:Description>
-            <maml:para>-AdvancedSearch ARRAY{filter:value,filter:value} Search with multiple criterias</maml:para>
-          </maml:Description>
-          <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
-          <dev:type>
-            <maml:name>Array</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="5" aliases="none">
-          <maml:name>SimpleSearchValue</maml:name>
-          <maml:Description>
-            <maml:para>-SimpleSearchValue STRING{value} string to be searched with -SimpleSearchFilter parameter</maml:para>
-          </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>APIKey</maml:name>
-          <maml:Description>
-            <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
-          </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
-          <dev:type>
-            <maml:name>String[]</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="10" aliases="none">
           <maml:name>Page</maml:name>
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
@@ -8359,7 +8556,66 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="11" aliases="none">
+          <maml:name>UseBetaFeatures</maml:name>
+          <maml:Description>
+            <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
+          </maml:Description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="12" aliases="none">
+          <maml:name>AdvancedFilter</maml:name>
+          <maml:Description>
+            <maml:para>-AdvancedFilter ARRAY{filter:value,filter:value} Filter with multiple criterias</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
+          <dev:type>
+            <maml:name>Array</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="3" aliases="none">
+          <maml:name>SearchValue</maml:name>
+          <maml:Description>
+            <maml:para>-SearchValue STRING{value} string to be searched with -SearchFilter parameter</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="6" aliases="none">
+          <maml:name>FilterValue</maml:name>
+          <maml:Description>
+            <maml:para>-FilterValue String value to use as input for FilterFunction</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="7" aliases="none">
+          <maml:name>AdvancedSearch</maml:name>
+          <maml:Description>
+            <maml:para>-AdvancedSearch ARRAY{filter:value,filter:value} Search with multiple criterias</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
+          <dev:type>
+            <maml:name>Array</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="8" aliases="none">
           <maml:name>wait</maml:name>
           <maml:Description>
             <maml:para>-Wait int{second} wait for x second before sending the request to manage rate limiting restriction</maml:para>
@@ -8370,6 +8626,42 @@
             <maml:uri />
           </dev:type>
           <dev:defaultValue>0</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="9" aliases="none">
+          <maml:name>APIKey</maml:name>
+          <maml:Description>
+            <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>FilterFunction</maml:name>
+          <maml:Description>
+            <maml:para>{{Fill FilterFunction Description}}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>SearchFilter</maml:name>
+          <maml:Description>
+            <maml:para>{{Fill SearchFilter Description}}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>SearchType</maml:name>
@@ -8383,25 +8675,13 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>SimpleSearchFilter</maml:name>
-          <maml:Description>
-            <maml:para>{{Fill SimpleSearchFilter Description}}</maml:para>
-          </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="5" aliases="none">
-        <maml:name>SimpleSearchValue</maml:name>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="3" aliases="none">
+        <maml:name>SearchValue</maml:name>
         <maml:Description>
-          <maml:para>-SimpleSearchValue STRING{value} string to be searched with -SimpleSearchFilter parameter</maml:para>
+          <maml:para>-SearchValue STRING{value} string to be searched with -SearchFilter parameter</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -8410,7 +8690,19 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="6" aliases="none">
+        <maml:name>FilterValue</maml:name>
+        <maml:Description>
+          <maml:para>-FilterValue String value to use as input for FilterFunction</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="7" aliases="none">
         <maml:name>AdvancedSearch</maml:name>
         <maml:Description>
           <maml:para>-AdvancedSearch ARRAY{filter:value,filter:value} Search with multiple criterias</maml:para>
@@ -8422,19 +8714,19 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="9" aliases="none">
         <maml:name>APIKey</maml:name>
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="10" aliases="none">
         <maml:name>Page</maml:name>
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
@@ -8446,7 +8738,7 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="8" aliases="none">
         <maml:name>wait</maml:name>
         <maml:Description>
           <maml:para>-Wait int{second} wait for x second before sending the request to manage rate limiting restriction</maml:para>
@@ -8458,10 +8750,34 @@
         </dev:type>
         <dev:defaultValue>0</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-        <maml:name>SearchType</maml:name>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="11" aliases="none">
+        <maml:name>UseBetaFeatures</maml:name>
         <maml:Description>
-          <maml:para>{{Fill SearchType Description}}</maml:para>
+          <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
+        </maml:Description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="12" aliases="none">
+        <maml:name>AdvancedFilter</maml:name>
+        <maml:Description>
+          <maml:para>-AdvancedFilter ARRAY{filter:value,filter:value} Filter with multiple criterias</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
+        <dev:type>
+          <maml:name>Array</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>FilterFunction</maml:name>
+        <maml:Description>
+          <maml:para>{{Fill FilterFunction Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -8471,9 +8787,21 @@
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-        <maml:name>SimpleSearchFilter</maml:name>
+        <maml:name>SearchFilter</maml:name>
         <maml:Description>
-          <maml:para>{{Fill SimpleSearchFilter Description}}</maml:para>
+          <maml:para>{{Fill SearchFilter Description}}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>SearchType</maml:name>
+        <maml:Description>
+          <maml:para>{{Fill SearchType Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -8663,7 +8991,7 @@
         <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
         <dev:code>simple search with one filter/criteria</dev:code>
         <dev:remarks>
-          <maml:para>Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists C:\PS&gt; Search-OnypheInfo -SimpleSearchValue RU -SearchType threatlist -SimpleSearchFilter country</maml:para>
+          <maml:para>Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists C:\PS&gt; Search-OnypheInfo -SearchValue RU -SearchType threatlist -SearchFilter country</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
@@ -8677,7 +9005,14 @@
         <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
         <dev:code>simple search with one filter/criteria and request page 2 of the results</dev:code>
         <dev:remarks>
-          <maml:para>Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists C:\PS&gt; Search-OnypheInfo -SimpleSearchValue RU -SearchType threatlist -SimpleSearchFilter country -page "2"</maml:para>
+          <maml:para>Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists C:\PS&gt; Search-OnypheInfo -SearchValue RU -SearchType threatlist -SearchFilter country -page "2"</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 5 --------------------------</maml:title>
+        <dev:code>simple search with one filter/criteria and use a server filter to retrieve only objects indexed since 2 month</dev:code>
+        <dev:remarks>
+          <maml:para>Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists C:\PS&gt; Search-OnypheInfo -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2"</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -9041,12 +9376,23 @@
           <maml:Description>
             <maml:para>{{Fill APIKey Description}}</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>UseBetaFeatures</maml:name>
+          <maml:Description>
+            <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
+          </maml:Description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
         </command:parameter>
       </command:syntaxItem>
     </command:syntax>
@@ -9056,12 +9402,24 @@
         <maml:Description>
           <maml:para>{{Fill APIKey Description}}</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>UseBetaFeatures</maml:name>
+        <maml:Description>
+          <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
+        </maml:Description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
     </command:parameters>
     <command:inputTypes />
