@@ -12,7 +12,7 @@
 RootModule = 'use-onyphe.psm1'
 
 # Numero de version de ce module.
-ModuleVersion = '0.96'
+ModuleVersion = '0.97'
 
 # editions PS prises en charge
 # CompatiblePSEditions = @()
@@ -119,7 +119,7 @@ PrivateData = @{
         IconUri = 'https://www.onyphe.io/img/logo-solo.png'
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'v0.96 : add new filtering function for search request : add new filtering function for search request - add Get-OnypheSearchFunctions function, update Invoke-APIOnypheSearch and Search-OnypheInfo functions, replace SimpleSearchfilter parameter with SimpleSearchfilter, replace SimpleSearchValue parameter with SearchValue, add FunctionFilter and FunctionValue parameters, update Get-OnypheInfoFromCSV to manage new filter function in search request, add new alias Get-OnypheInfoFromCSV'
+        ReleaseNotes = 'v0.97 : code improvement, add beta switch to use beta interface of onyphe instead of production one, improve paging parameters, add advancedfilter option to Search-onyphe to manage multiple filter functions input, add onionshot category to datashot export function'
         # External dependent modules of this module
         # ExternalModuleDependencies = ''
 

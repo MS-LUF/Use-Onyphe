@@ -1,4 +1,3 @@
-![image](https://www.onyphe.io/img/logo-solo.png)
 # Use-Onyphe - How-To
 
 ## Intro Onyphe
@@ -165,9 +164,9 @@ for instance Get-OnypheInfo function will accept string as input for IP paramete
 ```
     C:\PS>"9.9.9.9" | Get-OnypheInfo -searchtype ip
 ```
-Search-OnypheInfo function will accept string as input for SimpleSearchValue parameter
+Search-OnypheInfo function will accept string as input for SearchValue parameter
 ```
-    C:\PS>"OVH SAS" | Search-OnypheInfo -SimpleSearchFilter organization -SearchType inetnum
+    C:\PS>"OVH SAS" | Search-OnypheInfo -SearchFilter organization -SearchType inetnum
 ```
 you can use the "verbose" parameter to show several useful information (like full url requested etc...)
 ```
@@ -266,63 +265,82 @@ API Search/DataScan : Return datascan information
     C:\PS>Search-OnypheInfo -AdvancedSearch @('product:Apache','port:443','os:Windows') -SearchType datascan
 ```
 ```
-    C:\PS>Search-OnypheInfo -SimpleSearchValue Windows -SimpleSearchFilter os -SearchType datascan
+    C:\PS>Search-OnypheInfo -SearchValue Windows -SearchFilter os -SearchType datascan
 ```
 API Search/Synscan : Return synscan information
 ```
     C:\PS>Search-OnypheInfo -AdvancedSearch @('country:FR','port:23','os:Linux') -SearchType synscan
 ```
 ```
-    C:\PS>Search-OnypheInfo -SimpleSearchValue 23 -SimpleSearchFilter port -SearchType synscan
+    C:\PS>Search-OnypheInfo -SearchValue 23 -SearchFilter port -SearchType synscan
 ```
 API Search/Inetnum : Return inetnum information
 ```
-    C:\PS>Search-OnypheInfo -SimpleSearchValue "OVH SAS" -SimpleSearchFilter organization -SearchType inetnum
+    C:\PS>Search-OnypheInfo -SearchValue "OVH SAS" -SearchFilter organization -SearchType inetnum
 ```
 API Search/Threatlist : Return threatlist information
 ```
-    C:\PS>Search-OnypheInfo -SimpleSearchValue RU -SimpleSearchFilter country -SearchType threatlist
+    C:\PS>Search-OnypheInfo -SearchValue RU -SearchFilter country -SearchType threatlist
 ```
 API Search/pastries : Return pastries information
 ```
-    C:\PS>Search-OnypheInfo -SimpleSearchValue "195.29.70.0/24" -SimpleSearchFilter ip -SearchType pastries
+    C:\PS>Search-OnypheInfo -SearchValue "195.29.70.0/24" -SearchFilter ip -SearchType pastries
 ```
 API Search/Resolver : Return resolver information
 ```
-    C:\PS>Search-OnypheInfo -SimpleSearchValue "124.108.0.0/16" -SimpleSearchFilter ip -SearchType resolver
+    C:\PS>Search-OnypheInfo -SearchValue "124.108.0.0/16" -SearchFilter ip -SearchType resolver
 ```
 API Search/sniffer : Return sniffer information
 ```
-    C:\PS>Search-OnypheInfo -SimpleSearchValue "14.164.0.0/14" -SimpleSearchFilter ip -SearchType sniffer
+    C:\PS>Search-OnypheInfo -SearchValue "14.164.0.0/14" -SearchFilter ip -SearchType sniffer
 ```
 API Search/onionscan : Return onionscan information
 ```
-    C:\PS>Search-OnypheInfo -SimpleSearchValue market -SimpleSearchFilter data -SearchType onionscan
+    C:\PS>Search-OnypheInfo -SearchValue market -SearchFilter data -SearchType onionscan
 ```
 API Search/ctl : Return ctl information
 ```
-    C:\PS>Search-OnypheInfo -SimpleSearchValue vpn -SimpleSearchFilter host -SearchType ctl
+    C:\PS>Search-OnypheInfo -SearchValue vpn -SearchFilter host -SearchType ctl
 ```
 API Search/datashot : Return datashot information
 ```
-    C:\PS>Search-OnypheInfo -SimpleSearchValue rdp -SimpleSearchFilter protocol -SearchType datashot
+    C:\PS>Search-OnypheInfo -SearchValue rdp -SearchFilter protocol -SearchType datashot
 ```
 
 ## paging and results
 by default 10 results are available in on object. if you have more than 10 results available, you can consult them ten by ten using pages.
-for instance the following request "Search-OnypheInfo -SimpleSearchValue "OVH SAS" -SimpleSearchFilter organization -SearchType inetnum" will send back a powershell object with the properties "max_page" to 1000.
+for instance the following request "Search-OnypheInfo -SearchValue "OVH SAS" -SearchFilter organization -SearchType inetnum" will send back a powershell object with the properties "max_page" to 1000.
 by default, the object will embbed the first 10 results available on the first page. to consult the page 2 containing the next 10 results, you can use the property "page" :
 ```
-    C:\PS>Search-OnypheInfo -SimpleSearchValue "OVH SAS" -SimpleSearchFilter organization -SearchType inetnum -page 2
+    C:\PS>Search-OnypheInfo -SearchValue "OVH SAS" -SearchFilter organization -SearchType inetnum -page 2
 ```
 You will see that the property "page" will switch to "2" and the "results" properties will be updated with the next 10 results.
-if you want to retrieve all the pages, you can do a simple loop :
+if you want to retrieve all the pages, you can specify first and last page separated with - using page parameter :
 ```
-    C:\PS>$script:AllResults = @()
-    C:\PS>for ($i=1;$i -le 1000;$i++) {$script:AllResults += Search-OnypheInfo -SimpleSearchValue "OVH SAS" -SimpleSearchFilter organization -SearchType inetnum -page $i -wait 3}
+    C:\PS>Search-OnypheInfo -SearchValue "OVH SAS" -SearchFilter organization -SearchType inetnum -page 1-1000
 ```
 Note : parameter "-wait 3" will wait 3 seconds between each request to manage rate limiting.
 
+## filter functions available on servers
+you can use some server filter functions to optimize your search (feature only available for search APIs not basic APIs). Currently, you can mainly use some timing function to filter results based on object creation date.
+you can use dayago, weekago, monthago functions to filter the results directly on the server side.
+For instance, hereunder we request all objects created since the last 2 months
+```
+    C:\PS> Search-OnypheInfo -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction monthago -FilterValue 2
+```
+Here are also the filters available currently : dayago, weekago, monthago, exist, wildcard.
+exist can be used to send back only result with a property containing a non null value. For instance, I can retrieve only the result containing a property OS set :
+```
+    C:\PS> Search-OnypheInfo -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction exist -FilterValue os
+```
+wildcard can be used to search deeply a property, but this is limited to 24 hours period of time to be sure the server won't crash. For instance, to look for all organization starting with company :
+```
+    C:\PS> Search-OnypheInfo -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction wildcard -FilterValue "organization,company*"
+```
+you can use multiple filter functions at a time using advancedfilter property :
+```
+    C:\PS> search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan
+```
 ## managing rate limiting
 you can add the parameter "wait" followed by a digit to request to wait x seconds between each request to manage rate limiting feature.
 It's usefull in case of a loop or in batch mode usage.
@@ -345,9 +363,8 @@ Note : the data or content properties of pastries,datascan ... are exported in d
 Just specify the target folder and several subfolders (on per request) containing csv and txt files will be created.
 to do so use the function Export-OnypheInfoToFile :
 ```
-    C:\PS>$script:AllResults = @()
-    C:\PS>for ($i=1;$i -le 1000;$i++) {$script:AllResults += Search-OnypheInfo -SimpleSearchValue "OVH SAS" -SimpleSearchFilter organization -SearchType inetnum -page $i -wait 3}
-    C:\PS>Export-OnypheInfoToFile -tofolder C:\temp -inputobject $AllResults
+    C:\PS> $AllResults = Search-OnypheInfo -SearchValue "OVH SAS" -SearchFilter organization -SearchType inetnum -page 1-1000
+    C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -inputobject $AllResults
 ```
 
 ## playing with onyphe and powershell objects
@@ -357,19 +374,19 @@ Well, we will do the stats for the first 100 pages of results for the demo :)
 
 First, retrieve the results (all threatlist objects tagged with mirai) :
 ```
-    C:\PS>$script:AllResults = @()
-    C:\PS>for ($i=1;$i -le 100;$i++) {$script:AllResults += Search-OnypheInfo -SimpleSearchValue mirai -SearchType threatlist -SimpleSearchFilter tag -page $i -wait 3}
+    C:\PS> Search-OnypheInfo -SearchValue mirai -SearchType threatlist -SearchFilter tag
+    C:\PS> Search-OnypheInfo -SearchValue mirai -SearchType threatlist -SearchFilter tag -Page 1-594
 ```
 Then, play with the objects :-)
 how many unique ip ?
 ```
-    C:\PS>($AllResults.results.subnet | sort-object -Unique).count
+    C:\PS> ($AllResults.results.subnet | sort-object -Unique).count
     978
 ```
 
 The ip list itself ?
 ```
-    C:\PS>$AllResults.results.subnet | sort-object -Unique
+    C:\PS> $AllResults.results.subnet | sort-object -Unique
     ...
     95.5.2.125/32
     95.9.177.76/32
@@ -384,13 +401,12 @@ Well, quite simple :)
 
 First, retrieve all the results avaialable (all synscan objects linked to Quad9 organization) :
 ```
-    C:\PS>$script:AllResults = @()
-    C:\PS>for ($i=1;$i -le ([int](Search-OnypheInfo -SimpleSearchValue Quad9 -SimpleSearchFilter organization -SearchType synscan).max_page);$i++) {$script:AllResults += Search-OnypheInfo -SimpleSearchValue Quad9 -SimpleSearchFilter organization -SearchType synscan -page $i -wait 3}
+    C:\PS> $AllResults = Search-OnypheInfo -SearchValue Quad9 -SearchFilter organization -SearchType synscan -Page 1-2
 ```
 Then, play with the objects :-)
 What are the open ports ?
 ```
-    C:\PS>$AllResults.results.port | sort-object -unique
+    C:\PS> $AllResults.results.port | sort-object -unique
     3389
     443
     53
@@ -401,7 +417,7 @@ can you please tell me what is the ip related to this port ?
 
 of course !
 ```
-    C:\PS>($AllResults.results | Where-Object {$_.port -eq 3389}).ip | sort-object -unique
+    C:\PS> ($AllResults.results | Where-Object {$_.port -eq 3389}).ip | sort-object -unique
     9.9.9.9
 ```
 
@@ -417,12 +433,11 @@ For instance, let's take a CSO from Citrix company, he wants to have, everyweek,
 
 First, retrieve all the results avaialable (all synscan objects linked to citrix organization) :
 ```
-    C:\PS>$script:AllResults = @()
-    C:\PS>for ($i=1;$i -le ([int](Search-OnypheInfo -AdvancedSearch @('organization:Citrix') -SearchType synscan).max_page);$i++) {$script:AllResults += Search-OnypheInfo -AdvancedSearch @('organization:Citrix') -SearchType synscan -page $i -wait 3}
+    C:\PS> Search-OnypheInfo -AdvancedSearch @('organization:Citrix') -SearchType synscan -Page 1-7
 ```
 Then, do the stats 
 ```
-    C:\PS>Get-OnypheStatsFromObject -Facets port -inputobject $AllResults
+    C:\PS> Get-OnypheStatsFromObject -Facets port -inputobject $AllResults
 
     Sum     : 420
     Count   : 5
@@ -453,10 +468,21 @@ Please Onyphe, I am a in charge of following security KPIs and my boss wants to 
 
 First, retrieve all the results avaialable (all synscan objects linked to your organization, here for instance OVH SAS) :
 ```
-    C:\PS>$script:AllResults = @()
-    C:\PS>for ($i=1;$i -le ([int](Search-OnypheInfo -AdvancedSearch @('organization:OVH SAS','protocol:rdp') -SearchType datashot).max_page);$i++) {$script:AllResults += Search-OnypheInfo -AdvancedSearch @('organization:Citrix') -SearchType synscan -page $i -wait 3}
+    C:\PS> $allresults = Search-OnypheInfo -AdvancedSearch @('organization:OVH SAS','port:3389') -SearchType datashot -Page 1-1000
 ```
 Then, export the screenshot of the home RDP login page for more information :)
 ```
-    C:\PS>$allresults | Export-OnypheDataShot -tofolder .\temp\
+    C:\PS> $allresults | Export-OnypheDataShot -tofolder .\temp\
+```
+
+### Example 5
+Please Onyphe, filter the result and show me only the answer with os property not null for threatlist category for all Russia
+```
+    C:\PS> Search-OnypheInfo -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction exist -FilterValue os
+```
+
+### Example 6
+Please Onyphe, filter the results using multiple filters (only os property known and from all organization like *company*) for tcp port 3389 opened in russia
+```
+    C:\PS> search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan
 ```

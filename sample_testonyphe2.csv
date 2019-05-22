@@ -1,5 +1,5 @@
-API;API-Input;Search-Type;Search-Request;Filter-Function;Function-Input
+API;API-Input;Search-Type;Search-Request;Filter-Request;Page
 Search;;datascan;product:Apache+port:443+os:Windows;;
 Search;;synscan;port:23+country:FR+os:Linux;;
-Search;;datascan;organization:OVH SAS+protocol:rdp;monthago;1
-Search;;datascan;organization:OVH SAS+protocol:rdp;monthago;0
+Search;;datascan;port:3389+country:FR;exists:os+monthago:1+wildcard:organization,*OVH*;1-2
+Search;;datascan;port:3389+country:FR;exists:os+monthago:0+wildcard:organization,*OVH*;1

@@ -32,6 +32,12 @@
 # - add FunctionFilter and FunctionValue parameters
 # - update Get-OnypheInfoFromCSV to manage new filter function in search request
 # - add new alias Get-OnypheInfoFromCSV
+# v0.97 :
+# - code improvement
+# - add beta switch to use beta interface of onyphe instead of production one
+# - improve paging parameters
+# - add advancedfilter option to Search-onyphe to manage multiple filter functions input
+# - add onionshot category to datashot export function
 #
 #'(c) 2018-2019 lucas-cueff.com - Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).'
 
@@ -94,7 +100,7 @@
 	[cmdletbinding()]
 	Param (
 		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
-		[ValidateScript({(($_ | Get-Member | Select-Object -ExpandProperty TypeName -Unique) -eq 'System.Management.Automation.PSCustomObject')})]
+		[ValidateScript({$_ -is [System.Management.Automation.PSCustomObject]})]
 			[array]$inputobject,
 		[parameter(Mandatory=$false)] 
 		[ValidateNotNullOrEmpty()]
@@ -242,9 +248,9 @@
   	[ValidateScript({test-path "$($_)"})]
 		  $fromcsv,
   	[parameter(Mandatory=$false)]
-	[ValidateLength(40,40)]
-		[string]$APIKey,
-	[parameter(Mandatory=$false)]
+	  [ValidateLength(40,40)]
+		  [string]$APIKey,
+	  [parameter(Mandatory=$false)]
     	$csvdelimiter
 	)
 	process {
@@ -253,10 +259,9 @@
 			Set-OnypheAPIKey -APIKEY $APIKey | out-null
 		}
 		if (!$csvdelimiter) {$csvdelimiter = ";"}
-		$FromcsvType = $fromcsv | Get-Member | Select-Object -ExpandProperty TypeName -Unique
-		if (($FromcsvType -eq 'System.String') -and (test-path $fromcsv)) {
+		if (($fromcsv -is [System.String]) -and (test-path $fromcsv)) {
 				$csvcontent = import-csv $fromcsv -delimiter $csvdelimiter
-		} ElseIf (($FromcsvType -eq 'System.Management.Automation.PSCustomObject') -and $fromcsv.'API-Input') {
+		} ElseIf (($fromcsv -is [System.Management.Automation.PSCustomObject]) -and $fromcsv.'API-Input') {
 			$csvcontent = $fromcsv
 		} Else {
 			write-verbose -message "provide a valid csv file as input or valid System.Management.Automation.PSCustomObject object"
@@ -275,9 +280,16 @@
 			} else {
 				$params.add('AdvancedSearch',@($entry.'Search-Request'))
 			}
-			if ($entry.'Filter-Function' -and $entry.'Function-Input') {
-				$params.add('FilterFunction', $entry.'Filter-Function')
-				$params.add('FilterValue',$entry.'Function-Input')
+			if ($entry.'Filter-Request') {
+				if ($entry.'Filter-Request'.contains("+")) {
+					$tmparray = $entry.'Filter-Request'.split("+")
+					$params.add('AdvancedFilter',$tmparray)
+				} else {
+					$params.add('AdvancedFilter', $entry.'Filter-Request')
+				}
+			}
+			if ($entry.'Page') {
+				$params.add('Page', $entry.'Page')
 			}
 			$Script:Result += Search-OnypheInfo @params
 		}
@@ -300,6 +312,10 @@
 	 .PARAMETER AdvancedSearch
 	 -AdvancedSearch ARRAY{filter:value,filter:value}
 	 Search with multiple criterias
+
+	 .PARAMETER AdvancedFilter
+	 -AdvancedFilter ARRAY{filter:value,filter:value}
+	 Filter with multiple criterias
  
 	 .PARAMETER SearchValue
 	 -SearchValue STRING{value}
@@ -328,10 +344,15 @@
 	 .PARAMETER Page
 	 -page string{page number}
 	 go directly to a specific result page (1 to 1000)
+	 you can set a list of page using x-y like 1-100 to read the first 100 pages
  
 	 .PARAMETER Wait
 	 -Wait int{second}
 	 wait for x second before sending the request to manage rate limiting restriction
+
+	 .PARAMETER UseBetaFeatures
+	 -UseBetaFeatures switch
+	 use test.onyphe.io to use new beat features of Onyphe
 	 
 	 .OUTPUTS
 	 TypeName: System.Management.Automation.PSCustomObject
@@ -380,6 +401,14 @@
 	 simple search with one filter/criteria and use a server filter to retrieve only objects indexed since 2 month
 	 Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
 	 C:\PS> Search-OnypheInfo -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2"
+
+	.EXAMPLE
+	 filter the result and show me only the answer with os property not null for threatlist category for all Russia
+	 C:\PS> Search-OnypheInfo -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction exist -FilterValue os
+
+	 .EXAMPLE
+   filter the results using multiple filters (only os property known and from all organization like *company*) for tcp port 3389 opened in russia
+	 C:\PS> search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan
  #>
 	 [cmdletbinding()]
 	 param(
@@ -388,7 +417,7 @@
 			 [string]$SearchValue,
 		 [parameter(Mandatory=$false,Position=5)] 
 		 [ValidateNotNullOrEmpty()]
-		   [string]$FilterValue,
+		   [string[]]$FilterValue,
 		 [parameter(Mandatory=$false,Position=6)] 
 		 [ValidateNotNullOrEmpty()]
 		     [Array]$AdvancedSearch,
@@ -396,10 +425,15 @@
 		 [ValidateLength(40,40)]
 		     [string]$APIKey,
 		 [parameter(Mandatory=$false,Position=9)]
-		 [ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+		 [ValidateScript({($_ -match "^([1-9][0-9]{0,2}|1000)$") -or ($_ -match "^(([1-9][0-9]{0,2}|1000)(-)([1-9][0-9]{0,2}|1000))$")})]
 			 [string[]]$Page,
 		 [parameter(Mandatory=$false,Position=7)]
-			 [int]$wait
+			 [int]$wait,
+		 [parameter(Mandatory=$false,Position=10)]
+			 [switch]$UseBetaFeatures,
+		 [parameter(Mandatory=$false,Position=11)] 
+		 [ValidateNotNullOrEmpty()]
+				[Array]$AdvancedFilter
 	 )
 	 DynamicParam
 	 {
@@ -452,6 +486,9 @@
 		$SearchType = $PsBoundParameters[$ParameterNameType]
 		$SearchFilter = $PsBoundParameters[$ParameterNameFilter]
 		$SearchFunction = $PsBoundParameters[$ParameterNameFunction]
+		$params = @{
+			SearchType = $SearchType
+		}
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
 		if ($wait) {start-sleep -s $wait}
 		if ($SearchFilter -and !($SearchValue)) {
@@ -461,25 +498,41 @@
 			throw "please use the FilterValue parameter when using FilterFunction parameter"
 		}
 		if ($AdvancedSearch) {
-			 $params = @{
-				AdvancedSearch = $AdvancedSearch
-				SearchType = $SearchType
-			 }
-		} else {
-			$params = @{
-				SearchValue = $SearchValue
-				SearchType = $SearchType
-				SearchFilter = $SearchFilter
-			}
+			 $params.add('AdvancedSearch',$AdvancedSearch)
+		} elseif ($SearchValue) {
+			$params.add('SearchValue',$SearchValue)
+			$params.add('SearchFilter',$SearchFilter)
 		}
-		if ($SearchFunction) {
+		if ($AdvancedFilter) {
+			$params.add('AdvancedFilter',$AdvancedFilter)
+		} elseif ($SearchFunction) {
 			$params.add('FilterFunction', $SearchFunction)
 			$params.add('FilterValue',$FilterValue)
 		}
-		if ($Page) {
-			$params.add('Page', $page)
+		if ($UseBetaFeatures) {
+			$params.add('UseBetaFeatures', $true)
 		}
-		Invoke-APIOnypheSearch @params
+		if ($Page) {
+			switch -regex ($page) {
+				"^(([1-9][0-9]{0,2}|1000)(-)([1-9][0-9]{0,2}|1000))$" {
+					$page = $page -split "-"
+					for ($i=[int]$page[0];$i -le [int]$page[1];$i++) {
+						if ($params.page) {
+							$params.Page = $i.tostring()
+						} else {
+							$params.add('Page', $i.tostring())
+						}
+						Invoke-APIOnypheSearch @params
+					}
+				}
+				"^([1-9][0-9]{0,2}|1000)$" {
+					$params.add('Page', $page)
+					Invoke-APIOnypheSearch @params
+				}
+			}
+		} else {
+			Invoke-APIOnypheSearch @params
+		}
 	}
  	}
 	Function Get-OnypheInfo {
@@ -511,9 +564,10 @@
 	-APIKey string{APIKEY}
 	set your APIKEY to be able to use Onyphe API.
 
-	.PARAMETER Page
+  .PARAMETER Page
 	-page string{page number}
 	go directly to a specific result page (1 to 1000)
+	you can set a list of page using x-y like 1-100 to read the first 100 pages
 
   .PARAMETER Wait
 	-Wait int{second}
@@ -601,7 +655,7 @@
 		[ValidateLength(40,40)]
 		[string]$APIKey,
 	[parameter(Mandatory=$false)]
-	[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+	[ValidateScript({($_ -match "^([1-9][0-9]{0,2}|1000)$") -or ($_ -match "^(([1-9][0-9]{0,2}|1000)(-)([1-9][0-9]{0,2}|1000))$")})]
 		[string[]]$Page,
 	[parameter(Mandatory=$false)]
 		[int]$wait
@@ -631,19 +685,41 @@
 		}
 		if ($wait) {start-sleep -s $wait}
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
-		if ($Page) {$params.add('Page', $page)}
 		If ($MyIP.IsPresent -eq $true) {
 			Invoke-APIOnypheMyIP
 		} elseIf ($searchtype) {
-				if ($SearchValue) {
-					if (test-path function:\"Invoke-APIOnyphe$($Searchtype)") {
-						invoke-expression "Invoke-APIOnyphe$($Searchtype) $($SearchValue)"
+			if ($SearchValue) {
+				$params = @{
+					input = $SearchValue
+				}
+				if (test-path function:\"Invoke-APIOnyphe$($Searchtype)") {
+					if ($Page) {
+						switch -regex ($page) {
+							"^(([1-9][0-9]{0,2}|1000)(-)([1-9][0-9]{0,2}|1000))$" {
+								$page = $page -split "-"
+								for ($i=[int]$page[0];$i -le [int]$page[1];$i++) {
+									if ($params.page) {
+										$params.Page = $i.tostring()
+									} else {
+										$params.add('Page', $i.tostring())
+									}
+									invoke-expression "Invoke-APIOnyphe$($Searchtype) `@params"
+								}
+							}
+							"^([1-9][0-9]{0,2}|1000)$" {
+								$params.add('Page', $page)
+								invoke-expression "Invoke-APIOnyphe$($Searchtype) `@params"
+							}
+						}
 					} else {
-						throw "API $($Searchtype) not implemented yet in this version of Use-Onyphe pwsh module"
+						invoke-expression "Invoke-APIOnyphe$($Searchtype) `@params"
 					}
 				} else {
-					throw "-SearchValue parameter must be used with -Searchtype"
+					throw "API $($Searchtype) not implemented yet in this version of Use-Onyphe pwsh module"
 				}
+			} else {
+				throw "-SearchValue parameter must be used with -Searchtype"
+			}
 		} 
 	}
 	}
@@ -660,7 +736,11 @@
 	 -APIKey string{APIKEY}
 	 set your APIKEY to be able to use Onyphe API.
 
-     .PARAMETER Wait
+	 .PARAMETER UseBetaFeatures
+	 -UseBetaFeatures switch
+	 use test.onyphe.io to use new beat features of Onyphe
+
+   .PARAMETER Wait
 	 -Wait int{second}
 	 wait for x second before sending the request to manage rate limiting restriction
 	 
@@ -696,15 +776,22 @@
    [cmdletbinding()]
    Param (
 	[parameter(Mandatory=$false)]
-		[ValidateLength(40,40)]
+	[ValidateLength(40,40)]
 		[string]$APIKey,
 	[parameter(Mandatory=$false)]
-		[int]$wait
+		[int]$wait,
+	[parameter(Mandatory=$false)]
+		[switch]$UseBetaFeatures
    )
 	process {
 		if ($wait) {start-sleep -s $wait}
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
-		Invoke-APIOnypheUser
+		if ($UseBetaFeatures) {
+			$params = @{
+				UseBetaFeatures = $true
+			}
+		}
+		Invoke-APIOnypheUser @params
 	}
  	}
 	Function Invoke-APIOnypheUser {
@@ -717,7 +804,11 @@
 	  	  
 	  .PARAMETER APIKEY
 	  -APIKey string{APIKEY}
-	  Set APIKEY as global variable.
+		Set APIKEY as global variable.
+		
+		.PARAMETER UseBetaFeatures
+	  -UseBetaFeatures switch
+	  use test.onyphe.io to use new beat features of Onyphe
 	  
 	  .OUTPUTS
 		 TypeName : System.Management.Automation.PSCustomObject
@@ -750,9 +841,11 @@
 	#>
 	[cmdletbinding()]
 	Param ( 
-	[parameter(Mandatory=$false)]
-	  [ValidateLength(40,40)]
-	  [string]$APIKey
+		[parameter(Mandatory=$false)]
+		[ValidateLength(40,40)]
+			[string]$APIKey,
+		[parameter(Mandatory=$false,Position=10)]
+			[switch]$UseBetaFeatures
 	)  
 	  Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -761,6 +854,9 @@
 				APIInfo = "user"
 				APIInput = "none"
 				APIKeyrequired = $true
+			}
+			if ($UseBetaFeatures) {
+				$params.add("UseBetaFeatures", $true)
 			}
 			Write-Verbose -message "URL Info : $($params.request)"  
 			Invoke-Onyphe @params
@@ -837,16 +933,17 @@
   #>
   [cmdletbinding()]
   Param (
-  [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
-	[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
-    [string[]]$IP, 
-  [parameter(Mandatory=$false)]
-	[ValidateLength(40,40)]
-	[string]$APIKey,
-  [parameter(Mandatory=$false)]
-  [ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
-	[string[]]$Page
-  )	
+		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+		[Alias("input")]
+		[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
+			[string[]]$IP, 
+		[parameter(Mandatory=$false)]
+		[ValidateLength(40,40)]
+			[string]$APIKey,
+		[parameter(Mandatory=$false)]
+		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+			[string[]]$Page
+  )
 	Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
 		$params = @{
@@ -930,16 +1027,17 @@
   #>
   [cmdletbinding()]
   Param (
-  [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
-	[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
-    [string[]]$IP, 
-  [parameter(Mandatory=$false)]
-	[ValidateLength(40,40)]
-	[string]$APIKey,
-  [parameter(Mandatory=$false)]
-  [ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
-	[string[]]$Page
-  )	
+		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+		[Alias("input")]
+		[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
+			[string[]]$IP, 
+		[parameter(Mandatory=$false)]
+		[ValidateLength(40,40)]
+			[string]$APIKey,
+		[parameter(Mandatory=$false)]
+		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+			[string[]]$Page
+  )
 	Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
 		$params = @{
@@ -1024,15 +1122,16 @@
   #>
   [cmdletbinding()]
   Param (
-  [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
-	[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
-    [string[]]$IP, 
-  [parameter(Mandatory=$false)]
-	[ValidateLength(40,40)]
-	[string]$APIKey,
-  [parameter(Mandatory=$false)]
-  [ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
-	[string[]]$Page
+		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+		[Alias("input")]
+		[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
+			[string[]]$IP, 
+		[parameter(Mandatory=$false)]
+		[ValidateLength(40,40)]
+			[string]$APIKey,
+		[parameter(Mandatory=$false)]
+		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+			[string[]]$Page
   )
 	Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -1136,15 +1235,16 @@
   #>
 		[cmdletbinding()]
 		Param (
-		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
-		[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
-			[string[]]$IP, 
-		[parameter(Mandatory=$false)]
-		[ValidateLength(40,40)]
-		[string]$APIKey,
-		[parameter(Mandatory=$false)]
-		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
-		[string[]]$Page
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
+				[string[]]$IP, 
+			[parameter(Mandatory=$false)]
+			[ValidateLength(40,40)]
+				[string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+				[string[]]$Page
 		)
 		Process {
 			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -1231,15 +1331,16 @@
   #>
 		[cmdletbinding()]
 		Param (
-		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
-		[ValidateScript({($_ -match "^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$")})]
-			[string[]]$Domain, 
-		[parameter(Mandatory=$false)]
-		[ValidateLength(40,40)]
-		[string]$APIKey,
-		[parameter(Mandatory=$false)]
-		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
-		[string[]]$Page
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({($_ -match "^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$")})]
+				[string[]]$Domain, 
+			[parameter(Mandatory=$false)]
+			[ValidateLength(40,40)]
+				[string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+				[string[]]$Page
 		)
 		Process {
 			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -1347,15 +1448,16 @@
   #>
 		[cmdletbinding()]
 		Param (
-		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
-		[ValidateScript({($_ -match "^[a-f0-9]{32}$")})]
-			[string[]]$MD5, 
-		[parameter(Mandatory=$false)]
-		[ValidateLength(40,40)]
-		[string]$APIKey,
-		[parameter(Mandatory=$false)]
-		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
-		[string[]]$Page
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({($_ -match "^[a-f0-9]{32}$")})]
+				[string[]]$MD5, 
+			[parameter(Mandatory=$false)]
+			[ValidateLength(40,40)]
+				[string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+				[string[]]$Page
 		)
 		Process {
 			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -1437,15 +1539,16 @@
   #>
 		[cmdletbinding()]
 		Param (
-		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
-		[ValidateScript({($_ -match "[a-z2-7]{16}\.onion") -or ($_ -match "[a-z2-7]{56}\.onion")})]
-			[string[]]$Onion, 
-		[parameter(Mandatory=$false)]
-		[ValidateLength(40,40)]
-		[string]$APIKey,
-		[parameter(Mandatory=$false)]
-		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
-		[string[]]$Page
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({($_ -match "[a-z2-7]{16}\.onion") -or ($_ -match "[a-z2-7]{56}\.onion")})]
+				[string[]]$Onion, 
+			[parameter(Mandatory=$false)]
+			[ValidateLength(40,40)]
+				[string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+				[string[]]$Page
 		)
 		Process {
 			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -1530,15 +1633,16 @@
   #>
   [cmdletbinding()]
   Param (
-  [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
-	[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
-    [string[]]$IP, 
-  [parameter(Mandatory=$false)]
-	[ValidateLength(40,40)]
-	[string]$APIKey,
-  [parameter(Mandatory=$false)]
-  [ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
-	[string[]]$Page
+		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+		[Alias("input")]
+		[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
+			[string[]]$IP, 
+		[parameter(Mandatory=$false)]
+		[ValidateLength(40,40)]
+			[string]$APIKey,
+		[parameter(Mandatory=$false)]
+		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+			[string[]]$Page
   )
 	Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -1622,15 +1726,16 @@
   #>
   [cmdletbinding()]
   Param (
-  [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
-	[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
-    [string[]]$IP, 
-  [parameter(Mandatory=$false)]
-	[ValidateLength(40,40)]
-	[string]$APIKey,
-  [parameter(Mandatory=$false)]
-  [ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
-	[string[]]$Page
+		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+		[Alias("input")]
+		[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
+			[string[]]$IP, 
+		[parameter(Mandatory=$false)]
+		[ValidateLength(40,40)]
+			[string]$APIKey,
+		[parameter(Mandatory=$false)]
+		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+			[string[]]$Page
   )
 	Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -1716,15 +1821,16 @@
   #>
   [cmdletbinding()]
   Param (
-  [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
-	[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
-    [string[]]$IP, 
-  [parameter(Mandatory=$false)]
-	[ValidateLength(40,40)]
-	[string]$APIKey,
-  [parameter(Mandatory=$false)]
-  [ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
-	[string[]]$Page
+		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+		[Alias("input")]
+		[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
+			[string[]]$IP, 
+		[parameter(Mandatory=$false)]
+		[ValidateLength(40,40)]
+			[string]$APIKey,
+		[parameter(Mandatory=$false)]
+		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+			[string[]]$Page
   )
 	Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -1825,15 +1931,16 @@
   #> 
  [cmdletbinding()]
   Param (
-	[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
-	[ValidateNotNullOrEmpty()]
-    [string[]]$IPOrDataScanString,
-  [parameter(Mandatory=$false)]
-	[ValidateLength(40,40)]
-	  [string]$APIKey,
-  [parameter(Mandatory=$false)]
-  [ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
-	  [string[]]$Page
+		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+		[Alias("input")]
+		[ValidateNotNullOrEmpty()]
+			[string[]]$IPOrDataScanString,
+		[parameter(Mandatory=$false)]
+		[ValidateLength(40,40)]
+			[string]$APIKey,
+		[parameter(Mandatory=$false)]
+		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+			[string[]]$Page
   )
 	Process {
 		$script:DateRequest = get-date
@@ -1920,15 +2027,16 @@
   #>  
 [cmdletbinding()]
   Param (
-  [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
-	[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
-    [string[]]$IP, 
-  [parameter(Mandatory=$false)]
-	[ValidateLength(40,40)]
-	[string]$APIKey,
-	[parameter(Mandatory=$false)]
-	[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
-	   [string[]]$Page
+		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+		[Alias("input")]
+		[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
+			[string[]]$IP, 
+		[parameter(Mandatory=$false)]
+		[ValidateLength(40,40)]
+			[string]$APIKey,
+		[parameter(Mandatory=$false)]
+		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+			[string[]]$Page
   )
 	Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -2047,41 +2155,50 @@
   #> 
 [cmdletbinding()]
   Param (
-  [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
-	[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
-    [string[]]$IP
+		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+		[Alias("input")]
+		[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
+			[string[]]$IP
   )
   process {
-	$params = @{
-		request = "geoloc/$($IP)"
-		APIInfo = "geoloc"
-		APIInput = @("$($IP)")
-		APIKeyrequired = $false
-	}
-	Write-Verbose -message "URL Info : $($params.request)"
-	Invoke-Onyphe @params
+		$params = @{
+			request = "geoloc/$($IP)"
+			APIInfo = "geoloc"
+			APIInput = @("$($IP)")
+			APIKeyrequired = $false
+		}
+		Write-Verbose -message "URL Info : $($params.request)"
+		Invoke-Onyphe @params
   }
 	}
 	Function Invoke-Onyphe {
   [cmdletbinding()]
   Param (
-  [parameter(Mandatory=$true)]
-  [ValidateNotNullOrEmpty()]  
-    [string[]]$request,
-  [parameter(Mandatory=$true)]
-  [ValidateNotNullOrEmpty()]  
-	[string[]]$APIInfo,
-  [parameter(Mandatory=$true)]
-  [ValidateNotNullOrEmpty()]  
-    [string[]]$APIInput,
-  [parameter(Mandatory=$true)]
-	[Bool[]]$APIKeyrequired,
-  [parameter(Mandatory=$false)]
-  [ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})] 
-    [string[]]$page
+		[parameter(Mandatory=$true)]
+		[ValidateNotNullOrEmpty()]  
+			[string[]]$request,
+		[parameter(Mandatory=$true)]
+		[ValidateNotNullOrEmpty()]  
+			[string[]]$APIInfo,
+		[parameter(Mandatory=$true)]
+		[ValidateNotNullOrEmpty()]  
+			[string[]]$APIInput,
+		[parameter(Mandatory=$true)]
+			[Bool[]]$APIKeyrequired,
+		[parameter(Mandatory=$false)]
+		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})] 
+			[string[]]$page,
+		[parameter(Mandatory=$false)]
+			[switch]$UseBetaFeatures
   )
   Process {
-	$script:onypheurl = "https://www.onyphe.io/api/"
+	if ($UseBetaFeatures) {
+		$script:onypheurl = "https://test.onyphe.io/api/"
+		write-verbose -message "using beta Onyphe service - https://test.onyphe.io"
+	} else {
+		$script:onypheurl = "https://www.onyphe.io/api/"
+		write-verbose -message "using production Onyphe service - https://www.onyphe.io"
+	}
 	$script:DateRequest = get-date
 	if (($APIKeyrequired)-and(!$global:OnypheAPIKey)) {
 		write-verbose -message "incorrect parameter - Please provide an APIKey with -APIKEY parameter"
@@ -2112,6 +2229,46 @@
 			$params = @{}
 			$params.add('UseBasicParsing', $true)
 			$params.add('URI', "$($fullonypheurl)")
+		}
+		if ($UseBetaFeatures) {
+			if ($host.Version.Major -lt 6) {
+				try {
+				if (-not ([System.Management.Automation.PSTypeName]'ServerCertificateValidationCallback').Type) {
+					$certCallback = @"
+							using System;
+							using System.Net;
+							using System.Net.Security;
+							using System.Security.Cryptography.X509Certificates;
+							public class ServerCertificateValidationCallback
+							{
+									public static void Ignore()
+									{
+											if(ServicePointManager.ServerCertificateValidationCallback ==null)
+											{
+													ServicePointManager.ServerCertificateValidationCallback += 
+															delegate
+															(
+																	Object obj, 
+																	X509Certificate certificate, 
+																	X509Chain chain, 
+																	SslPolicyErrors errors
+															)
+															{
+																	return true;
+															};
+											}
+									}
+							}
+"@
+						Add-Type $certCallback
+				}
+				[ServerCertificateValidationCallback]::Ignore()
+				} catch {
+					throw "impossible to add a new type, check your PowerShell Constrained Language settings or run PowerShell as Admin"
+				}
+			} else {
+				$params.add('SkipCertificateCheck', $true)
+			}
 		}
 		$onypheresult = invoke-webrequest @params
 	} catch {
@@ -2222,10 +2379,10 @@
   [cmdletbinding()]
   Param (
   [parameter(Mandatory=$true)]
-  	[ValidateScript({test-path "$($_)"})]
+  [ValidateScript({test-path "$($_)"})]
 		$tofolder,
   [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
-  	[ValidateScript({(($_ | Get-Member | Select-Object -ExpandProperty TypeName -Unique) -eq 'System.Management.Automation.PSCustomObject') -or (($_ | Get-Member | Select-Object -ExpandProperty TypeName -Unique) -eq 'Deserialized.System.Management.Automation.PSCustomObject')})]
+  [ValidateScript({($_ -is [System.Management.Automation.PSCustomObject]) -or ($_ -is [Deserialized.System.Management.Automation.PSCustomObject])})]
 		[array]$inputobject,
   [parameter(Mandatory=$false)]
     $csvdelimiter
@@ -2407,15 +2564,15 @@
   #>
   [cmdletbinding()]
   Param (
-    [parameter(Mandatory=$false)]
-    [ValidateLength(40,40)]
-		[string]$APIKey,
-	[parameter(Mandatory=$false)]
-		[switch]$Remove,
-	[parameter(Mandatory=$false)]
-		[switch]$EncryptKeyInLocalFile,
-	[parameter(Mandatory=$false)]
-		[securestring]$MasterPassword
+		[parameter(Mandatory=$false)]
+		[ValidateLength(40,40)]
+			[string]$APIKey,
+		[parameter(Mandatory=$false)]
+			[switch]$Remove,
+		[parameter(Mandatory=$false)]
+			[switch]$EncryptKeyInLocalFile,
+		[parameter(Mandatory=$false)]
+			[securestring]$MasterPassword
   )
   process {
 	if ($Remove.IsPresent) {
@@ -2474,7 +2631,7 @@
   #>
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true)]
+      [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true)]
         [securestring]$MasterPassword
 	)
 	process {
@@ -2657,15 +2814,15 @@
 	[cmdletbinding()]
 	Param (
 	  [Parameter(Mandatory=$false,ValueFromPipelineByPropertyName=$false)]
-		[switch]$DirectNoProxy,
+		  [switch]$DirectNoProxy,
 	  [Parameter(Mandatory=$false,ValueFromPipelineByPropertyName=$true)]
 	    [string]$Proxy,
 	  [Parameter(Mandatory=$false,ValueFromPipelineByPropertyName=$false)]
 	    [Management.Automation.PSCredential]$ProxyCredential,
 	  [Parameter(Mandatory=$false,ValueFromPipelineByPropertyName=$false)]
-		[Switch]$ProxyUseDefaultCredentials,
+		  [Switch]$ProxyUseDefaultCredentials,
 	  [Parameter(Mandatory=$false,ValueFromPipelineByPropertyName=$false)]
-		[Switch]$AnonymousProxy
+		  [Switch]$AnonymousProxy
 	)
 	if ($DirectNoProxy.IsPresent){
 		$global:OnypheProxyParams = $null
@@ -2694,7 +2851,11 @@
 
 	  .PARAMETER AdvancedSearch
 	  -AdvancedSearch ARRAY{filter:value,filter:value}
-	  Search with multiple criterias
+		Search with multiple criterias
+		
+		.PARAMETER AdvancedFilter
+	  -AdvancedFilter ARRAY{filter:value,filter:value}
+	  Filter with multiple criterias
 
 	  .PARAMETER SearchValue
 	  -SearchValue STRING{value}
@@ -2722,7 +2883,11 @@
 
 	  .PARAMETER Page
 	  -page string{page number}
-	  go directly to a specific result page (1 to 1000)
+		go directly to a specific result page (1 to 1000)
+		
+		.PARAMETER UseBetaFeatures
+	  -UseBetaFeatures switch
+	  use test.onyphe.io to use new beat features of Onyphe
 
 	  .OUTPUTS
 	     TypeName : System.Management.Automation.PSCustomObject
@@ -2788,7 +2953,7 @@
 			[ValidateNotNullOrEmpty()]
 				[string]$SearchType,  
 			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$false,Position=2)]
-			[ValidateNotNullOrEmpty()]  
+			[ValidateNotNullOrEmpty()]
 				[string]$SearchValue,
 			[parameter(Mandatory=$false,Position=3)]
 			[ValidateNotNullOrEmpty()]
@@ -2798,7 +2963,7 @@
 				[string]$FilterFunction,    
 			[parameter(Mandatory=$false,Position=5)] 
 			[ValidateNotNullOrEmpty()]
-				[string]$FilterValue,
+				[string[]]$FilterValue,
 			[parameter(Mandatory=$false,Position=6)] 
 			[ValidateNotNullOrEmpty()]
 				[Array]$AdvancedSearch,
@@ -2809,10 +2974,16 @@
 			[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
 				[string[]]$Page,
 			[parameter(Mandatory=$false,Position=7)]
-				[int]$wait
+				[int]$wait,
+			[parameter(Mandatory=$false,Position=10)]
+				[switch]$UseBetaFeatures,
+			[parameter(Mandatory=$false,Position=11)] 
+			[ValidateNotNullOrEmpty()]
+				[Array]$AdvancedFilter
     )
     Process {		
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+		$APIInput = @()
 		if ($AdvancedSearch) {
 			for ($i=0; $i -lt $AdvancedSearch.length; $i++) {
 				$tmp = $null
@@ -2820,33 +2991,49 @@
 				if (($tmp[1] -match "\s") -and ($tmp[1] -notlike "`"*`"")) {$tmp[1] = "`"$($tmp[1])`""}
 				$AdvancedSearch[$i] = $tmp -join ":"
 			}
-			$tmpvalue = $AdvancedSearch -join " "
-			if ($FilterFunction) {
-				$tmpvalue = "$($tmpvalue) -$($FilterFunction):$($FilterValue)"
-			}
-			$tmpvaluemd = [System.Uri]::EscapeURIString($tmpvalue)
-			$params = @{
-				request = "search/$($SearchType)/$($tmpvaluemd)"
-				APIInput = @("$($tmpvalue)")
-			}
-		} Else {
+			$SearchValue = $AdvancedSearch -join " "
+			$APIInput += @($SearchValue)
+		} Elseif ($SearchValue) {
 			if ($SearchValue -match "(\s)"){
-				$SearchValue = "`"$($SearchValue)`""
-				$SearchValuemd = [System.Uri]::EscapeURIString($SearchValue)
-			} Else {
-				$SearchValuemd = $SearchValue
+				$SearchValue = "$($searchfilter):`"$($SearchValue)`""
+			} else {
+				$SearchValue = "$($searchfilter):$($SearchValue)"
 			}
-			if ($FilterFunction) {
-				$SearchValuemd = "$($SearchValuemd) -$($FilterFunction):$($FilterValue)"
-			}
-			$params = @{
-				request = "search/$($SearchType)/$($SearchFilter):$($SearchValuemd)"
-				APIInput = @("$($SearchFilter):$($SearchValue)")
-			}
+			$APIInput += @($SearchValue)
 		}
-		$params.add('APIInfo',"search/$($SearchType)")
-		$params.add('APIKeyrequired',$true)
-		if ($page) {$params.add('page',$page)}
+		if ($AdvancedFilter) {
+			for ($i=0; $i -lt $AdvancedFilter.length; $i++) {
+				$tmp = $null
+				$tmp = $AdvancedFilter[$i] -split ":"
+				if ($tmp[1].contains(",")) {
+					$tmp2 = $tmp[1] -split ","
+					if (($tmp2[1] -match "\s") -and ($tmp2[1] -notlike "`"*`"")) {$tmp2[1] = "`"$($tmp2[1])`""}
+					$tmp[1] = $tmp2 -join ","
+				} else {
+					if (($tmp[1] -match "\s") -and ($tmp[1] -notlike "`"*`"")) {$tmp[1] = "`"$($tmp[1])`""}
+				}
+				$tmp[0] = "-" + $tmp[0]
+				$AdvancedFilter[$i] = $tmp -join ":"
+			}
+			$AdvancedFilter = $AdvancedFilter -join " "
+			$SearchValue = "$($SearchValue) $($AdvancedFilter)"
+			$APIInput += @($AdvancedFilter)
+		} elseif ($FilterFunction) {
+				$SearchValue = "$($SearchValue) -$($FilterFunction):$($FilterValue -join ",")"
+				$APIInput += "-$($FilterFunction):$($FilterValue -join ",")"
+		} 
+		$params = @{
+			request = [System.Uri]::EscapeURIString("search/$($SearchType)/$($SearchValue)")
+			APIInfo = "search/$($SearchType)"
+			APIKeyrequired = $true
+			APIInput = $APIInput
+		}
+		if ($page) {
+			$params.add('page',$page)
+		}
+		if ($UseBetaFeatures) {
+			$params.add('UseBetaFeatures', $true)
+		}
 		Write-Verbose -message "URL Info : $($params.request)"
 		Invoke-Onyphe @params
 	}
@@ -2860,7 +3047,15 @@
 	  Update Onyphe-Data-Model.xml local file containing a cache of available APIs, functions, filters from user API
 	  
 	  .OUTPUTS
-	  none
+		none
+		
+		.PARAMETER APIKEY
+	  -APIKey string{APIKEY}
+		Set APIKEY as global variable
+		
+		.PARAMETER UseBetaFeatures
+	  -UseBetaFeatures switch
+	  use test.onyphe.io to use new beat features of Onyphe
 	  
 	  .EXAMPLE
 	  Update Onyphe-Data-Model.xml local file containing a cache of available APIs, functions, filters from user API
@@ -2868,29 +3063,28 @@
 	#>
 	[cmdletbinding()]
 	Param ( 
-	[parameter(Mandatory=$false)]
-	  [ValidateLength(40,40)]
-	  [string]$APIKey
+		[parameter(Mandatory=$false)]
+		[ValidateLength(40,40)]
+			[string]$APIKey,
+		[parameter(Mandatory=$false)]
+			[switch]$UseBetaFeatures
 	)  
 	  Process {
-		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
-			$params = @{
-				request = "user/"
-				APIInfo = "user"
-				APIInput = "none"
-				APIKeyrequired = $true
+			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+			if ($UseBetaFeatures) {
+				$params = @{
+					UseBetaFeatures = $true
+				}
+			} else {
+				$params = @{}
 			}
-			Write-Verbose -message "URL Info : $($params.request)"  
-			$userinfo = Invoke-Onyphe @params
 			$XMLFilePath = join-path (Get-ScriptDirectory) "Onyphe-Data-Model.xml"
 			if (test-path $XMLFilePath) {
 				Write-Verbose -message "file Onyphe-Data-Model.xml already exists, removing the old file"
 				Remove-Item -Path $XMLFilePath -Force
 			}
-			if ($userinfo) {
-				write-verbose -Message "generating new file from Onyphe User info"
-				(Get-OnypheUserInfo).results | Select-Object -Property apis,filters,functions | Export-Clixml -Force -Path $XMLFilePath
-			}
+			write-verbose -Message "generating new file from Onyphe User info"
+			(Get-OnypheUserInfo @params).results | Select-Object -Property apis,filters,functions | Export-Clixml -Force -Path $XMLFilePath
 		}
 	}
 	Function Export-OnypheDataShot {
@@ -2911,19 +3105,19 @@
 		[cmdletbinding()]
 		Param (
 			[parameter(Mandatory=$true)]
-				[ValidateScript({test-path "$($_)"})]
+			[ValidateScript({test-path "$($_)"})]
 				$tofolder,
 			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
-			[ValidateScript({(($_ | Get-Member | Select-Object -ExpandProperty TypeName -Unique) -eq 'System.Management.Automation.PSCustomObject') -or (($_ | Get-Member | Select-Object -ExpandProperty TypeName -Unique) -eq 'Deserialized.System.Management.Automation.PSCustomObject')})]
+			[ValidateScript({($_ -is [System.Management.Automation.PSCustomObject]) -or ($_ -is [Deserialized.System.Management.Automation.PSCustomObject])})]
 				[array]$inputobject
 			)
 			Process {
 				$ticks = (get-date).ticks.ToString()
 				foreach ($result in $inputobject) {
-					$datashotsfilter = $result.results | Where-Object {$_.'@category' -eq 'datashot'}
+					$datashotsfilter = $result.results | Where-Object {($_.'@category' -eq 'datashot') -or ($_.'@category' -eq 'onionshot')}
 					foreach ($datashot in $datashotsfilter) {
 						if ($datashot.app.screenshot.image) {
-							$file = "$($ticks)_$($datashot.ip.Replace(".","-"))_$($datashot.port).jpg"
+							$file = "$($ticks)_$($datashot.datamd5)_$((Get-Random -Maximum 999).tostring()).jpg"
 							$fullfilepath = join-path $tofolder $file
 							if ($host.Version.Major -ge 6) {
 								[System.Convert]::FromBase64String($datashot.app.screenshot.image) | Set-Content $fullfilepath -AsByteStream -Force

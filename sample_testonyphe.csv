@@ -1,4 +1,4 @@
-API;API-Input;Search-Type;Search-Request;Filter-Function;Function-Input
+API;API-Input;Search-Type;Search-Request;Filter-Request;Page
 Ip;8.8.8.8;;;;
 Geoloc;7.7.7.7;;;;
 DataScan;IIS;;;;
@@ -27,4 +27,4 @@ Search;;onionscan;data:market;;
 Search;;threatlist;tag:mirai;;
 search;;datashot;protocol:rdp;;
 search;;ctl;host:vpn;;
-Search;;datascan;organization:OVH SAS+protocol:rdp;monthago;1
+Search;;datascan;organization:OVH SAS+protocol:rdp;monthago:1;1
