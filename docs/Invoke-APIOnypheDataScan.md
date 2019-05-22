@@ -13,7 +13,7 @@ create several input for Invoke-Onyphe function and then call it to get the data
 ## SYNTAX
 
 ```
-Invoke-APIOnypheDataScan [-IPOrDataScanString] <String[]> [[-APIKey] <String[]>] [[-Page] <String[]>]
+Invoke-APIOnypheDataScan [-IPOrDataScanString] <String[]> [[-APIKey] <String>] [[-Page] <String[]>]
  [<CommonParameters>]
 ```
 
@@ -54,7 +54,7 @@ string to be used for the DataScan API usage
 ```yaml
 Type: String[]
 Parameter Sets: (All)
-Aliases:
+Aliases: input
 
 Required: True
 Position: 1
@@ -68,7 +68,7 @@ Accept wildcard characters: False
 Set APIKEY as global variable.
 
 ```yaml
-Type: String[]
+Type: String
 Parameter Sets: (All)
 Aliases:
 
@@ -96,8 +96,7 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

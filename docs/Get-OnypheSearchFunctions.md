@@ -5,19 +5,19 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-OnypheSearchCategories
+# Get-OnypheSearchFunctions
 
 ## SYNOPSIS
-Get category available for search APIs of Onyphe
+Get search functions available for search APIs of Onyphe
 
 ## SYNTAX
 
 ```
-Get-OnypheSearchCategories [<CommonParameters>]
+Get-OnypheSearchFunctions [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Get category available for search APIs of Onyphe
+Get search functions available for search APIs of Onyphe (like time filterring etc...)
 
 ## EXAMPLES
 
@@ -26,7 +26,7 @@ Get category available for search APIs of Onyphe
 Get category available for search APIs of Onyphe
 ```
 
-C:\PS\> Get-OnypheSearchCategories
+C:\PS\> Get-OnypheSearchFunctions
 
 ## PARAMETERS
 
@@ -37,7 +37,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
-### filters as string
+### functions as string
 ## NOTES
 
 ## RELATED LINKS

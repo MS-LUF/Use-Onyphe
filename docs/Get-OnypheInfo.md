@@ -13,8 +13,8 @@ main function/cmdlet - Get IP information from onyphe.io web service using dedic
 ## SYNTAX
 
 ```
-Get-OnypheInfo [[-SearchValue] <String[]>] [-MyIP] [[-APIKey] <String[]>] [[-Page] <String[]>]
- [[-wait] <Int32>] [-SearchType <String>] [<CommonParameters>]
+Get-OnypheInfo [[-SearchValue] <String[]>] [-MyIP] [[-APIKey] <String>] [[-Page] <String[]>] [[-wait] <Int32>]
+ [-SearchType <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -145,7 +145,7 @@ Accept wildcard characters: False
 set your APIKEY to be able to use Onyphe API.
 
 ```yaml
-Type: String[]
+Type: String
 Parameter Sets: (All)
 Aliases:
 
@@ -204,8 +204,7 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

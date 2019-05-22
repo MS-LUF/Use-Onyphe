@@ -13,7 +13,7 @@ Update Onyphe-Data-Model.xml local file containing a cache of available APIs, fu
 ## SYNTAX
 
 ```
-Update-OnypheFacetsFilters [[-APIKey] <String[]>] [<CommonParameters>]
+Update-OnypheFacetsFilters [[-APIKey] <String>] [-UseBetaFeatures] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -34,7 +34,7 @@ C:\PS\> Update-OnypheFacetsFilters
 {{Fill APIKey Description}}
 
 ```yaml
-Type: String[]
+Type: String
 Parameter Sets: (All)
 Aliases:
 
@@ -45,9 +45,24 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -UseBetaFeatures
+-UseBetaFeatures switch
+use test.onyphe.io to use new beat features of Onyphe
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

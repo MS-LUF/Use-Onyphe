@@ -13,8 +13,7 @@ Get IP information from onyphe.io web service using as an input a CSV file conta
 ## SYNTAX
 
 ```
-Get-OnypheInfoFromCSV [-fromcsv] <Object> [[-APIKey] <String[]>] [[-csvdelimiter] <Object>]
- [<CommonParameters>]
+Get-OnypheInfoFromCSV [-fromcsv] <Object> [[-APIKey] <String>] [[-csvdelimiter] <Object>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -66,7 +65,7 @@ Accept wildcard characters: False
 set your APIKEY to be able to use Onyphe API.
 
 ```yaml
-Type: String[]
+Type: String
 Parameter Sets: (All)
 Aliases:
 
@@ -95,8 +94,7 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

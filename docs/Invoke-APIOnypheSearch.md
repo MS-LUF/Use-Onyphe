@@ -13,8 +13,9 @@ create several input for Invoke-Onyphe function and then call it to search info 
 ## SYNTAX
 
 ```
-Invoke-APIOnypheSearch [[-SimpleSearchValue] <String>] [[-AdvancedSearch] <Array>] [-APIKey <String[]>]
- [-Page <String[]>] -SearchType <String> [-SimpleSearchFilter <String>] [<CommonParameters>]
+Invoke-APIOnypheSearch [[-SearchType] <String>] [[-SearchValue] <String>] [[-SearchFilter] <String>]
+ [[-FilterFunction] <String>] [[-FilterValue] <String[]>] [[-AdvancedSearch] <Array>] [[-APIKey] <String>]
+ [[-Page] <String[]>] [[-wait] <Int32>] [-UseBetaFeatures] [[-AdvancedFilter] <Array>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -36,13 +37,61 @@ simple search with one filter/criteria
 ```
 
 Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
-C:\PS\> Invoke-APIOnypheSearch -SimpleSearchValue RU -SearchType threatlist -SimpleSearchFilter country
+C:\PS\> Invoke-APIOnypheSearch -SearchValue RU -SearchType threatlist -SearchFilter country
 
 ## PARAMETERS
 
-### -SimpleSearchValue
--SimpleSearchValue STRING{value}
-string to be searched with -SimpleSearchFilter parameter
+### -SearchType
+-SearchType STRING{Get-OnypheSearchCategories}
+Search Type or Category
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 2
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -SearchValue
+-SearchValue STRING{value}
+string to be searched with -SearchFilter parameter
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 3
+Default value: None
+Accept pipeline input: True (ByPropertyName, ByValue)
+Accept wildcard characters: False
+```
+
+### -SearchFilter
+-SearchFilter STRING{Get-OnypheSearchFilters}
+Filter to be used with string set with SearchValue parameter
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 4
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -FilterFunction
+-FilterFunction String{Get-OnypheSearchFunctions}
+Filter search function
 
 ```yaml
 Type: String
@@ -52,7 +101,23 @@ Aliases:
 Required: False
 Position: 5
 Default value: None
-Accept pipeline input: True (ByPropertyName, ByValue)
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -FilterValue
+-FilterValue String
+value to use as input for FilterFunction
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 6
+Default value: None
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
@@ -66,7 +131,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 2
+Position: 7
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -77,12 +142,12 @@ Accept wildcard characters: False
 Set APIKEY as global variable
 
 ```yaml
-Type: String[]
+Type: String
 Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: Named
+Position: 9
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -98,45 +163,61 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: Named
+Position: 10
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -SearchType
-{{Fill SearchType Description}}
+### -wait
+{{Fill wait Description}}
 
 ```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -SimpleSearchFilter
-{{Fill SimpleSearchFilter Description}}
-
-```yaml
-Type: String
+Type: Int32
 Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: Named
+Position: 8
+Default value: 0
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -UseBetaFeatures
+-UseBetaFeatures switch
+use test.onyphe.io to use new beat features of Onyphe
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 11
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -AdvancedFilter
+-AdvancedFilter ARRAY{filter:value,filter:value}
+Filter with multiple criterias
+
+```yaml
+Type: Array
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 12
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
