@@ -1,3 +1,5 @@
+![image](https://www.onyphe.io/img/logo-solo.png)
+
 # Use-Onyphe
 Simple PowerShell module to use Onyphe.io API
 
