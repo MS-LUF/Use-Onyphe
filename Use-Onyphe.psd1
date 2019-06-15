@@ -119,7 +119,7 @@ PrivateData = @{
         IconUri = 'https://www.onyphe.io/img/logo-solo.png'
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'v0.97 : code improvement, add beta switch to use beta interface of onyphe instead of production one, improve paging parameters, add advancedfilter option to Search-onyphe to manage multiple filter functions input, add onionshot category to datashot export function'
+        ReleaseNotes = 'v0.98 : fix paging regex to support more than 1000 pages'
         # External dependent modules of this module
         # ExternalModuleDependencies = ''
 

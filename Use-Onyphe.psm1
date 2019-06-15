@@ -39,6 +39,9 @@
 # - add advancedfilter option to Search-onyphe to manage multiple filter functions input
 # - add onionshot category to datashot export function
 #
+# v0.98 :
+# - update paging regex to support more than 1000 pages
+#
 #'(c) 2018-2019 lucas-cueff.com - Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).'
 
 <#
@@ -425,7 +428,7 @@
 		 [ValidateLength(40,40)]
 		     [string]$APIKey,
 		 [parameter(Mandatory=$false,Position=9)]
-		 [ValidateScript({($_ -match "^([1-9][0-9]{0,2}|1000)$") -or ($_ -match "^(([1-9][0-9]{0,2}|1000)(-)([1-9][0-9]{0,2}|1000))$")})]
+		 [ValidateScript({($_ -match "^((?!0)\d+)$") -or ($_ -match "^((?!0)\d+)(-)((?!0)\d+)$")})]
 			 [string[]]$Page,
 		 [parameter(Mandatory=$false,Position=7)]
 			 [int]$wait,
@@ -514,7 +517,7 @@
 		}
 		if ($Page) {
 			switch -regex ($page) {
-				"^(([1-9][0-9]{0,2}|1000)(-)([1-9][0-9]{0,2}|1000))$" {
+				"^((?!0)\d+)(-)((?!0)\d+)$" {
 					$page = $page -split "-"
 					for ($i=[int]$page[0];$i -le [int]$page[1];$i++) {
 						if ($params.page) {
@@ -525,7 +528,7 @@
 						Invoke-APIOnypheSearch @params
 					}
 				}
-				"^([1-9][0-9]{0,2}|1000)$" {
+				"^((?!0)\d+)$" {
 					$params.add('Page', $page)
 					Invoke-APIOnypheSearch @params
 				}
@@ -655,7 +658,7 @@
 		[ValidateLength(40,40)]
 		[string]$APIKey,
 	[parameter(Mandatory=$false)]
-	[ValidateScript({($_ -match "^([1-9][0-9]{0,2}|1000)$") -or ($_ -match "^(([1-9][0-9]{0,2}|1000)(-)([1-9][0-9]{0,2}|1000))$")})]
+	[ValidateScript({($_ -match "^((?!0)\d+)$") -or ($_ -match "^((?!0)\d+)(-)((?!0)\d+)$")})]
 		[string[]]$Page,
 	[parameter(Mandatory=$false)]
 		[int]$wait
@@ -695,7 +698,7 @@
 				if (test-path function:\"Invoke-APIOnyphe$($Searchtype)") {
 					if ($Page) {
 						switch -regex ($page) {
-							"^(([1-9][0-9]{0,2}|1000)(-)([1-9][0-9]{0,2}|1000))$" {
+							"^((?!0)\d+)(-)((?!0)\d+)$" {
 								$page = $page -split "-"
 								for ($i=[int]$page[0];$i -le [int]$page[1];$i++) {
 									if ($params.page) {
@@ -706,7 +709,7 @@
 									invoke-expression "Invoke-APIOnyphe$($Searchtype) `@params"
 								}
 							}
-							"^([1-9][0-9]{0,2}|1000)$" {
+							"^((?!0)\d+)$" {
 								$params.add('Page', $page)
 								invoke-expression "Invoke-APIOnyphe$($Searchtype) `@params"
 							}
@@ -941,7 +944,7 @@
 		[ValidateLength(40,40)]
 			[string]$APIKey,
 		[parameter(Mandatory=$false)]
-		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
 			[string[]]$Page
   )
 	Process {
@@ -1035,7 +1038,7 @@
 		[ValidateLength(40,40)]
 			[string]$APIKey,
 		[parameter(Mandatory=$false)]
-		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
 			[string[]]$Page
   )
 	Process {
@@ -1130,7 +1133,7 @@
 		[ValidateLength(40,40)]
 			[string]$APIKey,
 		[parameter(Mandatory=$false)]
-		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
 			[string[]]$Page
   )
 	Process {
@@ -1243,7 +1246,7 @@
 			[ValidateLength(40,40)]
 				[string]$APIKey,
 			[parameter(Mandatory=$false)]
-			[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+			[ValidateScript({$_ -match "^((?!0)\d+)$"})]
 				[string[]]$Page
 		)
 		Process {
@@ -1339,7 +1342,7 @@
 			[ValidateLength(40,40)]
 				[string]$APIKey,
 			[parameter(Mandatory=$false)]
-			[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+			[ValidateScript({$_ -match "^((?!0)\d+)$"})]
 				[string[]]$Page
 		)
 		Process {
@@ -1456,7 +1459,7 @@
 			[ValidateLength(40,40)]
 				[string]$APIKey,
 			[parameter(Mandatory=$false)]
-			[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+			[ValidateScript({$_ -match "^((?!0)\d+)$"})]
 				[string[]]$Page
 		)
 		Process {
@@ -1547,7 +1550,7 @@
 			[ValidateLength(40,40)]
 				[string]$APIKey,
 			[parameter(Mandatory=$false)]
-			[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+			[ValidateScript({$_ -match "^((?!0)\d+)$"})]
 				[string[]]$Page
 		)
 		Process {
@@ -1641,7 +1644,7 @@
 		[ValidateLength(40,40)]
 			[string]$APIKey,
 		[parameter(Mandatory=$false)]
-		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
 			[string[]]$Page
   )
 	Process {
@@ -1734,7 +1737,7 @@
 		[ValidateLength(40,40)]
 			[string]$APIKey,
 		[parameter(Mandatory=$false)]
-		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
 			[string[]]$Page
   )
 	Process {
@@ -1829,7 +1832,7 @@
 		[ValidateLength(40,40)]
 			[string]$APIKey,
 		[parameter(Mandatory=$false)]
-		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
 			[string[]]$Page
   )
 	Process {
@@ -1939,7 +1942,7 @@
 		[ValidateLength(40,40)]
 			[string]$APIKey,
 		[parameter(Mandatory=$false)]
-		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
 			[string[]]$Page
   )
 	Process {
@@ -2035,7 +2038,7 @@
 		[ValidateLength(40,40)]
 			[string]$APIKey,
 		[parameter(Mandatory=$false)]
-		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
 			[string[]]$Page
   )
 	Process {
@@ -2186,7 +2189,7 @@
 		[parameter(Mandatory=$true)]
 			[Bool[]]$APIKeyrequired,
 		[parameter(Mandatory=$false)]
-		[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})] 
+		[ValidateScript({$_ -match "^((?!0)\d+)$"})] 
 			[string[]]$page,
 		[parameter(Mandatory=$false)]
 			[switch]$UseBetaFeatures
@@ -2971,7 +2974,7 @@
 			[ValidateLength(40,40)]
 				[string]$APIKey,
 			[parameter(Mandatory=$false,Position=9)]
-			[ValidateScript({$_ -match "^([1-9][0-9]{0,2}|1000)$"})]
+			[ValidateScript({$_ -match "^((?!0)\d+)$"})]
 				[string[]]$Page,
 			[parameter(Mandatory=$false,Position=7)]
 				[int]$wait,
