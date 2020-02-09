@@ -1,5 +1,5 @@
 ---
-external help file: use-onyphe-help.xml
+external help file: Use-Onyphe-help.xml
 Module Name: Use-Onyphe
 online version:
 schema: 2.0.0
@@ -13,7 +13,7 @@ Get facets available for stats on local Onyphe PS Object
 ## SYNTAX
 
 ```
-Get-OnypheCliFacets [<CommonParameters>]
+Get-OnypheCliFacets
 ```
 
 ## DESCRIPTION
@@ -29,9 +29,6 @@ Get facets available for stats on local Onyphe PS Object
 C:\PS\> Get-OnypheCliFacets
 
 ## PARAMETERS
-
-### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

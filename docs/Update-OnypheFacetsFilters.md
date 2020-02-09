@@ -1,5 +1,5 @@
 ---
-external help file: use-onyphe-help.xml
+external help file: Use-Onyphe-help.xml
 Module Name: Use-Onyphe
 online version:
 schema: 2.0.0
@@ -31,7 +31,8 @@ C:\PS\> Update-OnypheFacetsFilters
 ## PARAMETERS
 
 ### -APIKey
-{{Fill APIKey Description}}
+-APIKey string{APIKEY}
+Set APIKEY as global variable
 
 ```yaml
 Type: String
@@ -62,7 +63,8 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
+For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

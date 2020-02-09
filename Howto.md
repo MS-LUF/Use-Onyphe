@@ -2,6 +2,9 @@
 
 # Use-Onyphe - How-To
 
+## ChangeLog
+This documentation has been updated to take into account **new features available with v0.99 including new Alerting APIs**. Enjoy your Onyphe stuff with Power[Shell](Of Love)
+
 ## Intro Onyphe
 Onyphe.io provides data about IP address space and publicly available information in just one place.
 
@@ -11,27 +14,36 @@ To request it : https://www.onyphe.io/login
 More info about available APIs :
 https://www.onyphe.io/documentation/api
 
-(c) 2018-2019 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
+(c) 2018-2020 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
+
+## APIs v1 and v2
+Since a few weeks now, new APIs are available in "v2". Main differences between v1 and v2 APIs are :
+- V1 : accept only GET requests, all inputs must be managed as dedicated parameters (including API Key)
+- V2 : accept GET and POST requests (using JSON formatted body for POST), API key must be provided as a HTTP Header. No paging for now.
+To manage separated evolutions of V1 and V2 APIs, I am using also 2 different functions (Invoke-OnypheAPIV1, Invoke-OnypheAPIV2)
 
 ## Intro Use-Onyphe
-Hello Guys,
-
-A few words about the Powershell module Use-Onyphe that you can use to simply request Onyphe APIs from a Powershell prompt or script.
+Use-Onyphe is a free PowerShell module that you can use to simply request Onyphe APIs from a Powershell prompt or script (including PowerShell Core)
 The module is available from :
- - Powershell Gallery (using install-module / update-module from Powershell command line on recent PS version) https://www.powershellgallery.com/packages/Use-Onyphe/
+ - Powershell Gallery (using install-module / update-module from PowerShell command line on recent PS version) https://www.powershellgallery.com/packages/Use-Onyphe/
  - Github https://github.com/MS-LUF/Use-Onyphe
 
 After the installation and load of the module (using import-module), you will have to manage your context before starting to use it :-)
-
+This module can both work on PowerShell and PowerShell Core. It means you can use it on every platform supported by PowerShell Core, including Windows, Linux and MacOS.
+```
 C:\PS> import-module "C:\My Modules\Use-Onyphe.psd1" -DisableNameChecking
-
+```
+```
+PS /home/yours> import-module "/home/yours/My Modules/Use-Onyphe.psd1" -DisableNameChecking
+```
 ## Prerequisites
 ### Prerequisite 1 : Managing your API Key
 First thing to do is your API Key. You can directly load it in a global variable through Set-OnypheAPIKey :
 ```
     C:\PS>Set-OnypheAPIKey -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
-Or, you can save it encrypted in a local file (%appdata%\Use-Onyphe\Use-Onyphe-Config.xml) and load it at each start of Powershell using your Profile Script
+Or, you can save it encrypted in a local file (%home%\Use-Onyphe\Use-Onyphe-Config.xml) and load it at each start of Powershell using your Profile Script
+**Note : previously it was stored under %appdata% but since v0.99 it is now stored under %home% for linux and Powershell Core compatibility**
 ```
     Set-OnypheAPIKey -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -MasterPassword (ConvertTo-SecureString -String "YourP@ssw0rd" -AsPlainText -Force) -EncryptKeyInLocalFile
 ```
@@ -45,7 +57,7 @@ Second stuff to do is to manage your internet access, you can set it (proxy with
 ```
     C:\PS>Set-OnypheProxy -proxy "http://myproxy:3128" -ProxyUseDefaultCredentials
 ```
-You can also add it in your Microsoft.Powershell_profile.ps1 to set your environment automatically
+You can also add it in your Microsoft.PowerShell_profile.ps1 to set your environment automatically (%PROFILE% variable in your PowerShell user context)
 
 ## Output of Use-Onyphe functions / cmdlets
 all output are managed through Powershell Objects (TypeName: System.Management.Automation.PSCustomObject)
@@ -55,12 +67,14 @@ cli-* properties of the objects are properties added by the cmdlets (not directl
  - a date time object of the request
  - the API called
  - the API input
+ - the API version used
  - if the API required an API Key
 
 sample output :
 ```
     cli-API_info     : {ip}
     cli-API_input    : {9.9.9.9}
+    cli-API_version  : 1
     cli-key_required : {True}
     cli-Request_Date : 22/08/2018 16:50:44
 ```
@@ -85,6 +99,7 @@ object example for request Get-OnypheInfo -searchvalue 9.9.9.9 (all info availab
     total            : 263
     cli-API_info     : {ip}
     cli-API_input    : {9.9.9.9}
+    cli-API_version  : 1
     cli-key_required : {True}
     cli-Request_Date : 22/08/2018 23:50:01
 ```
@@ -191,11 +206,13 @@ Get-help is available on all functions, for instance, if you want to consult the
     C:\PS>Get-Help Get-OnypheInfo -full
 ```
 
-## Using Use-Onyphe to use onyphe.io API
-3 main functions / cmdlets will be used : 
- - Get-OnypheInfo to use Myip,geoloc,ip,inetnum,threatlist,pastries,synscan,datascan,reverse,forward APIs
- - Search-OnypheInfo to use all search APIs. Last but not least
+## Using Use-Onyphe to use onyphe.io APIs
+5 main functions / cmdlets will be used : 
+ - Get-OnypheInfo (or Get-Onyphe) to use Myip,geoloc,ip,inetnum,threatlist,pastries,synscan,datascan,reverse,forward APIs
+ - Search-OnypheInfo (or Search-Onyphe) to use all search APIs. Last but not least
  - Get-OnypheUserInfo will be used to follow your API key / user account (user API)
+ - Get-OnypheAlertInfo (or Get-OnpyheAlert) to list your alerts using v2/alert/list API
+ - Set-OnypheAlertInfo (or Set-OnypheAlert) to create and delete alerts using v2/alert/add or v2/alert/del APIs
  
 Find hereunder several use cases for all API examples documented on https://www.onyphe.io/documentation/api
 
@@ -308,8 +325,58 @@ API Search/datashot : Return datashot information
 ```
     C:\PS>Search-OnypheInfo -SearchValue rdp -SearchFilter protocol -SearchType datashot
 ```
+API V2/Alert/List : List your account alerts already set
+```
+    C:\PS>Get-OnypheAlert
+```
+```
+    C:\PS>Get-OnypheAlert -SearchValue "jeanclaude.dusse@lesbronzesfontdusk.io" -SearchOperator eq -SearchFilter email
+```
+API V2/Alert/Add : Define a new alert for your account
+```
+    C:\PS>Set-OnypheAlert -AdvancedSearch @("product:Apache","port:443","os:Windows") -SearchType datascan -AlertAction new -AlertName "windows apache" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"
+```
+```
+    C:\PS>Set-OnypheAlert -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
+```
+API V2/Alert/Del : Remove an existing alert from your account
+```
+    C:\PS>Set-OnypheAlert -AlertAction delete -AlertName "windows apache"
+```
 
-## paging and results
+## E-mail alerting system
+Since a few weeks now, 3 new APIs (V2) are available to manage automatic e-mail alerts for your Onyphe account. It means you can automate search request at Onyphe server side and received an e-mail alerts when new events are available (especially when using timeline filter functions in your request).
+Of course this new feature requires an API Key (non free).
+**You can create 100 alerts maximum by account.**
+Of course, this PowerShell module has been updated to manage this new important features :) You can now create / delete / modify your alerts using Use-Onyphe module.
+The parameters are quite the same compared to the Search-Onyphe function. It means, you are free to create simple search request or advanced search / filters requests for an alert.
+**The alerts are sent from noreply@onyphe.fr with the following object [ONYPHE][ALERT]**
+
+Here are several samples to help you understand how it works ;-)
+Create a "simple" alert named "from Paris with love" when a new french IP has been added to Onyphe threatlist (new daily info) and sent back the alert to "jeanclaude.dusse@lesbronzesfontdusk.io"
+```
+    C:\PS>Set-OnypheAlert -SearchValue FR -SearchType threatlist -SearchFilter country -FilterFunction dayago -FilterValue 0 -AlertAction new -AlertName "from Paris with love" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"
+```
+Create an advanced alert named "FR RDP" when a new IP has been tagged for an open MS-RDP port, in France, from an organization named like *company*, with an available OS property (since the last 2 month) and sent back the alert to "robert.lespinasse@lesbronzesfontdusk.io"
+```
+    C:\PS> Set-OnypheAlert -AdvancedFilter @("wildcard:organization,*company*","exists:os","monthago:2") -AdvancedSearch @("country:FR","port:3389") -SearchType datascan -AlertAction new -AlertName "FR RDP" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
+```
+Delete an existing alert named "FR RDP"
+```
+    C:\PS> Set-OnypheAlert -AlertAction delete -AlertName "FR RDP"
+```
+List all existing alert
+```
+    C:\PS> Get-OnypheAlert
+```
+Get alert based on mail,name or query criteria. Here with mail criteria, retrieve all alert defined to "jeanclaude.dusse@lesbronzesfontdusk.io"
+Note : search operators available are the classic PowerShell ones : eq, ne, like, notlike, match, notmatch
+Note : default value for SearchOperator parameter is "eq"
+Note : default value for SearchFilter parameter is "name"
+```
+    C:\PS> Get-OnypheAlert -SearchValue "jeanclaude.dusse@lesbronzesfontdusk.io" -SearchOperator eq -SearchFilter email
+```
+## Paging and Results
 by default 10 results are available in on object. if you have more than 10 results available, you can consult them ten by ten using pages.
 for instance the following request "Search-OnypheInfo -SearchValue "OVH SAS" -SearchFilter organization -SearchType inetnum" will send back a powershell object with the properties "max_page" to 1000.
 by default, the object will embbed the first 10 results available on the first page. to consult the page 2 containing the next 10 results, you can use the property "page" :
@@ -323,15 +390,16 @@ if you want to retrieve all the pages, you can specify first and last page separ
 ```
 Note : parameter "-wait 3" will wait 3 seconds between each request to manage rate limiting.
 
-## filter functions available on servers
+## Filter functions available on servers
 you can use some server filter functions to optimize your search (feature only available for search APIs not basic APIs). Currently, you can mainly use some timing function to filter results based on object creation date.
 you can use dayago, weekago, monthago functions to filter the results directly on the server side.
+you can use the filter functions on search request but also on alert creation (because an alert is no more a linked between a automate search request and an e-mail address).
 For instance, hereunder we request all objects created since the last 2 months
 ```
     C:\PS> Search-OnypheInfo -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction monthago -FilterValue 2
 ```
-Here are also the filters available currently : dayago, weekago, monthago, exist, wildcard.
-exist can be used to send back only result with a property containing a non null value. For instance, I can retrieve only the result containing a property OS set :
+Here are also the filters available currently : dayago, weekago, monthago, exists, wildcard, fields
+exists can be used to send back only result with a property containing a non null value. For instance, I can retrieve only the result containing a property OS set :
 ```
     C:\PS> Search-OnypheInfo -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction exist -FilterValue os
 ```
@@ -343,12 +411,16 @@ you can use multiple filter functions at a time using advancedfilter property :
 ```
     C:\PS> search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan
 ```
-## managing rate limiting
+a last sample using the previous request but declared as an alert named "RandR" for robert.lespinasse@lesbronzesfontdusk.io
+```
+    C:\PS>Set-OnypheAlert -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
+```
+## Managing rate limiting
 you can add the parameter "wait" followed by a digit to request to wait x seconds between each request to manage rate limiting feature.
 It's usefull in case of a loop or in batch mode usage.
 Note : in batch usage (see next chapter) the wait parameter is set automatically to 3
 
-## batch mode usage
+## Batch mode usage
 a cmdlet / function is available to automate request based on a csv.
 the output is an array containing all results.
 to do so use the function "Get-OnypheInfoFromCSV"
@@ -359,7 +431,7 @@ by default the CSV delimieter is ; (made in France ;-) ) to change it, use the p
 you can find a csv template on my github here : https://raw.githubusercontent.com/MS-LUF/Use-Onyphe/master/sample_testonyphe.csv
 all apis can be used. currently the pages are not managed, it should be done in the next version of the module (it means only the first 10 results are managed by default).
 
-## export results to file (CSV)
+## Export results to file (CSV)
 a cmdlet / function is available to export a onyphe powershell object to an external CSV.
 Note : the data or content properties of pastries,datascan ... are exported in dedicated text file to be more readable.
 Just specify the target folder and several subfolders (on per request) containing csv and txt files will be created.
@@ -369,7 +441,7 @@ to do so use the function Export-OnypheInfoToFile :
     C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -inputobject $AllResults
 ```
 
-## playing with onyphe and powershell objects
+## Playing with Onyphe and PowerShell objects
 ### Example 1
 Please onyphe, tell me what are the current IP addresses tagged with mirai botnet ?
 Well, we will do the stats for the first 100 pages of results for the demo :)
@@ -398,7 +470,7 @@ The ip list itself ?
 Well, not so hard, isn't it ;-)
 
 ### Example 2
-Please onyphe, I am a security guy from Quad9 and I want to have an overview of all my opened ports on internet.
+Please Onyphe, I am a security guy from Quad9 and I want to have an overview of all my opened ports on internet.
 Well, quite simple :)
 
 First, retrieve all the results avaialable (all synscan objects linked to Quad9 organization) :
@@ -428,7 +500,7 @@ thank you, let me check... it seems the port is now closed... but need some inve
 Still easy, isn't it ;-)
 
 ### Example 3
-Well, thanks onyphe but I am not very confortable with powershell and I have quite simple needs. Indeed, I am not a technical guy more a funtionnal one and I would like to do some simple stats related to several search.
+Well, thanks onyphe but I am not very confortable with PowerShell and I have quite simple needs. Indeed, I am not a technical guy more a funtionnal one and I would like to do some simple stats related to several search.
 Starting v0.93 of Use-Onyphe module, a new function is now available "Get-OnypheStatsFromObject" that can do several simple stuff for you :-) you can do some basic stats (count, total, average, min, max) on all properties of Onyphe results based on Powershell Onyphe result object.
 
 For instance, let's take a CSO from Citrix company, he wants to have, everyweek, a quick overview of all opened ports regarding his organzation to update his security dashboard.
@@ -487,4 +559,21 @@ Please Onyphe, filter the result and show me only the answer with os property no
 Please Onyphe, filter the results using multiple filters (only os property known and from all organization like *company*) for tcp port 3389 opened in russia
 ```
     C:\PS> search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan
+```
+
+### Example 7
+Please Onyphe, I have found a very useful search request and I want to create an alert for it
+
+Well, we can manage it in different ways, first create the alert 'manually'
+```
+    C:\PS> set-onyphealert -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
+```
+Or you can pipe a search object to the set-onyphealert function
+```
+    C:\PS> search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan | set-onyphealert -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
+```
+Or you can import an existing search object result in set-onyphealert function
+```
+    C:\PS> $test = search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan
+    C:\PS> set-onyphealert -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io" -InputOnypheObject $test
 ```

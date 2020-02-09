@@ -11,7 +11,6 @@
 # - add tag filter
 # v0.93 : 
 # - add local stat function
-# Released on: 08/2018
 # v0.94 :
 # - manage new apis (ctl, sniffer, onionscan, md5)
 # - use userinfos API to collect APIs and search filters
@@ -38,11 +37,17 @@
 # - improve paging parameters
 # - add advancedfilter option to Search-onyphe to manage multiple filter functions input
 # - add onionshot category to datashot export function
-#
 # v0.98 :
 # - update paging regex to support more than 1000 pages
+# Released on: 02/2020
+# v0.99 :
+# - replace $env:appdata with $home for Linux and Powershell Core compatibility
+# - create new function to request APIv2 (Invoke-OnypheAPIV2) and managing api key as new header etc...
+# - rename previous function to request APIv1 (Invoke-OnypheAPIV1) and fix Net.WebException management for Powershell core
+# - create new functions to deal with Onyphe Alert APIs (Invoke-APIOnypheListAlert, Invoke-APIOnypheDelAlert, Invoke-APIOnypheAddAlert)
+# - create new functions for managing the Onyphe Alert (Get-OnypheAlertInfo, Set-OnypheAlertInfo)
 #
-#'(c) 2018-2019 lucas-cueff.com - Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).'
+#'(c) 2018-2020 lucas-cueff.com - Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).'
 
 <#
 	.SYNOPSIS 
@@ -410,7 +415,7 @@
 	 C:\PS> Search-OnypheInfo -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction exist -FilterValue os
 
 	 .EXAMPLE
-   filter the results using multiple filters (only os property known and from all organization like *company*) for tcp port 3389 opened in russia
+     filter the results using multiple filters (only os property known and from all organization like *company*) for tcp port 3389 opened in russia
 	 C:\PS> search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan
  #>
 	 [cmdletbinding()]
@@ -436,7 +441,7 @@
 			 [switch]$UseBetaFeatures,
 		 [parameter(Mandatory=$false,Position=11)] 
 		 [ValidateNotNullOrEmpty()]
-				[Array]$AdvancedFilter
+			[Array]$AdvancedFilter
 	 )
 	 DynamicParam
 	 {
@@ -743,7 +748,7 @@
 	 -UseBetaFeatures switch
 	 use test.onyphe.io to use new beat features of Onyphe
 
-   .PARAMETER Wait
+     .PARAMETER Wait
 	 -Wait int{second}
 	 wait for x second before sending the request to manage rate limiting restriction
 	 
@@ -796,7 +801,383 @@
 		}
 		Invoke-APIOnypheUser @params
 	}
- 	}
+	}
+	#v0.99
+	Function Get-OnypheAlertInfo {
+<#
+	 .SYNOPSIS 
+	 main function/cmdlet - get existing alert on onyphe.io web service using alert APIs
+ 
+	 .DESCRIPTION
+	 main function/cmdlet - get all alert on onyphe.io web service using alert APIs and filter alert with query or mail criteria at client side
+	 get content through HTTP request to onyphe.io web service and convert back JSON information to a powershell custom object
+ 	 
+	 .PARAMETER APIKey
+	 -APIKey string{APIKEY}
+	 set your APIKEY to be able to use Onyphe API.
+ 
+	 .PARAMETER UseBetaFeatures
+	 -UseBetaFeatures switch
+	 use test.onyphe.io to use new beat features of Onyphe
+	
+	 .PARAMETER SearchFilter
+	 -SearchFilter String {"query","name", "email", "id" - default value "name"} 
+	 Selected field to be used for searching/filtering process at client side
+	 
+	 .PARAMETER SearchOperator
+	 -SearchOperator String {"eq","ne","like","notlike","match","notmatch" - default value "eq"}
+	 Powershell Search operator to be used for filtering
+
+	 .PARAMETER SearchValue
+	 -SearchValue String
+	 Value to be used as main filter could be a word or expression depending of chosen search operator
+
+	 .OUTPUTS
+	 TypeName: System.Management.Automation.PSCustomObject
+	 
+			Name             MemberType   Definition                                                                                                                                                                                                                                       
+			----             ----------   ----------
+			Equals           Method       bool Equals(System.Object obj)
+			GetHashCode      Method       int GetHashCode()
+			GetType          Method       type GetType()
+			ToString         Method       string ToString()
+			cli-API_info     NoteProperty string[] cli-API_info=System.String[]
+			cli-API_input    NoteProperty string[] cli-API_input=System.String[]
+			cli-API_version  NoteProperty string cli-API_version=2
+			cli-key_required NoteProperty bool[] cli-key_required=System.Boolean[]
+			cli-Request_Date NoteProperty datetime cli-Request_Date=27/12/2019 12:20:36
+			count            NoteProperty long count=2
+			error            NoteProperty long error=0
+			myip             NoteProperty string myip=8.8.8.8
+			results          NoteProperty Object[] results=System.Object[]
+			status           NoteProperty string status=ok
+			took             NoteProperty string took=0.000
+			total            NoteProperty long total=2
+		 
+	 .EXAMPLE
+	 Get all existing alert using "jeanclaude.dusse@lesbronzesfontdusk.io"
+	 C:\PS> Get-OnypheAlert -SearchValue "jeanclaude.dusse@lesbronzesfontdusk.io" -SearchOperator eq -SearchFilter email
+
+	 .EXAMPLE
+     Get all existing alert for your onyphe account
+	 C:\PS> Get-OnypheAlert
+ #>
+		[cmdletbinding()]
+		Param (
+		 [parameter(Mandatory=$false)]
+		 [ValidateLength(40,40)]
+			 [string]$APIKey,
+		 [parameter(Mandatory=$false,Position=10)]
+			 [switch]$UseBetaFeatures,
+		 [Parameter(Mandatory=$false)]
+		 [validateSet("query","name", "email", "id")]
+			 [string]$SearchFilter = "name",
+		 [Parameter(Mandatory=$false)]
+		 [ValidateNotNullOrEmpty()]
+			 [string]$SearchValue,
+	     [Parameter(Mandatory=$false)]
+	     [validateSet("eq","ne","like","notlike","match","notmatch")]
+			 [string]$SearchOperator = "eq"
+		)
+		 process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+			 if ($UseBetaFeatures) {
+				$results = Invoke-APIOnypheListAlert -UseBetaFeatures
+			 } else {
+				$results = Invoke-APIOnypheListAlert
+			 }
+			 #fixing issue with convertfrom-json and APIv2
+			 if ($results.count -eq 2) {
+				 if ($results[0].results) {
+					 $results = $results[0]
+				} else {
+					$results = $results[1]
+				}
+			 }
+			 #end of fix
+			 if (!$SearchValue) {
+				$results
+			 } else {
+				switch ($SearchOperator) {
+					eq {$results | add-member -MemberType NoteProperty -Name 'cli-Filtered_Results' -Value ($results.results | Where-Object {$_."$($SearchFilter)" -eq $SearchValue})}
+					ne {$results | add-member -MemberType NoteProperty -Name 'cli-Filtered_Results' -Value ($results.results | Where-Object {$_."$($SearchFilter)" -ne $SearchValue})}
+					like {$results| add-member -MemberType NoteProperty -Name 'cli-Filtered_Results' -Value ($results.results | Where-Object {$_."$($SearchFilter)" -like $SearchValue})}
+					notlike {$results | add-member -MemberType NoteProperty -Name 'cli-Filtered_Results' -Value ($results.results | Where-Object {$_."$($SearchFilter)" -notlike $SearchValue})}
+					match {$results | add-member -MemberType NoteProperty -Name 'cli-Filtered_Results' -Value ($results.results | Where-Object {$_."$($SearchFilter)" -match $SearchValue})}
+					notmatch {$results | add-member -MemberType NoteProperty -Name 'cli-Filtered_Results' -Value ($results.results | Where-Object {$_."$($SearchFilter)" -notmatch $SearchValue})}
+					Default {$results | add-member -MemberType NoteProperty -Name 'cli-Filtered_Results' -Value ($results.results | Where-Object {$_."$($SearchFilter)" -eq $SearchValue})}
+				}
+				$results
+			 }
+		 }
+	}
+	#v0.99
+	Function Set-OnypheAlertInfo {
+<#
+	 .SYNOPSIS 
+	 main function/cmdlet - create, modify, delete an alert on onyphe.io web service using alert APIs
+ 
+	 .DESCRIPTION
+	 main function/cmdlet - create, modify, delete an alert on onyphe.io web service using alert APIs
+	 post JSON content through HTTP request to onyphe.io web service and convert back JSON information to a powershell custom object
+ 
+	 .PARAMETER AdvancedSearch
+	 -AdvancedSearch ARRAY{filter:value,filter:value}
+	 Search with multiple criterias
+
+	 .PARAMETER AdvancedFilter
+	 -AdvancedFilter ARRAY{filter:value,filter:value}
+	 Filter with multiple criterias
+ 
+	 .PARAMETER SearchValue
+	 -SearchValue STRING{value}
+	 string to be searched with -SearchFilter parameter
+ 
+	 .PARAMETER SearchFilter
+	 -SearchFilter STRING{Get-OnypheSearchFilters}
+	 Filter to be used with string set with SearchValue parameter
+ 
+	 .PARAMETER SearchType
+	 -SearchType STRING{Get-OnypheSearchCategories}
+	 Search Type or Category
+
+	 .PARAMETER FilterFunction
+	 -FilterFunction String{Get-OnypheSearchFunctions}
+	 Filter search function
+
+	 .PARAMETER FilterValue
+	 -FilterValue String
+	 value to use as input for FilterFunction
+	 
+	 .PARAMETER APIKey
+	 -APIKey string{APIKEY}
+	 set your APIKEY to be able to use Onyphe API.
+ 
+	 .PARAMETER UseBetaFeatures
+	 -UseBetaFeatures switch
+	 use test.onyphe.io to use new beat features of Onyphe
+	
+	 .PARAMETER AlertAction
+	 -AlertAction String {"new","delete","modify" - default value "new"} 
+	 Mandatory parameter used to select what kind of action is requested : creation, deletion, modification of an alert
+	 
+	 .PARAMETER AlertName
+	 -AlertName String
+	 Name of the alert. Only alphanumeric and space characters allowed.
+
+	 .PARAMETER AlertMail
+	 -AlertMail String
+	 Mail address used to send you back the alert when a new event is matching your query
+
+	 .OUTPUTS
+	 TypeName: System.Management.Automation.PSCustomObject
+	 
+			Name             MemberType   Definition                                                                                                                                                                                                                                       
+			----             ----------   ----------
+			Equals           Method       bool Equals(System.Object obj)
+			GetHashCode      Method       int GetHashCode()
+			GetType          Method       type GetType()
+			ToString         Method       string ToString()
+			cli-API_info     NoteProperty string[] cli-API_info=System.String[]
+			cli-API_input    NoteProperty string[] cli-API_input=System.String[]
+			cli-API_version  NoteProperty string cli-API_version=2
+			cli-key_required NoteProperty bool[] cli-key_required=System.Boolean[]
+			cli-Request_Date NoteProperty datetime cli-Request_Date=27/12/2019 12:24:24
+			error            NoteProperty long error=0
+			message          NoteProperty string message=Success
+			myip             NoteProperty string myip=8.8.8.8
+			status           NoteProperty string status=ok
+		 
+	 .EXAMPLE
+	 New alert for AdvancedSearch with multiple criteria/filters
+	 Set a new alert named "windows apache" matching datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows, and sent back the alert on "jeanclaude.dusse@lesbronzesfontdusk.io"
+	 C:\PS> Set-OnypheAlert -AdvancedSearch @("product:Apache","port:443","os:Windows") -SearchType datascan -AlertAction new -AlertName "windows apache" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"
+ 
+	 .EXAMPLE
+	 New alert for simple search with one filter/criteria
+	 Set a new alert named "from russia with lv" matching threatlist for all IP matching the criteria : all IP from russia tagged by threat lists, and sent back the alert on "jeanclaude.dusse@lesbronzesfontdusk.io"
+	 C:\PS> Set-OnypheAlert -SearchValue RU -SearchType threatlist -SearchFilter country -AlertAction new -AlertName "from russia with lv" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"
+ 	 
+	 .EXAMPLE
+	 New alert for simple search with one filter/criteria and use a server filter to retrieve only objects indexed since 2 month, 
+	 Set an new alert named "from russia with lv 2 m" matching threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
+	 C:\PS> Set-OnypheAlert -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2" -AlertAction new -AlertName "from russia with lv 2 m" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"
+
+	 .EXAMPLE
+	 Modify an existing alert named "from paris with lv" and update mail and query
+	 Modify an existing alert named "from paris with lv" an update it to match threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and filter the result and show me only the answer with os property not null, finally sent back the alert to new mail "robert.lespinasse@lesbronzesfontdusk.io"
+	 C:\PS> Set-OnypheAlert -SearchValue FR -SearchType threatlist -SearchFilter country -FilterFunction exist -FilterValue os -AlertAction modify -AlertName "from paris with lv" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
+
+	 .EXAMPLE
+	 New alert for advanced search and filter
+	 Set a new alert named "RandR" matching datascan for all IP matching the criteria : all ip from RU with TCP 3389 port opened, filter the results using multiple filters (only os property known and from all organization like *company*), and finally sent back the alert to "robert.lespinasse@lesbronzesfontdusk.io"
+	 C:\PS> Set-OnypheAlert -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
+
+	 .EXAMPLE
+     Delete an existing alert named "windows apache"
+	 C:\PS> Set-OnypheAlert -AlertAction delete -AlertName "windows apache"
+ #>
+		[cmdletbinding()]
+		param(
+			[parameter(Mandatory=$false,Position=5)]
+			[ValidateNotNullOrEmpty()]  
+				[string]$SearchValue,
+			[parameter(Mandatory=$false,Position=8)] 
+			[ValidateNotNullOrEmpty()]
+				[string[]]$FilterValue,
+			[parameter(Mandatory=$false,Position=9)] 
+			[ValidateNotNullOrEmpty()]
+				[Array]$AdvancedSearch,
+			[Parameter(Mandatory=$true,Position=1)]
+			[validateSet("new","delete","modify")]
+				[string]$AlertAction = "new",
+			[Parameter(Mandatory=$false,Position=2)]
+			[ValidateScript({$_ -match "^[a-zA-Z0-9.!£#$%&'^_`{}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$"})]
+				[string]$AlertMail,
+			[Parameter(Mandatory=$true, Position=3)]
+			[ValidateScript({$_ -match "^[a-zA-Z0-9 ]*$"})]
+				[string]$AlertName,
+			[parameter(Mandatory=$false,Position=11)]
+			[ValidateLength(40,40)]
+				[string]$APIKey,
+			[parameter(Mandatory=$false,Position=12)]
+				[switch]$UseBetaFeatures,
+			[parameter(Mandatory=$false,Position=10)] 
+			[ValidateNotNullOrEmpty()]
+				[Array]$AdvancedFilter,
+			[parameter(Mandatory=$false,ValueFromPipeline=$true,ValueFromPipelineByPropertyName=$true)]
+			[ValidateScript({($_ -is [System.Management.Automation.PSCustomObject]) -and ($_.'cli-API_info')})]
+				$InputOnypheObject
+		)
+		DynamicParam
+		{
+			$ParameterNameType = 'SearchType'
+			$RuntimeParameterDictionary = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
+			$AttributeCollection = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
+			$ParameterAttribute = New-Object System.Management.Automation.ParameterAttribute
+			$ParameterAttribute.ValueFromPipeline = $false
+			$ParameterAttribute.ValueFromPipelineByPropertyName = $false
+			$ParameterAttribute.Mandatory = $false
+			$ParameterAttribute.Position = 4
+			$AttributeCollection.Add($ParameterAttribute)
+			$arrSet = Get-OnypheSearchCategories
+			$ValidateSetAttribute = New-Object System.Management.Automation.ValidateSetAttribute($arrSet)
+			$AttributeCollection.Add($ValidateSetAttribute)
+			$RuntimeParameter = New-Object System.Management.Automation.RuntimeDefinedParameter($ParameterNameType, [string], $AttributeCollection)
+			$RuntimeParameterDictionary.Add($ParameterNameType, $RuntimeParameter)
+			
+			$ParameterNameFilter = 'SearchFilter'
+			$AttributeCollection2 = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
+			$ParameterAttribute2 = New-Object System.Management.Automation.ParameterAttribute
+			$ParameterAttribute2.ValueFromPipeline = $false
+			$ParameterAttribute2.ValueFromPipelineByPropertyName = $false
+			$ParameterAttribute2.Mandatory = $false
+			$ParameterAttribute2.Position = 6
+			$AttributeCollection2.Add($ParameterAttribute2)
+			$arrSet =  Get-OnypheSearchFilters
+			$ValidateSetAttribute2 = New-Object System.Management.Automation.ValidateSetAttribute($arrSet)
+			$AttributeCollection2.Add($ValidateSetAttribute2)
+			$RuntimeParameter2 = New-Object System.Management.Automation.RuntimeDefinedParameter($ParameterNameFilter, [string], $AttributeCollection2)
+			$RuntimeParameterDictionary.Add($ParameterNameFilter, $RuntimeParameter2)
+   
+			$ParameterNameFunction = 'FilterFunction'
+			$AttributeCollection3 = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
+			$ParameterAttribute3 = New-Object System.Management.Automation.ParameterAttribute
+			$ParameterAttribute3.ValueFromPipeline = $false
+			$ParameterAttribute3.ValueFromPipelineByPropertyName = $false
+			$ParameterAttribute3.Mandatory = $false
+			$ParameterAttribute3.Position = 7
+			$AttributeCollection3.Add($ParameterAttribute3)
+			$arrSet =  Get-OnypheSearchFunctions
+			$ValidateSetAttribute3 = New-Object System.Management.Automation.ValidateSetAttribute($arrSet)
+			$AttributeCollection3.Add($ValidateSetAttribute3)
+			$RuntimeParameter3 = New-Object System.Management.Automation.RuntimeDefinedParameter($ParameterNameFunction, [string], $AttributeCollection3)
+			$RuntimeParameterDictionary.Add($ParameterNameFunction, $RuntimeParameter3)
+			
+			return $RuntimeParameterDictionary
+	   }
+		 process {
+			$SearchType = $PsBoundParameters[$ParameterNameType]
+			$SearchFilter = $PsBoundParameters[$ParameterNameFilter]
+			$SearchFunction = $PsBoundParameters[$ParameterNameFunction]
+			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+			if ($SearchValue -or $AdvancedSearch) {
+				$params = @{
+					SearchType = $SearchType
+					AlertName = $AlertName
+					AlertEmail = $AlertMail
+				}
+			} elseif ($InputOnypheObject) {
+				if (!$AlertName -and !$AlertMail) {
+					throw "please use AlertName, AlertMail and AlertAction parameters when using InputOnypheObject parameter"
+				} else {
+					$params = @{
+						InputOnypheObject = $InputOnypheObject
+						AlertName = $AlertName
+						AlertEmail = $AlertMail
+					}
+				}
+			}
+			if ($SearchFilter -and !($SearchValue)) {
+				throw "please use the SearchValue parameter when using SearchFilter parameter or used AdvancedSearch instead"
+			}
+			if ($SearchFunction -and !($FilterValue)) {
+				throw "please use the FilterValue parameter when using FilterFunction parameter"
+			}
+			if ($AdvancedSearch) {
+				 $params.add('AdvancedSearch',$AdvancedSearch)
+			} elseif ($SearchValue) {
+				$params.add('SearchValue',$SearchValue)
+				$params.add('SearchFilter',$SearchFilter)
+			}
+			if ($AdvancedFilter) {
+				$params.add('AdvancedFilter',$AdvancedFilter)
+			} elseif ($SearchFunction) {
+				$params.add('FilterFunction', $SearchFunction)
+				$params.add('FilterValue',$FilterValue)
+			}
+			if ($UseBetaFeatures) {
+				$params.add('UseBetaFeatures', $true)
+			}
+			$AlertCheck = Get-OnypheAlertInfo -SearchValue $AlertName
+			switch ($AlertAction) {
+				new {
+					if (!$AlertMail) {
+						throw "please provide a mail address using AlertMail parameter"
+					}
+					if (!$AdvancedSearch -and !$SearchValue -and !$InputOnypheObject) {
+						throw "please provide valid search request for the alert query system using AdvancedSearch or SearchValue parameters. Or Please provide a valid input object using InputOnypheObject parameter."
+					}
+					if ($AlertCheck.'cli-Filtered_Results') {
+						throw "$($Alertname) is already used as an existing alert"
+					} else {
+						Invoke-APIOnypheAddAlert @params
+					}
+				}
+				delete {
+					if ($AlertCheck.'cli-Filtered_Results') {
+						Invoke-APIOnypheDelAlert -AlertID $AlertCheck.'cli-Filtered_Results'.ID
+					} else {
+						throw "$($Alertname) not existing"
+					}
+				}
+				modify {
+					if (!$AlertMail) {
+						throw "please provide a mail address using AlertMail parameter"
+					}
+					if (!$AdvancedSearch -and !$SearchValue -and !$InputOnypheObject) {
+						throw "please provide valid search request for the alert query system using AdvancedSearch or SearchValue parameters. Or Please provide a valid input object using InputOnypheObject parameter."
+					}
+					if ($AlertCheck.'cli-Filtered_Results') {
+						Invoke-APIOnypheDelAlert -AlertID $AlertCheck.'cli-Filtered_Results'.ID
+						Invoke-APIOnypheAddAlert @params
+					} else {
+						throw "$($Alertname) not existing"
+					}
+				}
+			}
+		 }
+	}
 	Function Invoke-APIOnypheUser {
 	<#
 	  .SYNOPSIS 
@@ -862,9 +1243,9 @@
 				$params.add("UseBetaFeatures", $true)
 			}
 			Write-Verbose -message "URL Info : $($params.request)"  
-			Invoke-Onyphe @params
+			Invoke-OnypheAPIV1 @params
 		}
-  }
+    }
 	Function Invoke-APIOnypheInetnum {
   <#
 	.SYNOPSIS 
@@ -957,7 +1338,7 @@
 		}
 		if ($page) {$params.add('page',$page)}
 		Write-Verbose -message "URL Info : $($params.request)"
-		Invoke-Onyphe @params
+		Invoke-OnypheAPIV1 @params
 	}
 	}
 	Function Invoke-APIOnyphePastries {
@@ -1051,7 +1432,7 @@
 		}
 		if ($page) {$params.add('page',$page)}
 		Write-Verbose -message "URL Info : $($params.request)"
-		Invoke-Onyphe @params
+		Invoke-OnypheAPIV1 @params
 	}
 	}
 	Function Invoke-APIOnypheSynScan {
@@ -1146,7 +1527,7 @@
 		}
 		if ($page) {$params.add('page',$page)}
 		Write-Verbose -message "URL Info : $($params.request)"
-		Invoke-Onyphe @params
+		Invoke-OnypheAPIV1 @params
 	}
 	}
 	Function Invoke-APIOnypheSniffer {
@@ -1259,7 +1640,7 @@
 			}
 			if ($page) {$params.add('page',$page)}
 			Write-Verbose -message "URL Info : $($params.request)"
-			Invoke-Onyphe @params
+			Invoke-OnypheAPIV1 @params
 		}
 	}
 	Function Invoke-APIOnypheCtl {
@@ -1355,7 +1736,7 @@
 			}
 			if ($page) {$params.add('page',$page)}
 			Write-Verbose -message "URL Info : $($params.request)"
-			Invoke-Onyphe @params
+			Invoke-OnypheAPIV1 @params
 		}
 	}
 	Function Invoke-APIOnypheMD5 {
@@ -1472,7 +1853,7 @@
 			}
 			if ($page) {$params.add('page',$page)}
 			Write-Verbose -message "URL Info : $($params.request)"
-			Invoke-Onyphe @params
+			Invoke-OnypheAPIV1 @params
 		}
 	}
 	Function Invoke-APIOnypheOnionScan {
@@ -1563,7 +1944,7 @@
 			}
 			if ($page) {$params.add('page',$page)}
 			Write-Verbose -message "URL Info : $($params.request)"
-			Invoke-Onyphe @params
+			Invoke-OnypheAPIV1 @params
 		}
 	}
 	Function Invoke-APIOnypheReverse {
@@ -1657,7 +2038,7 @@
 		}
 		if ($page) {$params.add('page',$page)}
 		Write-Verbose -message "URL Info : $($params.request)"
-		Invoke-Onyphe @params
+		Invoke-OnypheAPIV1 @params
 	}
 	}
 	Function Invoke-APIOnypheForward {
@@ -1750,7 +2131,7 @@
 		}
 		if ($page) {$params.add('page',$page)}
 		Write-Verbose -message "URL Info : $($params.request)"
-		Invoke-Onyphe @params
+		Invoke-OnypheAPIV1 @params
 	}
 	}
 	Function Invoke-APIOnypheThreatlist {
@@ -1845,7 +2226,7 @@
 		}
 		if ($page) {$params.add('page',$page)}
 		Write-Verbose -message "URL Info : $($params.request)"
-		Invoke-Onyphe @params
+		Invoke-OnypheAPIV1 @params
 	}
 	}
 	Function Invoke-APIOnypheDataScan {
@@ -1956,7 +2337,7 @@
 		}
 		if ($page) {$params.add('page',$page)}
 		Write-Verbose -message "URL Info : $($params.request)"
-		Invoke-Onyphe @params
+		Invoke-OnypheAPIV1 @params
 	}
 	}
 	Function Invoke-APIOnypheIP {
@@ -2051,7 +2432,7 @@
 		}
 		if ($page) {$params.add('page',$page)}
 		Write-Verbose -message "URL Info : $($params.request)"
-		Invoke-Onyphe @params
+		Invoke-OnypheAPIV1 @params
 	}			
 	}
 	Function Invoke-APIOnypheMyIP {
@@ -2102,7 +2483,7 @@
 		APIKeyrequired = $false
 	} 
 	Write-Verbose -message "URL Info : $($params.request)"
-	Invoke-Onyphe @params
+	Invoke-OnypheAPIV1 @params
   }			
 	}
 	Function Invoke-APIOnypheGeoloc {
@@ -2171,10 +2552,11 @@
 			APIKeyrequired = $false
 		}
 		Write-Verbose -message "URL Info : $($params.request)"
-		Invoke-Onyphe @params
+		Invoke-OnypheAPIV1 @params
   }
 	}
-	Function Invoke-Onyphe {
+	#v0.99
+	Function Invoke-OnypheAPIV1 {
   [cmdletbinding()]
   Param (
 		[parameter(Mandatory=$true)]
@@ -2210,7 +2592,7 @@
 	try {
 		$fullonypheurl = "$($onypheurl)$($request)"
 		if ($page -and $APIKeyrequired) {
-			$fullonypheurl = "$($fullonypheurl)?apikey=$($global:OnypheAPIKey)&page=$($page)"
+				$fullonypheurl = "$($fullonypheurl)?apikey=$($global:OnypheAPIKey)&page=$($page)"
 		}
 		elseif ($page -and ($APIKeyrequired -eq $false)) {
 			$fullonypheurl = "$($fullonypheurl)?page=$($page)"
@@ -2282,13 +2664,22 @@
 			write-verbose -message "HTTP error message:$($_.Exception.Response.StatusDescription)"
 			$errorcode = $_.Exception.Response.StatusCode.value__
 			if (($errorcode -eq 429) -or ($errorcode -eq 200)) {
-				$result = $_.Exception.Response.GetResponseStream()
-				$reader = New-Object System.IO.StreamReader($result)
-				$reader.BaseStream.Position = 0
-				$httpbody = $reader.ReadToEnd()
-				$errorvalue = $httpbody | Convertfrom-Json
+				if ($_.ErrorDetails.Message) {
+					$errorvalue = $_.ErrorDetails.Message | Convertfrom-Json
+				} 
+				elseif (get-member -InputObject $_.Exception.Response -MemberType Method | Where-Object {$_.name -eq "GetResponseStream"}){
+				  $result = $_.Exception.Response.GetResponseStream()
+				  $reader = New-Object System.IO.StreamReader($result)
+				  $reader.BaseStream.Position = 0
+				  $httpbody = $reader.ReadToEnd()
+				  $errorvalue = $httpbody | Convertfrom-Json
+				}
+				else {
+				  $errorvalue = [PSCustomObject]@{}
+				}
 				$errorvalue | add-member -MemberType NoteProperty -Name 'cli-API_info' -Value $APIInfo
 				$errorvalue | add-member -MemberType NoteProperty -Name 'cli-API_input' -Value $APIInput
+				$errorvalue | add-member -MemberType NoteProperty -Name 'cli-API_version' -Value "1"
 				$errorvalue | add-member -MemberType NoteProperty -Name 'cli-key_required' -Value $APIKeyrequired
 				$errorvalue | add-member -MemberType NoteProperty -Name 'cli-Request_Date' -Value $script:DateRequest
 			} else {
@@ -2303,6 +2694,7 @@
 					total = 0
 					'cli-API_info' = $APIInfo
 					'cli-API_input' = $APIInput
+					'cli-API_version' = "1"
 					'cli-key_required' = $APIKeyrequired
 					'cli-Request_Date' = $script:DateRequest
 				}
@@ -2310,14 +2702,13 @@
 		}
 		if (-not $errorvalue) {
 			try {
+				write-verbose "Web Content : $($onypheresult.Content)"
 				$temp = $onypheresult.Content | convertfrom-json
 				$temp | add-member -MemberType NoteProperty -Name 'cli-API_info' -Value $APIInfo
 				$temp | add-member -MemberType NoteProperty -Name 'cli-API_input' -Value $APIInput
+				$temp | add-member -MemberType NoteProperty -Name 'cli-API_version' -value "1"
 				$temp | add-member -MemberType NoteProperty -Name 'cli-key_required' -Value $APIKeyrequired
 				$temp | add-member -MemberType NoteProperty -Name 'cli-Request_Date' -Value $script:DateRequest
-				if ($debug -or $verbose) {
-					$temp | add-member -MemberType NoteProperty -Name cli-API_Request -Value "$($request)"
-				}
 			} catch {
 				write-verbose -message "unable to convert result into a powershell object - json error"
 				write-verbose -message "Error Type: $($_.Exception.GetType().FullName)"
@@ -2333,6 +2724,7 @@
 					total = 0
 					'cli-API_info' = $APIInfo
 					'cli-API_input' = $APIInput
+					'cli-API_version' = "1"
 					'cli-key_required' = $APIKeyrequired
 					'cli-Request_Date' = $script:DateRequest
 				}
@@ -2344,6 +2736,201 @@
 			$temp
 		}
 	}
+	}
+	#v0.99
+	Function Invoke-OnypheAPIV2 {
+	[cmdletbinding()]
+	Param (
+		  [parameter(Mandatory=$true)]
+		  [ValidateNotNullOrEmpty()]  
+			  [string[]]$request,
+		  [parameter(Mandatory=$false)]
+		  [ValidateNotNullOrEmpty()]  
+			  [string[]]$data,
+		  [parameter(Mandatory=$false)]
+		  [Validateset("GET","POST")]
+			  [string]$Method = "GET",
+		  [parameter(Mandatory=$true)]
+		  [ValidateNotNullOrEmpty()]  
+			  [string[]]$APIInfo,
+		  [parameter(Mandatory=$true)]
+		  [ValidateNotNullOrEmpty()]  
+			  [string[]]$APIInput,
+		  [parameter(Mandatory=$true)]
+			  [Bool]$APIKeyrequired,
+		  [parameter(Mandatory=$false)]
+		  [ValidateScript({$_ -match "^((?!0)\d+)$"})] 
+			  [string[]]$page,
+		  [parameter(Mandatory=$false)]
+			  [switch]$UseBetaFeatures
+	)
+	Process {
+	  if ($UseBetaFeatures) {
+		  $script:onypheurl = "https://test.onyphe.io/api/"
+		  write-verbose -message "using beta Onyphe service - https://test.onyphe.io"
+	  } else {
+		  $script:onypheurl = "https://www.onyphe.io/api/"
+		  write-verbose -message "using production Onyphe service - https://www.onyphe.io"
+	  }
+	  $script:DateRequest = get-date
+	  if (($APIKeyrequired)-and(!$global:OnypheAPIKey)) {
+		  write-verbose -message "incorrect parameter - Please provide an APIKey with -APIKEY parameter"
+		  throw "Please provide an APIKey with -APIKEY parameter"
+	  }
+	try {
+		  $fullonypheurl = "$($onypheurl)$($request)"
+		  if ($page) {
+			  $fullonypheurl = "$($fullonypheurl)?page=$($page)"
+		  }
+		  if ($global:OnypheProxyParams) {
+			  $params = $global:OnypheProxyParams.clone()
+			  If (!$params.UseBasicParsing){
+				  $params.add('UseBasicParsing', $true)
+			  }
+			  If (!$params.URI) {
+				  $params.add('URI', "$($fullonypheurl)")
+			  } Else {
+				  $params['URI'] = "$($fullonypheurl)"
+			  }
+		  } Else {
+			  $params = @{}
+			  $params.add('UseBasicParsing', $true)
+			  $params.add('URI', "$($fullonypheurl)")
+		  }
+		  if ($UseBetaFeatures) {
+			  if ($host.Version.Major -lt 6) {
+				  try {
+				  if (-not ([System.Management.Automation.PSTypeName]'ServerCertificateValidationCallback').Type) {
+					  $certCallback = @"
+							  using System;
+							  using System.Net;
+							  using System.Net.Security;
+							  using System.Security.Cryptography.X509Certificates;
+							  public class ServerCertificateValidationCallback
+							  {
+									  public static void Ignore()
+									  {
+											  if(ServicePointManager.ServerCertificateValidationCallback ==null)
+											  {
+													  ServicePointManager.ServerCertificateValidationCallback += 
+															  delegate
+															  (
+																	  Object obj, 
+																	  X509Certificate certificate, 
+																	  X509Chain chain, 
+																	  SslPolicyErrors errors
+															  )
+															  {
+																	  return true;
+															  };
+											  }
+									  }
+							  }
+"@
+						  Add-Type $certCallback
+				  }
+				  [ServerCertificateValidationCallback]::Ignore()
+				  } catch {
+					  throw "impossible to add a new type, check your PowerShell Constrained Language settings or run PowerShell as Admin"
+				  }
+			  } else {
+				  $params.add('SkipCertificateCheck', $true)
+			  }
+		  }
+		  if ($data) {
+			  $params.add('Method','Post')
+			  $params.add('Body', $data)
+			  $params.add('ContentType', 'application/json') 
+		  }
+		  
+		  if (($Method -eq "POST") -and !$params.Method) {
+			  $params.add('Method','Post') 
+		  }
+		  if ($APIKeyrequired) {
+			  $params.Headers
+			  $params.add('Headers', @{'Authorization' = 'apikey {0}' -f $global:OnypheAPIKey}) 
+		  }
+		  $onypheresult = invoke-webrequest @params
+	  } catch {
+			  write-verbose -message "Not able to use onyphe online service - KO"
+			  write-verbose -message "Error Type: $($_.Exception.GetType().FullName)"
+			  write-verbose -message "Error Message: $($_.Exception.Message)"
+			  write-verbose -message "HTTP error code:$($_.Exception.Response.StatusCode.Value__)"
+			  write-verbose -message "HTTP error message:$($_.Exception.Response.StatusDescription)"
+			  $errorcode = $_.Exception.Response.StatusCode.value__
+			  if (($errorcode -eq 429) -or ($errorcode -eq 200) -or ($errorcode -eq 400)) {
+				  if ($_.ErrorDetails.Message) {
+					  $errorvalue = $_.ErrorDetails.Message | Convertfrom-Json
+				  } 
+				  elseif (get-member -InputObject $_.Exception.Response -MemberType Method | Where-Object {$_.name -eq "GetResponseStream"}){
+					$result = $_.Exception.Response.GetResponseStream()
+					$reader = New-Object System.IO.StreamReader($result)
+					$reader.BaseStream.Position = 0
+					$httpbody = $reader.ReadToEnd()
+					$errorvalue = $httpbody | Convertfrom-Json
+				  }
+				  else {
+					$errorvalue = [PSCustomObject]@{}
+				  }
+				  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-API_info' -Value $APIInfo
+				  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-API_input' -Value $APIInput
+				  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-API_version' -Value "2"
+				  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-key_required' -Value $APIKeyrequired
+				  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-Request_Date' -Value $script:DateRequest
+			  } else {
+				  $errorvalue = [PSCustomObject]@{
+					  Count = 0
+					  error = ""
+					  myip = 0
+					  results = ''
+					  'cli-error_results' = "$($_.Exception.GetType().FullName) - $($_.Exception.Message) : $($onypheresult.Content)"
+					  status = "ko"
+					  took = 0
+					  total = 0
+					  'cli-API_info' = $APIInfo
+					  'cli-API_input' = $APIInput
+					  'cli-API_version' = "2"
+					  'cli-key_required' = $APIKeyrequired
+					  'cli-Request_Date' = $script:DateRequest
+				  }
+			  }
+		  }
+		  if (-not $errorvalue) {
+			  try {
+				  write-verbose "Web Content : $($onypheresult.Content)"
+				  $temp = $onypheresult.Content | convertfrom-json
+				  $temp | add-member -MemberType NoteProperty -Name 'cli-API_info' -Value $APIInfo
+				  $temp | add-member -MemberType NoteProperty -Name 'cli-API_input' -Value $APIInput
+				  $temp | add-member -MemberType NoteProperty -Name 'cli-API_version' -Value "2"
+				  $temp | add-member -MemberType NoteProperty -Name 'cli-key_required' -Value $APIKeyrequired
+				  $temp | add-member -MemberType NoteProperty -Name 'cli-Request_Date' -Value $script:DateRequest
+			  } catch {
+				  write-verbose -message "unable to convert result into a powershell object - json error"
+				  write-verbose -message "Error Type: $($_.Exception.GetType().FullName)"
+				  write-verbose -message "Error Message: $($_.Exception.Message)"
+				  $errorvalue = [PSCustomObject]@{
+					  Count = 0
+					  error = ""
+					  myip = 0
+					  results = ''
+					  'cli-error_results' = "$($_.Exception.GetType().FullName) - $($_.Exception.Message) : $($onypheresult.Content)"
+					  status = "ko"
+					  took = 0
+					  total = 0
+					  'cli-API_info' = $APIInfo
+					  'cli-API_input' = $APIInput
+					  'cli-API_version' = "2"
+					  'cli-key_required' = $APIKeyrequired
+					  'cli-Request_Date' = $script:DateRequest
+				  }
+			  }
+		  }
+		  if ($errorvalue) {
+			  $errorvalue
+		  } elseif ($temp) {
+			  $temp
+		  }
+	  }
 	}
 	Function Export-OnypheInfoToFile {
 	<#
@@ -2601,13 +3188,16 @@
 				}
 				$FolderName = 'Use-Onyphe'
 				$ConfigName = 'Use-Onyphe-Config.xml'
-				if (!(Test-Path -Path "$($env:AppData)\$FolderName")) {
-					New-Item -ItemType directory -Path "$($env:AppData)\$FolderName" | Out-Null
+				if (!$home) {
+					$global:home = $env:userprofile
 				}
-				if (test-path "$($env:AppData)\$FolderName\$ConfigName") {
-					Remove-item -Path "$($env:AppData)\$FolderName\$ConfigName" -Force | out-null
+				if (!(Test-Path -Path "$($home)\$FolderName")) {
+					New-Item -ItemType directory -Path "$($home)\$FolderName" | Out-Null
 				}
-				$ObjConfigOnyphe | Export-Clixml "$($env:AppData)\$FolderName\$ConfigName"
+				if (test-path "$($home)\$FolderName\$ConfigName") {
+					Remove-item -Path "$($home)\$FolderName\$ConfigName" -Force | out-null
+				}
+				$ObjConfigOnyphe | Export-Clixml "$($home)\$FolderName\$ConfigName"
 			}	
 		}
 	  }
@@ -2640,10 +3230,13 @@
 	process {
 		$FolderName = 'Use-Onyphe'
 		$ConfigName = 'Use-Onyphe-Config.xml'
-        if (!(Test-Path "$($env:AppData)\$($FolderName)\$($ConfigName)")){
+		if (!$home) {
+			$global:home = $env:userprofile
+		}
+        if (!(Test-Path "$($home)\$($FolderName)\$($ConfigName)")){
 			throw 'Configuration file has not been set, Set-OnypheAPIKey to configure the API Keys.'
         }
-		$ObjConfigOnyphe = Import-Clixml "$($env:AppData)\$($FolderName)\$($ConfigName)"
+		$ObjConfigOnyphe = Import-Clixml "$($home)\$($FolderName)\$($ConfigName)"
         $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList 'user', $MasterPassword
 		try {
 			$Rfc2898Deriver = New-Object System.Security.Cryptography.Rfc2898DeriveBytes -ArgumentList $Credentials.GetNetworkCredential().Password, $ObjConfigOnyphe.Salt
@@ -2721,7 +3314,7 @@
 				$SearchFilters = Import-Clixml -Path $XMLFilePath
 				($SearchFilters.functions | Where-Object {$_ -like "-*"}) -replace "-",""
 			}
-		}
+	}
 	Function Get-OnypheCliFacets {
 	<#
 	  .SYNOPSIS 
@@ -2742,7 +3335,7 @@
 			$SearchFilters = Import-Clixml -Path $XMLFilePath
 			$SearchFilters.filters
 	  }
-  }
+  	}
 	Function Get-OnypheAPIName {
 	<#
 	  .SYNOPSIS 
@@ -2765,7 +3358,7 @@
 			$Apis += ($SearchFilters.apis | Where-Object {$_ -like "*/resolver/*"}) -replace "/api/resolver/",""
 		  $Apis
 	  }
-  }
+  	}
 	Function Set-OnypheProxy {
 	<#
 	  .SYNOPSIS 
@@ -2843,7 +3436,8 @@
 			If ($OnypheProxyParams.ProxyCredential) {$OnypheProxyParams.Remove('ProxyCredential')}
 		}
 	}
-  }
+  	}
+	#v0.99
 	Function Invoke-APIOnypheSearch {
 	<#
 	  .SYNOPSIS 
@@ -2856,7 +3450,7 @@
 	  -AdvancedSearch ARRAY{filter:value,filter:value}
 		Search with multiple criterias
 		
-		.PARAMETER AdvancedFilter
+	  .PARAMETER AdvancedFilter
 	  -AdvancedFilter ARRAY{filter:value,filter:value}
 	  Filter with multiple criterias
 
@@ -2872,7 +3466,7 @@
 	  -SearchType STRING{Get-OnypheSearchCategories}
 		Search Type or Category
 		
-		.PARAMETER FilterFunction
+	  .PARAMETER FilterFunction
 	  -FilterFunction String{Get-OnypheSearchFunctions}
 	  Filter search function
 
@@ -2886,9 +3480,9 @@
 
 	  .PARAMETER Page
 	  -page string{page number}
-		go directly to a specific result page (1 to 1000)
+	  go directly to a specific result page (1 to 1000)
 		
-		.PARAMETER UseBetaFeatures
+	  .PARAMETER UseBetaFeatures
 	  -UseBetaFeatures switch
 	  use test.onyphe.io to use new beat features of Onyphe
 
@@ -2952,62 +3546,65 @@
 	#>
 	[cmdletbinding()]
     param(
-			[parameter(Mandatory=$false,Position=1)]
-			[ValidateNotNullOrEmpty()]
-				[string]$SearchType,  
-			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$false,Position=2)]
-			[ValidateNotNullOrEmpty()]
-				[string]$SearchValue,
-			[parameter(Mandatory=$false,Position=3)]
-			[ValidateNotNullOrEmpty()]
-				[string]$SearchFilter,
-			[parameter(Mandatory=$false,Position=4)]
-			[ValidateNotNullOrEmpty()]
-				[string]$FilterFunction,    
-			[parameter(Mandatory=$false,Position=5)] 
-			[ValidateNotNullOrEmpty()]
-				[string[]]$FilterValue,
-			[parameter(Mandatory=$false,Position=6)] 
-			[ValidateNotNullOrEmpty()]
-				[Array]$AdvancedSearch,
-			[parameter(Mandatory=$false,Position=8)]
-			[ValidateLength(40,40)]
-				[string]$APIKey,
-			[parameter(Mandatory=$false,Position=9)]
-			[ValidateScript({$_ -match "^((?!0)\d+)$"})]
-				[string[]]$Page,
-			[parameter(Mandatory=$false,Position=7)]
-				[int]$wait,
-			[parameter(Mandatory=$false,Position=10)]
-				[switch]$UseBetaFeatures,
-			[parameter(Mandatory=$false,Position=11)] 
-			[ValidateNotNullOrEmpty()]
-				[Array]$AdvancedFilter
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[string]$SearchType,  
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[string]$SearchValue,
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[string]$SearchFilter,
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[string]$FilterFunction,    
+		[parameter(Mandatory=$false)] 
+		[ValidateNotNullOrEmpty()]
+			[string[]]$FilterValue,
+		[parameter(Mandatory=$false)] 
+		[ValidateNotNullOrEmpty()]
+			[Array]$AdvancedSearch,
+		[parameter(Mandatory=$false)]
+		[ValidateLength(40,40)]
+			[string]$APIKey,
+		[parameter(Mandatory=$false)]
+		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
+			[string[]]$Page,
+		[parameter(Mandatory=$false)]
+			[int]$wait,
+		[parameter(Mandatory=$false)]
+			[switch]$UseBetaFeatures,
+		[parameter(Mandatory=$false)] 
+		[ValidateNotNullOrEmpty()]
+			[Array]$AdvancedFilter
     )
     Process {		
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
 		$APIInput = @()
 		if ($AdvancedSearch) {
-			for ($i=0; $i -lt $AdvancedSearch.length; $i++) {
+			$NewAdvancedSearch = $AdvancedSearch.clone()
+			for ($i=0; $i -lt $NewAdvancedSearch.length; $i++) {
 				$tmp = $null
-				$tmp = $AdvancedSearch[$i] -split ":"
+				$tmp = $NewAdvancedSearch[$i] -split ":"
 				if (($tmp[1] -match "\s") -and ($tmp[1] -notlike "`"*`"")) {$tmp[1] = "`"$($tmp[1])`""}
-				$AdvancedSearch[$i] = $tmp -join ":"
+				$NewAdvancedSearch[$i] = $tmp -join ":"
 			}
-			$SearchValue = $AdvancedSearch -join " "
-			$APIInput += @($SearchValue)
+			$NewSearchValue = $NewAdvancedSearch -join " "
+			$APIInput += @($NewSearchValue)
 		} Elseif ($SearchValue) {
-			if ($SearchValue -match "(\s)"){
-				$SearchValue = "$($searchfilter):`"$($SearchValue)`""
+			$NewSearchValue = $SearchValue
+			if ($NewSearchValue -match "(\s)"){
+				$NewSearchValue = "$($searchfilter):`"$($NewSearchValue)`""
 			} else {
-				$SearchValue = "$($searchfilter):$($SearchValue)"
+				$NewSearchValue = "$($searchfilter):$($NewSearchValue)"
 			}
-			$APIInput += @($SearchValue)
+			$APIInput += @($NewSearchValue)
 		}
 		if ($AdvancedFilter) {
-			for ($i=0; $i -lt $AdvancedFilter.length; $i++) {
+			$NewAdvancedFilter = $AdvancedFilter.clone()
+			for ($i=0; $i -lt $NewAdvancedFilter.length; $i++) {
 				$tmp = $null
-				$tmp = $AdvancedFilter[$i] -split ":"
+				$tmp = $NewAdvancedFilter[$i] -split ":"
 				if ($tmp[1].contains(",")) {
 					$tmp2 = $tmp[1] -split ","
 					if (($tmp2[1] -match "\s") -and ($tmp2[1] -notlike "`"*`"")) {$tmp2[1] = "`"$($tmp2[1])`""}
@@ -3016,17 +3613,18 @@
 					if (($tmp[1] -match "\s") -and ($tmp[1] -notlike "`"*`"")) {$tmp[1] = "`"$($tmp[1])`""}
 				}
 				$tmp[0] = "-" + $tmp[0]
-				$AdvancedFilter[$i] = $tmp -join ":"
+				$NewAdvancedFilter[$i] = $tmp -join ":"
 			}
-			$AdvancedFilter = $AdvancedFilter -join " "
-			$SearchValue = "$($SearchValue) $($AdvancedFilter)"
-			$APIInput += @($AdvancedFilter)
+			$NewAdvancedFilter = $NewAdvancedFilter -join " "
+			$NewSearchValue = "$($NewSearchValue) $($NewAdvancedFilter)"
+			$APIInput += @($NewAdvancedFilter)
 		} elseif ($FilterFunction) {
-				$SearchValue = "$($SearchValue) -$($FilterFunction):$($FilterValue -join ",")"
-				$APIInput += "-$($FilterFunction):$($FilterValue -join ",")"
-		} 
+				$NewFilterfunction = $FilterFunction
+				$NewSearchValue = "$($NewSearchValue) -$($NewFilterfunction):$($FilterValue -join ",")"
+				$APIInput += "-$($NewFilterfunction):$($FilterValue -join ",")"
+		}
 		$params = @{
-			request = [System.Uri]::EscapeURIString("search/$($SearchType)/$($SearchValue)")
+			request = [System.Uri]::EscapeURIString("search/$($SearchType)/$($NewSearchValue)")
 			APIInfo = "search/$($SearchType)"
 			APIKeyrequired = $true
 			APIInput = $APIInput
@@ -3038,8 +3636,352 @@
 			$params.add('UseBetaFeatures', $true)
 		}
 		Write-Verbose -message "URL Info : $($params.request)"
-		Invoke-Onyphe @params
+		Invoke-OnypheAPIV1 @params
 	}
+	}
+	#v0.99
+	Function Invoke-APIOnypheListAlert {
+	<#
+	  .SYNOPSIS 
+	  create several input for Invoke-OnypheAPIv2 function and then call it to list alert already set from alert/list API
+  
+	  .DESCRIPTION
+	  create several input for Invoke-OnypheAPIv2 function and then call it to list alert already set from alert/list API
+	  	  
+	  .PARAMETER APIKEY
+	  -APIKey string{APIKEY}
+		Set APIKEY as global variable.
+		
+		.PARAMETER UseBetaFeatures
+	  -UseBetaFeatures switch
+	  use test.onyphe.io to use new beat features of Onyphe
+	  
+	  .OUTPUTS
+		 TypeName : System.Management.Automation.PSCustomObject
+
+			Name             MemberType   Definition                                                                                                                                                                                                                                       
+			----             ----------   ----------
+			Equals           Method       bool Equals(System.Object obj)
+			GetHashCode      Method       int GetHashCode()
+			GetType          Method       type GetType()
+			ToString         Method       string ToString()
+			cli-API_info     NoteProperty string[] cli-API_info=System.String[]
+			cli-API_input    NoteProperty string[] cli-API_input=System.String[]
+			cli-API_version  NoteProperty string cli-API_version=2
+			cli-key_required NoteProperty bool[] cli-key_required=System.Boolean[]
+			cli-Request_Date NoteProperty datetime cli-Request_Date=27/12/2019 12:20:36
+			count            NoteProperty long count=2
+			error            NoteProperty long error=0
+			myip             NoteProperty string myip=8.8.8.8
+			results          NoteProperty Object[] results=System.Object[]
+			status           NoteProperty string status=ok
+			took             NoteProperty string took=0.000
+			total            NoteProperty long total=2
+
+	  .EXAMPLE
+	  get alert set and set api key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	  C:\PS> Invoke-APIOnypheListAlert -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+	  .EXAMPLE
+	  get alert set
+	  C:\PS> Invoke-APIOnypheListAlert
+	#>
+	[cmdletbinding()]
+	Param ( 
+		[parameter(Mandatory=$false)]
+		[ValidateLength(40,40)]
+			[string]$APIKey,
+		[parameter(Mandatory=$false,Position=10)]
+			[switch]$UseBetaFeatures
+	)  
+	  Process {
+		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+		$params = @{
+			request = "v2/alert/list/"
+			APIInfo = "alert/list"
+			APIInput = "none"
+			APIKeyrequired = $true
+		}
+		if ($UseBetaFeatures) {
+			$params.add("UseBetaFeatures", $true)
+		}
+		Write-Verbose -message "URL Info : $($params.request)"
+		Invoke-OnypheAPIV2 @params
+	  }
+	}
+	#v0.99
+	Function Invoke-APIOnypheDelAlert {
+	<#
+	  .SYNOPSIS 
+	  create several input for Invoke-OnypheAPIv2 function and then call it to delete an alert already create using alert/del API
+  
+	  .DESCRIPTION
+	  create several input for Invoke-OnypheAPIv2 function and then call it to delete an alert already create using alert/del API
+	  	  
+	  .PARAMETER APIKEY
+	  -APIKey string{APIKEY}
+	  Set APIKEY as global variable.
+	  
+	  .PARAMETER AlertID
+	  -AlertID string{ID}
+	   mandatory input containing the ID of the alert to be deleted
+		
+	  .PARAMETER UseBetaFeatures
+	  -UseBetaFeatures switch
+	  use test.onyphe.io to use new beat features of Onyphe
+	  
+	  .OUTPUTS
+		 TypeName : System.Management.Automation.PSCustomObject
+
+			Name             MemberType   Definition                                                                                                                                                                                                                                       
+			----             ----------   ----------
+			Equals           Method       bool Equals(System.Object obj)
+			GetHashCode      Method       int GetHashCode()
+			GetType          Method       type GetType()
+			ToString         Method       string ToString()
+			cli-API_info     NoteProperty string[] cli-API_info=System.String[]
+			cli-API_input    NoteProperty string[] cli-API_input=System.String[]
+			cli-API_version  NoteProperty string cli-API_version=2
+			cli-key_required NoteProperty bool[] cli-key_required=System.Boolean[]
+			cli-Request_Date NoteProperty datetime cli-Request_Date=27/12/2019 12:22:38
+			error            NoteProperty long error=0
+			message          NoteProperty string message=Success
+			myip             NoteProperty string myip=8.8.8.8
+			status           NoteProperty string status=ok
+
+	  .EXAMPLE
+	  Delete Onyphe Alert with ID 0 and set api key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	  C:\PS> Invoke-APIOnypheDelAlert -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -AlertID 0
+
+	  .EXAMPLE
+	  Delete Onyphe Alert with ID 0
+	  C:\PS> Invoke-APIOnypheDelAlert -AlertID 0
+	#>
+	[cmdletbinding()]
+	Param ( 
+		[parameter(Mandatory=$false)]
+		[ValidateLength(40,40)]
+			[string]$APIKey,
+		[parameter(Mandatory=$false,Position=10)]
+			[switch]$UseBetaFeatures,
+		[parameter(Mandatory=$true)]
+		[ValidateScript({($_ -match "^[0-9]*$")})]
+			[string]$AlertID
+	) 
+	  Process {
+		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+		$params = @{
+			request = "v2/alert/del/$($AlertID)"
+			APIInfo = "alert/del"
+			APIInput = "$($AlertID)"
+			Method = "POST"
+			APIKeyrequired = $true
+		}
+		if ($UseBetaFeatures) {
+			$params.add("UseBetaFeatures", $true)
+		}
+		Write-Verbose -message "URL Info : $($params.request)"
+		Invoke-OnypheAPIV2 @params
+	  }
+	}
+	#v0.99
+	Function Invoke-APIOnypheAddAlert {
+	<#
+	  .SYNOPSIS 
+	  create several input for Invoke-OnypheAPIv2 function and then call it to add new alert for alert/add API
+  
+	  .DESCRIPTION
+	  create several input for Invoke-OnypheAPIv2 function and then call it to add new alert for alert/add API
+	  	  
+	  .PARAMETER APIKEY
+	  -APIKey string{APIKEY}
+	   Set APIKEY as global variable.
+		
+	  .PARAMETER UseBetaFeatures
+	  -UseBetaFeatures switch
+	   use test.onyphe.io to use new beat features of Onyphe
+	  
+	  .PARAMETER AlertName
+	  -AlertName string
+	   Name of the new Onpyhe Alert
+
+	  .PARAMETER AdvancedSearch
+	  -AdvancedSearch ARRAY{filter:value,filter:value}
+		Search with multiple criterias
+		
+	  .PARAMETER AdvancedFilter
+	  -AdvancedFilter ARRAY{filter:value,filter:value}
+	  Filter with multiple criterias
+
+	  .PARAMETER SearchValue
+	  -SearchValue STRING{value}
+	  string to be searched with -SearchFilter parameter
+
+	  .PARAMETER SearchFilter
+	  -SearchFilter STRING{Get-OnypheSearchFilters}
+	  Filter to be used with string set with SearchValue parameter
+
+	  .PARAMETER SearchType
+	  -SearchType STRING{Get-OnypheSearchCategories}
+		Search Type or Category
+		
+	  .PARAMETER FilterFunction
+	  -FilterFunction String{Get-OnypheSearchFunctions}
+	  Filter search function
+
+	  .PARAMETER FilterValue
+	  -FilterValue String
+	  value to use as input for FilterFunction
+
+	  .PARAMETER AlertEmail
+	  -AlertEmail string
+	   Target mail receiving Onyphe Alert
+
+	  .PARAMETER GenerateAlertOutput
+	  -GenerateAlertOutput switch
+	   Generate A Powershell Object containing the input instead of calling Invoke-OnypheAPIV2 with the inputs
+
+	  .PARAMETER InputAlertObject
+	  -InputAlertObject PSObject
+	   use PSObject as input with the alert query already defined
+
+	  .OUTPUTS
+		 TypeName : System.Management.Automation.PSCustomObject
+
+			Name             MemberType   Definition                                                                                                                                                                                                                                       
+			----             ----------   ----------
+			Equals           Method       bool Equals(System.Object obj)
+			GetHashCode      Method       int GetHashCode()
+			GetType          Method       type GetType()
+			ToString         Method       string ToString()
+			cli-API_info     NoteProperty string[] cli-API_info=System.String[]
+			cli-API_input    NoteProperty string[] cli-API_input=System.String[]
+			cli-API_version  NoteProperty string cli-API_version=2
+			cli-key_required NoteProperty bool[] cli-key_required=System.Boolean[]
+			cli-Request_Date NoteProperty datetime cli-Request_Date=27/12/2019 12:24:24
+			error            NoteProperty long error=0
+			message          NoteProperty string message=Success
+			myip             NoteProperty string myip=8.8.8.8
+			status           NoteProperty string status=ok
+  
+	  .EXAMPLE
+	  New alert based on AdvancedSearch with multiple criteria/filters
+	  Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows
+	  C:\PS> Invoke-APIOnypheAddAlert -AlertEmail "alert@example.com" -AlertName "My new Alert" -AdvancedSearch @("product:Apache","port:443","os:Windows") -SearchType datascan
+
+	  .EXAMPLE
+	  New alert based on simple search with one filter/criteria
+	  Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
+	  C:\PS> Invoke-APIOnypheAddAlert -AlertEmail "alert@example.com" -AlertName "My new Alert" -SearchValue RU -SearchType threatlist -SearchFilter country
+	#>
+	[cmdletbinding()]
+	Param ( 
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()] 
+			[string]$AlertName,
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[string]$AlertEmail,
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[string]$SearchType,  
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[string]$SearchValue,
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[string]$SearchFilter,
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[string]$FilterFunction,    
+		[parameter(Mandatory=$false)] 
+		[ValidateNotNullOrEmpty()]
+			[string[]]$FilterValue,
+		[parameter(Mandatory=$false)] 
+		[ValidateNotNullOrEmpty()]
+			[Array]$AdvancedSearch,
+		[parameter(Mandatory=$false)]
+		[ValidateLength(40,40)]
+			[string]$APIKey,
+		[parameter(Mandatory=$false)]
+			[switch]$UseBetaFeatures,
+		[parameter(Mandatory=$false)] 
+		[ValidateNotNullOrEmpty()]
+			[Array]$AdvancedFilter,
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			$InputOnypheObject
+	)  
+	  Process {
+		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+		$APIInput = @()
+		if ($AdvancedSearch) {
+			$NewAdvancedSearch = $AdvancedSearch.clone()
+			for ($i=0; $i -lt $NewAdvancedSearch.length; $i++) {
+				$tmp = $null
+				$tmp = $NewAdvancedSearch[$i] -split ":"
+				if (($tmp[1] -match "\s") -and ($tmp[1] -notlike "`"*`"")) {$tmp[1] = "`"$($tmp[1])`""}
+				$NewAdvancedSearch[$i] = $tmp -join ":"
+			}
+			$NewSearchValue = $NewAdvancedSearch -join " "
+			$APIInput += @($NewSearchValue)
+		} Elseif ($SearchValue) {
+			$NewSearchValue = $SearchValue
+			if ($NewSearchValue -match "(\s)"){
+				$NewSearchValue = "$($searchfilter):`"$($NewSearchValue)`""
+			} else {
+				$NewSearchValue = "$($searchfilter):$($NewSearchValue)"
+			}
+			$APIInput += @($NewSearchValue)
+		}
+		if ($AdvancedFilter) {
+			$NewAdvancedFilter = $AdvancedFilter.clone()
+			for ($i=0; $i -lt $NewAdvancedFilter.length; $i++) {
+				$tmp = $null
+				$tmp = $NewAdvancedFilter[$i] -split ":"
+				if ($tmp[1].contains(",")) {
+					$tmp2 = $tmp[1] -split ","
+					if (($tmp2[1] -match "\s") -and ($tmp2[1] -notlike "`"*`"")) {$tmp2[1] = "`"$($tmp2[1])`""}
+					$tmp[1] = $tmp2 -join ","
+				} else {
+					if (($tmp[1] -match "\s") -and ($tmp[1] -notlike "`"*`"")) {$tmp[1] = "`"$($tmp[1])`""}
+				}
+				$tmp[0] = "-" + $tmp[0]
+				$NewAdvancedFilter[$i] = $tmp -join ":"
+			}
+			$NewAdvancedFilter = $NewAdvancedFilter -join " "
+			$NewSearchValue = "$($NewSearchValue) $($NewAdvancedFilter)"
+			$APIInput += @($NewAdvancedFilter)
+		} elseif ($FilterFunction) {
+				$NewFilterfunction = $FilterFunction
+				$NewSearchValue = "$($NewSearchValue) -$($NewFilterfunction):$($FilterValue -join ",")"
+				$APIInput += "-$($NewFilterfunction):$($FilterValue -join ",")"
+		}
+		$Data = [PSCustomObject]@{
+			name = $AlertName
+			email = $AlertEmail
+		}
+		if ($InputOnypheObject.'cli-API_input' -and $InputOnypheObject.'cli-API_info') {
+			if ($InputOnypheObject.'cli-API_info' -like "search*") {
+				$Data | add-member -MemberType NoteProperty -Name query -Value "category:$(($InputOnypheObject.'cli-API_info' -split "/")[($InputOnypheObject.'cli-API_info' -split "/").count -1]) $($InputOnypheObject.'cli-API_input')"
+			}
+		} else {
+			$Data | add-member -MemberType NoteProperty -Name query -Value "category:$($SearchType) $($NewSearchValue)"
+		}
+		$params = @{
+			request = "v2/alert/add/"
+			APIInfo = "alert/add"
+			APIInput = $Data
+			APIKeyrequired = $true
+			Data = $Data | ConvertTo-Json
+		}
+		if ($UseBetaFeatures) {
+			$params.add("UseBetaFeatures", $true)
+		}
+		write-verbose -message "POST JSON Data : $($Data | ConvertTo-Json)"
+		Write-Verbose -message "URL Info : $($params.request)" 
+		Invoke-OnypheAPIV2 @params
+	  }
 	}
 	Function Update-OnypheFacetsFilters {
 	<#
@@ -3131,14 +4073,16 @@
 					}
 				}
 			}
-		}
+	}
 
 	New-Alias -Name Update-OnypheLocalData -value Update-OnypheFacetsFilters
 	New-Alias -Name Get-Onyphe -Value Get-OnypheInfo
 	New-Alias -Name Get-OnypheFromCSV -Value Get-OnypheInfoFromCSV
 	New-Alias -Name Search-Onyphe -Value Search-OnypheInfo
+	New-Alias -Name Get-OnypheAlert -Value Get-OnypheAlertInfo
+	New-Alias -Name Set-OnypheAlert -Value Set-OnypheAlertInfo
 
 	Export-ModuleMember -Function  Get-OnypheUserInfo, Search-OnypheInfo, Get-OnypheInfo, Get-OnypheInfoFromCSV, Export-OnypheInfoToFile, Export-OnypheDataShot,
-															Invoke-APIOnypheMD5, Invoke-APIOnypheOnionScan, Invoke-APIOnypheCtl, Invoke-APIOnypheSniffer, Invoke-APIOnypheUser, Invoke-APIOnypheSearch, Invoke-APIOnypheDataScan, Invoke-APIOnypheForward, Invoke-APIOnypheGeoloc, Invoke-APIOnypheIP, Invoke-APIOnypheInetnum, Invoke-APIOnypheMyIP, Invoke-APIOnyphePastries, Invoke-APIOnypheReverse, Invoke-APIOnypheSynScan, Invoke-APIOnypheThreatlist, Invoke-Onyphe,
-															Get-OnypheSearchFunctions, Get-OnypheSearchCategories, Get-OnypheSearchFilters, Get-ScriptDirectory, Set-OnypheAPIKey, Update-OnypheFacetsFilters, Get-OnypheCliFacets, Get-OnypheStatsFromObject, Set-OnypheProxy, Import-OnypheEncryptedIKey, Get-OnypheAPIName
-	Export-ModuleMember -Alias Update-OnypheLocalData, Get-Onyphe, Search-Onyphe, Get-OnypheFromCSV
+									Invoke-APIOnypheMD5, Invoke-APIOnypheOnionScan, Invoke-APIOnypheCtl, Invoke-APIOnypheSniffer, Invoke-APIOnypheUser, Invoke-APIOnypheSearch, Invoke-APIOnypheDataScan, Invoke-APIOnypheForward, Invoke-APIOnypheGeoloc, Invoke-APIOnypheIP, Invoke-APIOnypheInetnum, Invoke-APIOnypheMyIP, Invoke-APIOnyphePastries, Invoke-APIOnypheReverse, Invoke-APIOnypheSynScan, Invoke-APIOnypheThreatlist, Invoke-APIOnypheListAlert, Invoke-OnypheAPIV1, Invoke-OnypheAPIV2, Invoke-APIOnypheAddAlert, Invoke-APIOnypheDelAlert,
+									Get-OnypheSearchFunctions, Get-OnypheSearchCategories, Get-OnypheSearchFilters, Get-ScriptDirectory, Set-OnypheAPIKey, Update-OnypheFacetsFilters, Get-OnypheCliFacets, Get-OnypheStatsFromObject, Set-OnypheProxy, Import-OnypheEncryptedIKey, Get-OnypheAPIName, Get-OnypheAlertInfo, Set-OnypheAlertInfo,
+	Export-ModuleMember -Alias Update-OnypheLocalData, Get-Onyphe, Search-Onyphe, Get-OnypheFromCSV, Get-OnypheAlert, Set-OnypheAlert

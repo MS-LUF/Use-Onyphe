@@ -5,42 +5,41 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-OnypheUserInfo
+# Invoke-APIOnypheListAlert
 
 ## SYNOPSIS
-main function/cmdlet - Get user account information (rate limiting status, requests remaining in pool...) from onyphe.io web service
+create several input for Invoke-OnypheAPIv2 function and then call it to list alert already set from alert/list API
 
 ## SYNTAX
 
 ```
-Get-OnypheUserInfo [[-APIKey] <String>] [[-wait] <Int32>] [-UseBetaFeatures] [<CommonParameters>]
+Invoke-APIOnypheListAlert [-APIKey <String>] [-UseBetaFeatures] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-main function/cmdlet - Get user account information (rate limiting status, requests remaining in pool...) from onyphe.io web service
-send HTTP request to onyphe.io web service and convert back JSON information to a powershell custom object
+create several input for Invoke-OnypheAPIv2 function and then call it to list alert already set from alert/list API
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-get user account info for api key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx and set the api key
+get alert set and set api key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-C:\PS\> Get-OnypheUserInfo -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+C:\PS\> Invoke-APIOnypheListAlert -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 ### EXAMPLE 2
 ```
-get user account info for api key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx already set as global variable
+get alert set
 ```
 
-C:\PS\> Get-OnypheUserInfo
+C:\PS\> Invoke-APIOnypheListAlert
 
 ## PARAMETERS
 
 ### -APIKey
 -APIKey string{APIKEY}
-set your APIKEY to be able to use Onyphe API.
+Set APIKEY as global variable.
 
 ```yaml
 Type: String
@@ -48,24 +47,8 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 1
+Position: Named
 Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -wait
--Wait int{second}
-wait for x second before sending the request to manage rate limiting restriction
-
-```yaml
-Type: Int32
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 2
-Default value: 0
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -80,7 +63,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: Named
+Position: 11
 Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -94,8 +77,8 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 ## OUTPUTS
 
-### TypeName: System.Management.Automation.PSCustomObject
-### Name             MemberType   Definition
+### TypeName : System.Management.Automation.PSCustomObject
+### Name             MemberType   Definition                                                                                                                                                                                                                                       
 ### ----             ----------   ----------
 ### Equals           Method       bool Equals(System.Object obj)
 ### GetHashCode      Method       int GetHashCode()
@@ -103,15 +86,16 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 ### ToString         Method       string ToString()
 ### cli-API_info     NoteProperty string[] cli-API_info=System.String[]
 ### cli-API_input    NoteProperty string[] cli-API_input=System.String[]
+### cli-API_version  NoteProperty string cli-API_version=2
 ### cli-key_required NoteProperty bool[] cli-key_required=System.Boolean[]
-### cli-Request_Date NoteProperty datetime cli-Request_Date=23/01/2018 11:33:17
-### count            NoteProperty int count=1
-### error            NoteProperty int error=0
-### myip             NoteProperty string myip=192.168.6.66
+### cli-Request_Date NoteProperty datetime cli-Request_Date=27/12/2019 12:20:36
+### count            NoteProperty long count=2
+### error            NoteProperty long error=0
+### myip             NoteProperty string myip=8.8.8.8
 ### results          NoteProperty Object[] results=System.Object[]
 ### status           NoteProperty string status=ok
-### took             NoteProperty string took=0.001
-### total            NoteProperty int total=1
+### took             NoteProperty string took=0.000
+### total            NoteProperty long total=2
 ## NOTES
 
 ## RELATED LINKS

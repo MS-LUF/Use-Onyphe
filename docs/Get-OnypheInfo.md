@@ -1,5 +1,5 @@
 ---
-external help file: use-onyphe-help.xml
+external help file: Use-Onyphe-help.xml
 Module Name: Use-Onyphe
 online version:
 schema: 2.0.0
@@ -159,6 +159,7 @@ Accept wildcard characters: False
 ### -Page
 -page string{page number}
 go directly to a specific result page (1 to 1000)
+you can set a list of page using x-y like 1-100 to read the first 100 pages
 
 ```yaml
 Type: String[]
@@ -204,7 +205,8 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
+For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

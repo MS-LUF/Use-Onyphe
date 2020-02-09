@@ -98,6 +98,8 @@
           <S>issuer.commonname</S>
           <S>issuer.country</S>
           <S>issuer.organization</S>
+          <S>issuer.organizationalunit</S>
+          <S>issuer.serial</S>
           <S>keyusage</S>
           <S>onion</S>
           <S>osdistribution</S>
@@ -117,7 +119,11 @@
           <S>syntax</S>
           <S>subdomains</S>
           <S>subject.altname</S>
+          <S>subject.country</S>
           <S>subject.commonname</S>
+          <S>subject.organization</S>
+          <S>subject.organizationalunit</S>
+          <S>subject.serial</S>
           <S>syntax</S>
           <S>title</S>
           <S>tld</S>

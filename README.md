@@ -11,7 +11,14 @@ To request it : https://www.onyphe.io/login
 More info about available APIs :
 https://www.onyphe.io/documentation/api
 
-(c) 2018-2019 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
+(c) 2018-2020 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
+
+## Notes version (0.99) :
+ - replace $env:appdata with $home for Linux and Powershell Core compatibility
+ - create new function to request APIv2 (Invoke-OnypheAPIV2) and managing api key as new header etc...
+ - rename previous function to request APIv1 (Invoke-OnypheAPIV1) and fix Net.WebException management for PowerShell core
+ - create new functions to deal with Onyphe Alert APIs (Invoke-APIOnypheListAlert, Invoke-APIOnypheDelAlert, Invoke-APIOnypheAddAlert)
+ - create new functions for managing the Onyphe Alert (Get-OnypheAlertInfo, Set-OnypheAlertInfo)
 
 ## Notes version (0.98) :
  - fix paging regex to support more than 1000 pages
@@ -84,24 +91,29 @@ using a simple powershell command and an internet access :-)
 ## module content
 documentation in markdown available here : https://github.com/MS-LUF/Use-Onyphe/tree/master/docs
 ### function
-- Export-OnypheInfoToFile
 - Export-OnypheDataShot
+- Export-OnypheInfoToFile
+- Get-OnypheAlertInfo
 - Get-OnypheAPIName
 - Get-OnypheCliFacets
 - Get-OnypheInfo
 - Get-OnypheInfoFromCSV
 - Get-OnypheSearchCategories
 - Get-OnypheSearchFilters
+- Get-OnypheSearchFunctions
 - Get-OnypheStatsFromObject
 - Get-OnypheUserInfo
 - Get-ScriptDirectory
 - Import-OnypheEncryptedIKey
+- Invoke-APIOnypheAddAlert
 - Invoke-APIOnypheCtl
 - Invoke-APIOnypheDataScan
+- Invoke-APIOnypheDelAlert
 - Invoke-APIOnypheForward
 - Invoke-APIOnypheGeoloc
 - Invoke-APIOnypheInetnum
 - Invoke-APIOnypheIP
+- Invoke-APIOnypheListAlert
 - Invoke-APIOnypheMD5
 - Invoke-APIOnypheMyIP
 - Invoke-APIOnypheOnionScan
@@ -112,13 +124,17 @@ documentation in markdown available here : https://github.com/MS-LUF/Use-Onyphe/
 - Invoke-APIOnypheSynScan
 - Invoke-APIOnypheThreatlist
 - Invoke-APIOnypheUser
-- Invoke-Onyphe
+- Invoke-OnypheAPIV1
+- Invoke-OnypheAPIV2
 - Search-OnypheInfo
+- Set-OnypheAlertInfo
 - Set-OnypheAPIKey
 - Set-OnypheProxy
 - Update-OnypheFacetsFilters
 ### alias
 - Get-Onyphe
+- Get-OnypheAlert
 - Get-OnypheFromCSV
 - Search-Onyphe
+- Set-OnypheAlert
 - Update-OnypheLocalData
