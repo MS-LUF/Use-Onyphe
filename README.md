@@ -13,23 +13,24 @@ https://www.onyphe.io/documentation/api
 
 (c) 2018-2020 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
 
+## Notes version (1.00) :
+ - fix rate limiting issue on paging
+ - manage new API in Export-OnypheInfoToFile
+
 ## Notes version (0.99) :
  - replace $env:appdata with $home for Linux and Powershell Core compatibility
  - create new function to request APIv2 (Invoke-OnypheAPIV2) and managing api key as new header etc...
  - rename previous function to request APIv1 (Invoke-OnypheAPIV1) and fix Net.WebException management for PowerShell core
  - create new functions to deal with Onyphe Alert APIs (Invoke-APIOnypheListAlert, Invoke-APIOnypheDelAlert, Invoke-APIOnypheAddAlert)
  - create new functions for managing the Onyphe Alert (Get-OnypheAlertInfo, Set-OnypheAlertInfo)
-
 ## Notes version (0.98) :
  - fix paging regex to support more than 1000 pages
-
 ## Notes version (0.97) :
  - code improvement
  - add beta switch to use beta interface of onyphe instead of production one
  - improve paging parameters
  - add advancedfilter option to Search-onyphe to manage multiple filter functions input
  - add onionshot category to datashot export function
-
 ## Notes version (0.96) :
 - add new filtering function for search request
 - add Get-OnypheSearchFunctions function
@@ -39,23 +40,19 @@ https://www.onyphe.io/documentation/api
 - add FunctionFilter and FunctionValue parameters
 - update Get-OnypheInfoFromCSV to manage new filter function in search request
 - add new alias Get-OnypheInfoFromCSV
-
 ## Notes version (0.95) :
 - fix HTTP error on invoke-onyphe when no network is available
 - add datashot management
 - add function to export datashot to picture file
 - fix Get-OnypheInfoFromCSV
 - update Export-OnypheInfoToFile
-
 ## Notes version (0.94) :
 - manage new apis (ctl, sniffer, onionscan, md5)
 - use userinfos API to collect APIs and search filters
 - rewrite get-onyphe info function to simplify the code
 - update invoke-apionyphedatascan with only a single parameter
-
 ## Notes version (0.93)
 - add statistics function
-
 ## Notes version (0.92)
 - add tag filter
 - manage new search APIs

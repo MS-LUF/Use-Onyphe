@@ -12,7 +12,7 @@
 RootModule = 'use-onyphe.psm1'
 
 # Numero de version de ce module.
-ModuleVersion = '0.99'
+ModuleVersion = '1.0'
 
 # editions PS prises en charge
 # CompatiblePSEditions = @()
@@ -120,7 +120,7 @@ PrivateData = @{
         IconUri = 'https://www.onyphe.io/img/logo-solo.png'
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'v0.99 : fix several issue regarding powershell core and linux environment, add new function for APIv2, add new functions to manage and use new alert APIs'
+        ReleaseNotes = 'v1.0 : fix rate limiting issue on paging, manage new API in Export-OnypheInfoToFile'
         # External dependent modules of this module
         # ExternalModuleDependencies = ''
 

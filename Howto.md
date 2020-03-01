@@ -325,6 +325,14 @@ API Search/datashot : Return datashot information
 ```
     C:\PS>Search-OnypheInfo -SearchValue rdp -SearchFilter protocol -SearchType datashot
 ```
+API Search/vulnscan : Return vulnerability found on internet asset
+```
+    C:\PS>Search-OnypheInfo -SearchValue CVE-2019-19781 -SearchFilter cve -SearchType vulnscan
+```
+API Search/topsite : Return information about a toplist like Alexa (https://www.alexa.com/topsites)
+```
+    C:\PS>Search-OnypheInfo -SearchValue fr -SearchFilter country -SearchType topsite
+```
 API V2/Alert/List : List your account alerts already set
 ```
     C:\PS>Get-OnypheAlert

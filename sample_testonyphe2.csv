@@ -3,3 +3,5 @@ Search;;datascan;product:Apache+port:443+os:Windows;;
 Search;;synscan;port:23+country:FR+os:Linux;;
 Search;;datascan;port:3389+country:FR;exists:os+monthago:1+wildcard:organization,*OVH*;1-2
 Search;;datascan;port:3389+country:FR;exists:os+monthago:0+wildcard:organization,*OVH*;1
+Search;;vulnscan;cve:CVE-2019-19781+country:ci;;
+Search;;topsite;tld:fr;monthago:1;

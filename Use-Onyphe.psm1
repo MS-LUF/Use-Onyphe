@@ -39,13 +39,17 @@
 # - add onionshot category to datashot export function
 # v0.98 :
 # - update paging regex to support more than 1000 pages
-# Released on: 02/2020
 # v0.99 :
 # - replace $env:appdata with $home for Linux and Powershell Core compatibility
 # - create new function to request APIv2 (Invoke-OnypheAPIV2) and managing api key as new header etc...
 # - rename previous function to request APIv1 (Invoke-OnypheAPIV1) and fix Net.WebException management for Powershell core
 # - create new functions to deal with Onyphe Alert APIs (Invoke-APIOnypheListAlert, Invoke-APIOnypheDelAlert, Invoke-APIOnypheAddAlert)
 # - create new functions for managing the Onyphe Alert (Get-OnypheAlertInfo, Set-OnypheAlertInfo)
+# 
+# released on 03/2020
+# V1.0 :
+# - fix rate limiting issue on paging
+# - manage new API in Export-OnypheInfoToFile
 #
 #'(c) 2018-2020 lucas-cueff.com - Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).'
 
@@ -530,6 +534,11 @@
 						} else {
 							$params.add('Page', $i.tostring())
 						}
+						if ($wait) {
+							Start-Sleep -s $wait
+						} else {
+							Start-Sleep -s 3
+						}
 						Invoke-APIOnypheSearch @params
 					}
 				}
@@ -802,7 +811,6 @@
 		Invoke-APIOnypheUser @params
 	}
 	}
-	#v0.99
 	Function Get-OnypheAlertInfo {
 <#
 	 .SYNOPSIS 
@@ -911,7 +919,6 @@
 			 }
 		 }
 	}
-	#v0.99
 	Function Set-OnypheAlertInfo {
 <#
 	 .SYNOPSIS 
@@ -2555,10 +2562,9 @@
 		Invoke-OnypheAPIV1 @params
   }
 	}
-	#v0.99
 	Function Invoke-OnypheAPIV1 {
-  [cmdletbinding()]
-  Param (
+  	[cmdletbinding()]
+  	Param (
 		[parameter(Mandatory=$true)]
 		[ValidateNotNullOrEmpty()]  
 			[string[]]$request,
@@ -2737,7 +2743,6 @@
 		}
 	}
 	}
-	#v0.99
 	Function Invoke-OnypheAPIV2 {
 	[cmdletbinding()]
 	Param (
@@ -2993,6 +2998,7 @@
 	  if (!(test-path $tempfolder)) {mkdir $tempfolder -force | out-null}
 	  $ticks = (get-date).ticks.ToString()
 	  $result | Export-Csv -NoTypeInformation -path "$($tempfolder)\$($ticks)_request_info.csv" -delimiter $csvdelimiter
+	  if ($result.ip) {$ip = $result.ip.tostring()}
 	  switch ($result.results.'@category') {
 		  'geoloc' {
 			  $filteredobj = $result.results | where-object {$_.'@category' -eq 'geoloc'} | sort-object -property country
@@ -3089,14 +3095,24 @@
 			}
 			'ctl' {
 				$filteredobj = $result.results | where-object {$_.'@category' -eq 'ctl'} | sort-object -property seen_date
-				$tempfilename = join-path $tempfolder "$($ticks)_$($ip)ctl.csv"
-			  $filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
+				$tempfilename = join-path $tempfolder "$($ticks)_$($ip)_ctl.csv"
+			  	$filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
 			}
 			'datashot' {
 				$filteredobj = $result.results | where-object {$_.'@category' -eq 'datashot'} | sort-object -property seen_date
 				$tempfilename = join-path $tempfolder "$($ticks)_$($ip)_datashot.csv"
 				$filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
 				Export-OnypheDataShot -tofolder $tempfolder -inputobject $result
+			}
+			'vulnscan' {
+				$filteredobj = $result.results | where-object {$_.'@category' -eq 'vulnscan'} | sort-object -property seen_date
+				$tempfilename = join-path $tempfolder "$($ticks)_$($ip)_vulnscan.csv"
+			  	$filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
+			}
+			'topsite' {
+				$filteredobj = $result.results | where-object {$_.'@category' -eq 'topsite'} | sort-object -property seen_date
+				$tempfilename = join-path $tempfolder "$($ticks)_$($ip)_topsite.csv"
+			  	$filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
 			}
 	  }
 	}
@@ -3437,7 +3453,6 @@
 		}
 	}
   	}
-	#v0.99
 	Function Invoke-APIOnypheSearch {
 	<#
 	  .SYNOPSIS 
@@ -3639,7 +3654,6 @@
 		Invoke-OnypheAPIV1 @params
 	}
 	}
-	#v0.99
 	Function Invoke-APIOnypheListAlert {
 	<#
 	  .SYNOPSIS 
@@ -3709,7 +3723,6 @@
 		Invoke-OnypheAPIV2 @params
 	  }
 	}
-	#v0.99
 	Function Invoke-APIOnypheDelAlert {
 	<#
 	  .SYNOPSIS 
@@ -3784,7 +3797,6 @@
 		Invoke-OnypheAPIV2 @params
 	  }
 	}
-	#v0.99
 	Function Invoke-APIOnypheAddAlert {
 	<#
 	  .SYNOPSIS 

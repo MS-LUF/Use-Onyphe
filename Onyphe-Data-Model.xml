@@ -25,7 +25,6 @@
           <S>/api/pastries</S>
           <S>/api/resolver</S>
           <S>/api/reverse</S>
-          <S>/api/search</S>
           <S>/api/search/ctl</S>
           <S>/api/search/datascan</S>
           <S>/api/search/datashot</S>
@@ -38,104 +37,23 @@
           <S>/api/search/sniffer</S>
           <S>/api/search/synscan</S>
           <S>/api/search/threatlist</S>
+          <S>/api/search/topsite</S>
+          <S>/api/search/vulnscan</S>
           <S>/api/sniffer</S>
           <S>/api/synscan</S>
           <S>/api/threatlist</S>
           <S>/api/user</S>
+          <S>/api/v2/alert/add</S>
+          <S>/api/v2/alert/del</S>
+          <S>/api/v2/alert/list</S>
         </LST>
       </Obj>
       <Obj N="filters" RefId="2">
         <TNRef RefId="1" />
         <LST>
-          <S>abuse</S>
-          <S>asn</S>
-          <S>city</S>
-          <S>count</S>
-          <S>country</S>
-          <S>data</S>
-          <S>datamd5</S>
-          <S>distinct</S>
-          <S>domain</S>
-          <S>forward</S>
-          <S>hostname</S>
-          <S>information</S>
-          <S>ip</S>
-          <S>ipv6</S>
-          <S>key</S>
-          <S>location</S>
-          <S>netname</S>
-          <S>organization</S>
-          <S>osvendor</S>
-          <S>os</S>
-          <S>osversion</S>
-          <S>port</S>
-          <S>productvendor</S>
-          <S>product</S>
-          <S>productversion</S>
-          <S>protocol</S>
-          <S>protocolversion</S>
-          <S>reason</S>
-          <S>reverse</S>
-          <S>since</S>
-          <S>source</S>
-          <S>status</S>
-          <S>subnet</S>
-          <S>threatlist</S>
-          <S>total</S>
-          <S>transport</S>
-          <S>type</S>
-          <S>basicconstraints</S>
-          <S>botnet</S>
-          <S>ca</S>
-          <S>classification</S>
-          <S>destport</S>
-          <S>extkeyusage</S>
-          <S>file</S>
-          <S>fingerprint.md5</S>
-          <S>fingerprint.sha1</S>
-          <S>fingerprint.sha256</S>
-          <S>host</S>
-          <S>issuer.commonname</S>
-          <S>issuer.country</S>
-          <S>issuer.organization</S>
-          <S>issuer.organizationalunit</S>
-          <S>issuer.serial</S>
-          <S>keyusage</S>
-          <S>onion</S>
-          <S>osdistribution</S>
-          <S>osdistributionversion</S>
-          <S>osbits</S>
-          <S>osversionpatch</S>
-          <S>productvendor</S>
-          <S>productversionpatch</S>
-          <S>publickey.algorithm</S>
-          <S>publickey.exponent</S>
-          <S>publickey.length</S>
-          <S>serial</S>
-          <S>scheme</S>
-          <S>signature.algorithm</S>
-          <S>size</S>
-          <S>srcport</S>
-          <S>syntax</S>
-          <S>subdomains</S>
-          <S>subject.altname</S>
-          <S>subject.country</S>
-          <S>subject.commonname</S>
-          <S>subject.organization</S>
-          <S>subject.organizationalunit</S>
-          <S>subject.serial</S>
-          <S>syntax</S>
-          <S>title</S>
-          <S>tld</S>
-          <S>tls</S>
-          <S>type</S>
-          <S>url</S>
-          <S>user</S>
-          <S>validity.notafter</S>
-          <S>validity.notbefore</S>
-          <S>version</S>
-          <S>wildcard</S>
-          <S>content</S>
+          <S>app.browse.type</S>
+          <S>app.browse.name</S>
+          <S>app.browse.file</S>
           <S>app.dns.versionbind</S>
           <S>app.elasticsearch.clustername</S>
           <S>app.elasticsearch.luceneversion</S>
@@ -150,12 +68,17 @@
           <S>app.http.component.productversion</S>
           <S>app.http.component.productversionpatch</S>
           <S>app.http.copyright</S>
+          <S>app.http.copyright.keyword</S>
+          <S>app.http.description</S>
+          <S>app.http.description.keyword</S>
           <S>app.http.headermd5</S>
           <S>app.http.header.name</S>
           <S>app.http.header.value</S>
           <S>app.http.keywords</S>
+          <S>app.http.keywords.keyword</S>
           <S>app.http.realm</S>
           <S>app.http.title</S>
+          <S>app.http.title.keyword</S>
           <S>app.length</S>
           <S>app.modbus.code</S>
           <S>app.modbus.function</S>
@@ -183,6 +106,91 @@
           <S>app.vnc.desktopname</S>
           <S>app.vnc.screensize</S>
           <S>app.vnc.version</S>
+          <S>abuse</S>
+          <S>asn</S>
+          <S>basicconstraints</S>
+          <S>botnet</S>
+          <S>ca</S>
+          <S>city</S>
+          <S>count</S>
+          <S>country</S>
+          <S>data</S>
+          <S>datamd5</S>
+          <S>destport</S>
+          <S>distinct</S>
+          <S>domain</S>
+          <S>extkeyusage</S>
+          <S>file</S>
+          <S>fingerprint.md5</S>
+          <S>fingerprint.sha1</S>
+          <S>fingerprint.sha256</S>
+          <S>forward</S>
+          <S>host</S>
+          <S>hostname</S>
+          <S>information</S>
+          <S>ip</S>
+          <S>ipv6</S>
+          <S>issuer.commonname</S>
+          <S>issuer.country</S>
+          <S>issuer.organization</S>
+          <S>issuer.organizationalunit</S>
+          <S>issuer.serial</S>
+          <S>key</S>
+          <S>keyusage</S>
+          <S>location</S>
+          <S>netname</S>
+          <S>organization</S>
+          <S>os</S>
+          <S>osbits</S>
+          <S>osdistribution</S>
+          <S>osdistributionversion</S>
+          <S>osvendor</S>
+          <S>osversion</S>
+          <S>osversionpatch</S>
+          <S>port</S>
+          <S>product</S>
+          <S>productvendor</S>
+          <S>productversion</S>
+          <S>productversionpatch</S>
+          <S>protocol</S>
+          <S>protocolversion</S>
+          <S>publickey.algorithm</S>
+          <S>publickey.exponent</S>
+          <S>publickey.length</S>
+          <S>reason</S>
+          <S>reverse</S>
+          <S>scheme</S>
+          <S>serial</S>
+          <S>signature.algorithm</S>
+          <S>since</S>
+          <S>size</S>
+          <S>source</S>
+          <S>srcport</S>
+          <S>status</S>
+          <S>subdomains</S>
+          <S>subject.altname</S>
+          <S>subject.country</S>
+          <S>subject.commonname</S>
+          <S>subject.organization</S>
+          <S>subject.organizationalunit</S>
+          <S>subject.serial</S>
+          <S>subnet</S>
+          <S>syntax</S>
+          <S>threatlist</S>
+          <S>title</S>
+          <S>tld</S>
+          <S>tls</S>
+          <S>total</S>
+          <S>transport</S>
+          <S>type</S>
+          <S>url</S>
+          <S>user</S>
+          <S>validity.notafter</S>
+          <S>validity.notbefore</S>
+          <S>version</S>
+          <S>wildcard</S>
+          <S>classification</S>
+          <S>content</S>
           <S>cpe</S>
           <S>cpecount</S>
           <S>cve</S>
@@ -192,6 +200,7 @@
           <S>device.productvendor</S>
           <S>device.productversion</S>
           <S>device.productversionpatch</S>
+          <S>onion</S>
           <S>tag</S>
         </LST>
       </Obj>
@@ -204,6 +213,7 @@
           <S>-monthago</S>
           <S>-exists</S>
           <S>-wildcard</S>
+          <S>-fields</S>
         </LST>
       </Obj>
     </MS>
