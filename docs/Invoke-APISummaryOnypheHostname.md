@@ -5,39 +5,40 @@ online version:
 schema: 2.0.0
 ---
 
-# Invoke-APIOnypheSynScan
+# Invoke-APISummaryOnypheHostname
 
 ## SYNOPSIS
-create several input for Invoke-OnypheAPIV2 function and then call it to get the syn scan info from synscan API
+create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an hostname from Geoloc Summary/hostname API
 
 ## SYNTAX
 
 ```
-Invoke-APIOnypheSynScan [-IP] <String[]> [[-APIKey] <String>] [[-Page] <String[]>] [<CommonParameters>]
+Invoke-APISummaryOnypheHostname [-Hostname] <String[]> [[-APIKey] <String>] [[-Page] <String[]>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-create several input for Invoke-OnypheAPIV2 function and then call it to get the syn scan info from synscan API
+create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an hostname from Geoloc Summary/hostname API
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-get syn scan info for IP 8.8.8.8
-C:\PS> Invoke-APIOnypheSynScan -IP 8.8.8.8
+get all onyphe info for hostname www.perdu.com
+C:\PS> Invoke-APISummaryOnypheHostname -Hostname www.perdu.com
 ```
 
 ### EXAMPLE 2
 ```
-get syn scan info for IP 8.8.8.8 and set the api key
-C:\PS> Invoke-APIOnypheSynScan -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+get all onyphe info for hostname www.perdu.com and set the API Key
+C:\PS> Invoke-APISummaryOnypheHostname -Hostname www.perdu.com -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
 ## PARAMETERS
 
-### -IP
--IP string{IP}
-IP to be used for the geoloc API usage
+### -Hostname
+-Hostname string{Hostname}
+Hostname to be used for the Summary/hostname API usage
 
 ```yaml
 Type: String[]

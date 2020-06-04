@@ -24,9 +24,8 @@ Update Onyphe-Data-Model.xml local file containing a cache of available APIs, fu
 ### EXAMPLE 1
 ```
 Update Onyphe-Data-Model.xml local file containing a cache of available APIs, functions, filters from user API
+C:\PS> Update-OnypheFacetsFilters
 ```
-
-C:\PS\> Update-OnypheFacetsFilters
 
 ## PARAMETERS
 
@@ -63,8 +62,7 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

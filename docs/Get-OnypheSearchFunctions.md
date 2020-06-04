@@ -24,9 +24,8 @@ Get search functions available for search APIs of Onyphe (like time filterring e
 ### EXAMPLE 1
 ```
 Get category available for search APIs of Onyphe
+C:\PS> Get-OnypheSearchFunctions
 ```
-
-C:\PS\> Get-OnypheSearchFunctions
 
 ## PARAMETERS
 

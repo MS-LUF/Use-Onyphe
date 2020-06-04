@@ -5,26 +5,26 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-OnypheSearchCategories
+# Get-OnypheSummaryAPIName
 
 ## SYNOPSIS
-Get category available for search APIs of Onyphe
+Get Summary API available for Onyphe
 
 ## SYNTAX
 
 ```
-Get-OnypheSearchCategories
+Get-OnypheSummaryAPIName
 ```
 
 ## DESCRIPTION
-Get category available for search APIs of Onyphe
+Get Summary API available for Onyphe
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Get category available for search APIs of Onyphe
-C:\PS> Get-OnypheSearchCategories
+Get API available for Onyphe
+C:\PS> Get-OnypheSummaryAPIName
 ```
 
 ## PARAMETERS
@@ -33,7 +33,7 @@ C:\PS> Get-OnypheSearchCategories
 
 ## OUTPUTS
 
-### filters as string
+### Summary API as string
 ## NOTES
 
 ## RELATED LINKS

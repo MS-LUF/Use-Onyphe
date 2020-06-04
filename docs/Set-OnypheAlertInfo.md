@@ -28,49 +28,43 @@ post JSON content through HTTP request to onyphe.io web service and convert back
 ### EXAMPLE 1
 ```
 New alert for AdvancedSearch with multiple criteria/filters
-```
-
 Set a new alert named "windows apache" matching datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows, and sent back the alert on "jeanclaude.dusse@lesbronzesfontdusk.io"
-C:\PS\> Set-OnypheAlert -AdvancedSearch @("product:Apache","port:443","os:Windows") -SearchType datascan -AlertAction new -AlertName "windows apache" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"
+C:\PS> Set-OnypheAlert -AdvancedSearch @("product:Apache","port:443","os:Windows") -SearchType datascan -AlertAction new -AlertName "windows apache" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"
+```
 
 ### EXAMPLE 2
 ```
 New alert for simple search with one filter/criteria
-```
-
 Set a new alert named "from russia with lv" matching threatlist for all IP matching the criteria : all IP from russia tagged by threat lists, and sent back the alert on "jeanclaude.dusse@lesbronzesfontdusk.io"
-C:\PS\> Set-OnypheAlert -SearchValue RU -SearchType threatlist -SearchFilter country -AlertAction new -AlertName "from russia with lv" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"
+C:\PS> Set-OnypheAlert -SearchValue RU -SearchType threatlist -SearchFilter country -AlertAction new -AlertName "from russia with lv" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"
+```
 
 ### EXAMPLE 3
 ```
-New alert for simple search with one filter/criteria and use a server filter to retrieve only objects indexed since 2 month,
-```
-
+New alert for simple search with one filter/criteria and use a server filter to retrieve only objects indexed since 2 month, 
 Set an new alert named "from russia with lv 2 m" matching threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
-C:\PS\> Set-OnypheAlert -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2" -AlertAction new -AlertName "from russia with lv 2 m" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"
+C:\PS> Set-OnypheAlert -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2" -AlertAction new -AlertName "from russia with lv 2 m" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"
+```
 
 ### EXAMPLE 4
 ```
 Modify an existing alert named "from paris with lv" and update mail and query
-```
-
 Modify an existing alert named "from paris with lv" an update it to match threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and filter the result and show me only the answer with os property not null, finally sent back the alert to new mail "robert.lespinasse@lesbronzesfontdusk.io"
-C:\PS\> Set-OnypheAlert -SearchValue FR -SearchType threatlist -SearchFilter country -FilterFunction exist -FilterValue os -AlertAction modify -AlertName "from paris with lv" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
+C:\PS> Set-OnypheAlert -SearchValue FR -SearchType threatlist -SearchFilter country -FilterFunction exist -FilterValue os -AlertAction modify -AlertName "from paris with lv" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
+```
 
 ### EXAMPLE 5
 ```
 New alert for advanced search and filter
-```
-
 Set a new alert named "RandR" matching datascan for all IP matching the criteria : all ip from RU with TCP 3389 port opened, filter the results using multiple filters (only os property known and from all organization like *company*), and finally sent back the alert to "robert.lespinasse@lesbronzesfontdusk.io"
-C:\PS\> Set-OnypheAlert -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
+C:\PS> Set-OnypheAlert -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
+```
 
 ### EXAMPLE 6
 ```
 Delete an existing alert named "windows apache"
+C:\PS> Set-OnypheAlert -AlertAction delete -AlertName "windows apache"
 ```
-
-C:\PS\> Set-OnypheAlert -AlertAction delete -AlertName "windows apache"
 
 ## PARAMETERS
 
@@ -220,7 +214,7 @@ Accept wildcard characters: False
 ```
 
 ### -InputOnypheObject
-{{Fill InputOnypheObject Description}}
+{{ Fill InputOnypheObject Description }}
 
 ```yaml
 Type: Object
@@ -235,7 +229,7 @@ Accept wildcard characters: False
 ```
 
 ### -FilterFunction
-{{Fill FilterFunction Description}}
+{{ Fill FilterFunction Description }}
 
 ```yaml
 Type: String
@@ -250,7 +244,7 @@ Accept wildcard characters: False
 ```
 
 ### -SearchFilter
-{{Fill SearchFilter Description}}
+{{ Fill SearchFilter Description }}
 
 ```yaml
 Type: String
@@ -265,12 +259,12 @@ Accept wildcard characters: False
 ```
 
 ### -SearchType
-{{Fill SearchType Description}}
+{{ Fill SearchType Description }}
 
 ```yaml
 Type: String
 Parameter Sets: (All)
-Aliases:
+Aliases: Category
 
 Required: False
 Position: Named
@@ -280,29 +274,13 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
 ## OUTPUTS
 
 ### TypeName: System.Management.Automation.PSCustomObject
-### 	Name             MemberType   Definition                                                                                                                                                                                                                                       
-### 	----             ----------   ----------
-### 	Equals           Method       bool Equals(System.Object obj)
-### 	GetHashCode      Method       int GetHashCode()
-### 	GetType          Method       type GetType()
-### 	ToString         Method       string ToString()
-### 	cli-API_info     NoteProperty string[] cli-API_info=System.String[]
-### 	cli-API_input    NoteProperty string[] cli-API_input=System.String[]
-### 	cli-API_version  NoteProperty string cli-API_version=2
-### 	cli-key_required NoteProperty bool[] cli-key_required=System.Boolean[]
-### 	cli-Request_Date NoteProperty datetime cli-Request_Date=27/12/2019 12:24:24
-### 	error            NoteProperty long error=0
-### 	message          NoteProperty string message=Success
-### 	myip             NoteProperty string myip=8.8.8.8
-### 	status           NoteProperty string status=ok
 ## NOTES
 
 ## RELATED LINKS

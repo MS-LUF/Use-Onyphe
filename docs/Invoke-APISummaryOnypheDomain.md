@@ -5,39 +5,40 @@ online version:
 schema: 2.0.0
 ---
 
-# Invoke-APIOnypheSynScan
+# Invoke-APISummaryOnypheDomain
 
 ## SYNOPSIS
-create several input for Invoke-OnypheAPIV2 function and then call it to get the syn scan info from synscan API
+create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an internet domain from Geoloc Summary/domain API
 
 ## SYNTAX
 
 ```
-Invoke-APIOnypheSynScan [-IP] <String[]> [[-APIKey] <String>] [[-Page] <String[]>] [<CommonParameters>]
+Invoke-APISummaryOnypheDomain [-Domain] <String[]> [[-APIKey] <String>] [[-Page] <String[]>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-create several input for Invoke-OnypheAPIV2 function and then call it to get the syn scan info from synscan API
+create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an internet domain from Geoloc Summary/domain API
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-get syn scan info for IP 8.8.8.8
-C:\PS> Invoke-APIOnypheSynScan -IP 8.8.8.8
+get all onyphe info for domain perdu.com
+C:\PS> Invoke-APISummaryOnypheDomain -Domain perdu.com
 ```
 
 ### EXAMPLE 2
 ```
-get syn scan info for IP 8.8.8.8 and set the api key
-C:\PS> Invoke-APIOnypheSynScan -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+get all onyphe info for domain perdu.com and set the API Key
+C:\PS> Invoke-APISummaryOnypheDomain -Domain perdu.com -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
 ## PARAMETERS
 
-### -IP
--IP string{IP}
-IP to be used for the geoloc API usage
+### -Domain
+-Domain string{Domain}
+Domain to be used for the Summary/domain API API usage
 
 ```yaml
 Type: String[]

@@ -5,82 +5,40 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-OnypheInfo
+# Get-OnypheSummary
 
 ## SYNOPSIS
-main function/cmdlet - Get information from onyphe.io web service using dedicated subfunctions by Simple API available
+main function/cmdlet - Get information from onyphe.io web service using dedicated subfunctions by Summary API available
 
 ## SYNTAX
 
 ```
-Get-OnypheInfo [[-SearchValue] <String>] [[-APIKey] <String>] [[-Page] <String[]>] [[-wait] <Int32>]
+Get-OnypheSummary [[-SearchValue] <String>] [[-APIKey] <String>] [[-Page] <String[]>] [[-wait] <Int32>]
  [-SearchType <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-main function/cmdlet - Get information from onyphe.io web service using dedicated subfunctions by Simple API available
+main function/cmdlet - Get information from onyphe.io web service using dedicated subfunctions by Summary API available
 send HTTP request to onyphe.io web service and convert back JSON information to a powershell custom object
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Request geoloc information for ip 8.8.8.8 
-C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Geoloc
+Request all information for ip 8.8.8.8 
+C:\PS> Get-OnypheSummary -SearchValue "8.8.8.8" -SummaryAPIType ip
 ```
 
 ### EXAMPLE 2
 ```
-Request dns reverse information for ip 8.8.8.8 
-C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType ResolverReverse -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+Request all information for perdu.com domain and set the API key
+C:\PS> Get-OnypheSummary -SearchValue "perdu.com" -SummaryAPIType domain -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
 ### EXAMPLE 3
 ```
-request IIS keyword datascan information
-C:\PS> Get-OnypheInfo -SimpleAPIType DataScan -SearchValue "IIS" -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-```
-
-### EXAMPLE 4
-```
-request datascan information for ip 8.8.8.8 
-C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType DataScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-```
-
-### EXAMPLE 5
-```
-Request pastebin content information for ip 8.8.8.8 
-C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-```
-
-### EXAMPLE 6
-```
-Request pastebin content information for ip 8.8.8.8 and see page 2 of results
-C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -page "2"
-```
-
-### EXAMPLE 7
-```
-Request dns forward information for ip 8.8.8.8 
-C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType ResolverForward -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-```
-
-### EXAMPLE 8
-```
-Request threatlist information for ip 8.8.8.8 
-C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Threatlist -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-```
-
-### EXAMPLE 9
-```
-Request inetnum information for ip 8.8.8.8 
-C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Inetnum -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-```
-
-### EXAMPLE 10
-```
-Request synscan information for ip 8.8.8.8 
-C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType SynScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+Request all information for www.perdu.com hostname  and see page 2 of results
+C:\PS> Get-OnypheSummary -SearchValue "www.perdu.com" -SummaryAPIType hostname -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -page "2"
 ```
 
 ## PARAMETERS
@@ -155,7 +113,7 @@ Accept wildcard characters: False
 ```yaml
 Type: String
 Parameter Sets: (All)
-Aliases: SimpleAPIType
+Aliases: SummaryAPIType
 
 Required: False
 Position: Named

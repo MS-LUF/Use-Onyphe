@@ -24,9 +24,8 @@ Get filters available for search APIs of Onyphe
 ### EXAMPLE 1
 ```
 Get filters available for search APIs of Onyphe
+C:\PS> Get-OnypheSearchFilters
 ```
-
-C:\PS\> Get-OnypheSearchFilters
 
 ## PARAMETERS
 

@@ -5,35 +5,51 @@ online version:
 schema: 2.0.0
 ---
 
-# Invoke-APIOnypheListAlert
+# Invoke-APIOnypheResolverForward
 
 ## SYNOPSIS
-create several input for Invoke-OnypheAPIv2 function and then call it to list alert already set from alert/list API
+create several input for Invoke-OnypheAPIV2 function and then call it to get the dns forwarder info from forward API
 
 ## SYNTAX
 
 ```
-Invoke-APIOnypheListAlert [-APIKey <String>] [-UseBetaFeatures] [<CommonParameters>]
+Invoke-APIOnypheResolverForward [-IP] <String[]> [[-APIKey] <String>] [[-Page] <String[]>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-create several input for Invoke-OnypheAPIv2 function and then call it to list alert already set from alert/list API
+create several input for Invoke-OnypheAPIV2 function and then call it to get the dns forwarder info from forward API
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-get alert set and set api key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-C:\PS> Invoke-APIOnypheListAlert -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+get all forward dns info for IP 8.8.8.8
+C:\PS> Invoke-APIOnypheResolverForward -IP 8.8.8.8
 ```
 
 ### EXAMPLE 2
 ```
-get alert set
-C:\PS> Invoke-APIOnypheListAlert
+get all forward dns info for IP 8.8.8.8 ans set the api key
+C:\PS> Invoke-APIOnypheResolverForward -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
 ## PARAMETERS
+
+### -IP
+-IP string{IP}
+IP to be used for the forward API usage
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases: input
+
+Required: True
+Position: 1
+Default value: None
+Accept pipeline input: True (ByPropertyName, ByValue)
+Accept wildcard characters: False
+```
 
 ### -APIKey
 -APIKey string{APIKEY}
@@ -45,24 +61,24 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: Named
+Position: 2
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -UseBetaFeatures
--UseBetaFeatures switch
-use test.onyphe.io to use new beat features of Onyphe
+### -Page
+-page string{page number}
+go directly to a specific result page (1 to 1000)
 
 ```yaml
-Type: SwitchParameter
+Type: String[]
 Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 11
-Default value: False
+Position: 3
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

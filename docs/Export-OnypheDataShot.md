@@ -24,14 +24,13 @@ Export encoded base64 jpg file from a datashot category object
 ### EXAMPLE 1
 ```
 Export all screenshots available in powershell object $temp into C:\temp folder
+C:\PS> Export-OnypheDataShot -tofolder C:\temp -inputobject $temp
 ```
-
-C:\PS\> Export-OnypheDataShot -tofolder C:\temp -inputobject $temp
 
 ## PARAMETERS
 
 ### -tofolder
-{{Fill tofolder Description}}
+{{ Fill tofolder Description }}
 
 ```yaml
 Type: Object
@@ -46,12 +45,12 @@ Accept wildcard characters: False
 ```
 
 ### -inputobject
-{{Fill inputobject Description}}
+{{ Fill inputobject Description }}
 
 ```yaml
 Type: Array
 Parameter Sets: (All)
-Aliases:
+Aliases: input
 
 Required: True
 Position: 2
@@ -61,8 +60,7 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

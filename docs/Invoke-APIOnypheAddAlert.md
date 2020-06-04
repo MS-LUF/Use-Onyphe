@@ -27,18 +27,16 @@ create several input for Invoke-OnypheAPIv2 function and then call it to add new
 ### EXAMPLE 1
 ```
 New alert based on AdvancedSearch with multiple criteria/filters
-```
-
 Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows
-C:\PS\> Invoke-APIOnypheAddAlert -AlertEmail "alert@example.com" -AlertName "My new Alert" -AdvancedSearch @("product:Apache","port:443","os:Windows") -SearchType datascan
+C:\PS> Invoke-APIOnypheAddAlert -AlertEmail "alert@example.com" -AlertName "My new Alert" -AdvancedSearch @("product:Apache","port:443","os:Windows") -SearchType datascan
+```
 
 ### EXAMPLE 2
 ```
 New alert based on simple search with one filter/criteria
-```
-
 Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
-C:\PS\> Invoke-APIOnypheAddAlert -AlertEmail "alert@example.com" -AlertName "My new Alert" -SearchValue RU -SearchType threatlist -SearchFilter country
+C:\PS> Invoke-APIOnypheAddAlert -AlertEmail "alert@example.com" -AlertName "My new Alert" -SearchValue RU -SearchType threatlist -SearchFilter country
+```
 
 ## PARAMETERS
 
@@ -75,13 +73,12 @@ Accept wildcard characters: False
 ```
 
 ### -SearchType
--SearchType STRING{Get-OnypheSearchCategories}
-Search Type or Category
+{{ Fill SearchType Description }}
 
 ```yaml
 Type: String
 Parameter Sets: (All)
-Aliases:
+Aliases: Category
 
 Required: False
 Position: 3
@@ -219,7 +216,7 @@ Accept wildcard characters: False
 ```
 
 ### -InputOnypheObject
-{{Fill InputOnypheObject Description}}
+{{ Fill InputOnypheObject Description }}
 
 ```yaml
 Type: Object
@@ -234,29 +231,13 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
 ## OUTPUTS
 
 ### TypeName : System.Management.Automation.PSCustomObject
-### Name             MemberType   Definition                                                                                                                                                                                                                                       
-### ----             ----------   ----------
-### Equals           Method       bool Equals(System.Object obj)
-### GetHashCode      Method       int GetHashCode()
-### GetType          Method       type GetType()
-### ToString         Method       string ToString()
-### cli-API_info     NoteProperty string[] cli-API_info=System.String[]
-### cli-API_input    NoteProperty string[] cli-API_input=System.String[]
-### cli-API_version  NoteProperty string cli-API_version=2
-### cli-key_required NoteProperty bool[] cli-key_required=System.Boolean[]
-### cli-Request_Date NoteProperty datetime cli-Request_Date=27/12/2019 12:24:24
-### error            NoteProperty long error=0
-### message          NoteProperty string message=Success
-### myip             NoteProperty string myip=8.8.8.8
-### status           NoteProperty string status=ok
 ## NOTES
 
 ## RELATED LINKS

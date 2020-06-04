@@ -5,39 +5,40 @@ online version:
 schema: 2.0.0
 ---
 
-# Invoke-APIOnypheSynScan
+# Invoke-APIOnypheDatascanDataMD5
 
 ## SYNOPSIS
-create several input for Invoke-OnypheAPIV2 function and then call it to get the syn scan info from synscan API
+create several input for Invoke-OnypheAPIV2 function and then call it to get info from onyphe md5 signature
 
 ## SYNTAX
 
 ```
-Invoke-APIOnypheSynScan [-IP] <String[]> [[-APIKey] <String>] [[-Page] <String[]>] [<CommonParameters>]
+Invoke-APIOnypheDatascanDataMD5 [-MD5] <String[]> [[-APIKey] <String>] [[-Page] <String[]>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-create several input for Invoke-OnypheAPIV2 function and then call it to get the syn scan info from synscan API
+create several input for Invoke-OnypheAPIV2 function and then call it to get info from onyphe md5 signature
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-get syn scan info for IP 8.8.8.8
-C:\PS> Invoke-APIOnypheSynScan -IP 8.8.8.8
+get md5 info for 7a1f20cae067b75a52bc024b83ee4667 hash
+C:\PS> Invoke-APIOnypheDatascanDataMd5 -MD5 7a1f20cae067b75a52bc024b83ee4667
 ```
 
 ### EXAMPLE 2
 ```
-get syn scan info for IP 8.8.8.8 and set the api key
-C:\PS> Invoke-APIOnypheSynScan -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+get md5 info for 7a1f20cae067b75a52bc024b83ee4667 hash and set the api key
+C:\PS> Invoke-APIOnypheDatascanDataMd5 -MD5 7a1f20cae067b75a52bc024b83ee4667 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
 ## PARAMETERS
 
-### -IP
--IP string{IP}
-IP to be used for the geoloc API usage
+### -MD5
+-MD5 string{MD5 Hash}
+MD5 to be used for the md5 API usage
 
 ```yaml
 Type: String[]

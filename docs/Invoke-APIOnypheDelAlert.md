@@ -24,16 +24,14 @@ create several input for Invoke-OnypheAPIv2 function and then call it to delete 
 ### EXAMPLE 1
 ```
 Delete Onyphe Alert with ID 0 and set api key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+C:\PS> Invoke-APIOnypheDelAlert -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -AlertID 0
 ```
-
-C:\PS\> Invoke-APIOnypheDelAlert -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -AlertID 0
 
 ### EXAMPLE 2
 ```
 Delete Onyphe Alert with ID 0
+C:\PS> Invoke-APIOnypheDelAlert -AlertID 0
 ```
-
-C:\PS\> Invoke-APIOnypheDelAlert -AlertID 0
 
 ## PARAMETERS
 
@@ -86,29 +84,13 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
 ## OUTPUTS
 
 ### TypeName : System.Management.Automation.PSCustomObject
-### Name             MemberType   Definition                                                                                                                                                                                                                                       
-### ----             ----------   ----------
-### Equals           Method       bool Equals(System.Object obj)
-### GetHashCode      Method       int GetHashCode()
-### GetType          Method       type GetType()
-### ToString         Method       string ToString()
-### cli-API_info     NoteProperty string[] cli-API_info=System.String[]
-### cli-API_input    NoteProperty string[] cli-API_input=System.String[]
-### cli-API_version  NoteProperty string cli-API_version=2
-### cli-key_required NoteProperty bool[] cli-key_required=System.Boolean[]
-### cli-Request_Date NoteProperty datetime cli-Request_Date=27/12/2019 12:22:38
-### error            NoteProperty long error=0
-### message          NoteProperty string message=Success
-### myip             NoteProperty string myip=8.8.8.8
-### status           NoteProperty string status=ok
 ## NOTES
 
 ## RELATED LINKS

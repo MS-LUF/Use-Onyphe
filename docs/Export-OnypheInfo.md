@@ -5,21 +5,22 @@ online version:
 schema: 2.0.0
 ---
 
-# Search-OnypheInfo
+# Export-OnypheInfo
 
 ## SYNOPSIS
-main function/cmdlet - Search for IP information on onyphe.io web service using search API
+main function/cmdlet - Export Search information on onyphe.io web service using search export API
 
 ## SYNTAX
 
 ```
-Search-OnypheInfo [[-SearchValue] <String>] [[-FilterValue] <String[]>] [[-AdvancedSearch] <Array>]
- [[-APIKey] <String>] [[-Page] <String[]>] [[-wait] <Int32>] [-UseBetaFeatures] [[-AdvancedFilter] <Array>]
- -SearchType <String> [-SearchFilter <String>] [-FilterFunction <String>] [<CommonParameters>]
+Export-OnypheInfo [[-SearchValue] <String>] [[-FilterValue] <String[]>] [[-AdvancedSearch] <Array>]
+ [[-APIKey] <String>] [[-wait] <Int32>] [-UseBetaFeatures] [[-AdvancedFilter] <Array>]
+ [-SaveInfoAsFile] <String> -SearchType <String> [-SearchFilter <String>] [-FilterFunction <String>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-main function/cmdlet - Search for IP information on onyphe.io web service using search API
+main function/cmdlet - Export Search information on onyphe.io web service using search export API
 send HTTP request to onyphe.io web service and convert back JSON information to a powershell custom object
 
 ## EXAMPLES
@@ -27,48 +28,41 @@ send HTTP request to onyphe.io web service and convert back JSON information to 
 ### EXAMPLE 1
 ```
 AdvancedSearch with multiple criteria/filters
-Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows
-C:\PS> Search-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan
+Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows and export data to myexport.json
+C:\PS> Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan .\myexport.json
 ```
 
 ### EXAMPLE 2
 ```
 simple search with one filter/criteria
-Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
-C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country
+Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and export data to myexport.json
+C:\PS> Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country .\myexport.json
 ```
 
 ### EXAMPLE 3
 ```
 AdvancedSearch with multiple criteria/filters and set the API key
-Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows
-C:\PS> Search-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows and export data to myexport.json
+C:\PS> Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -SaveInfoAsFile .\myexport.json
 ```
 
 ### EXAMPLE 4
 ```
-simple search with one filter/criteria and request page 2 of the results
-Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
-C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -page "2"
+simple search with one filter/criteria and use a server filter to retrieve only objects indexed since 2 month
+Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and export data to myexport.json
+C:\PS> Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2" .\myexport.json
 ```
 
 ### EXAMPLE 5
 ```
-simple search with one filter/criteria and use a server filter to retrieve only objects indexed since 2 month
-Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
-C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2"
+filter the result and show me only the answer with os property not null for threatlist category for all Russia  and export data to myexport.json
+C:\PS> Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os .\myexport.json
 ```
 
 ### EXAMPLE 6
 ```
-filter the result and show me only the answer with os property not null for threatlist category for all Russia
-C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os
-```
-
-### EXAMPLE 7
-```
-filter the results using multiple filters (only os property known and from all organization like *company*) for tcp port 3389 opened in russia
-C:\PS> search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan
+filter the results using multiple filters (only os property known and from all organization like *company*) for tcp port 3389 opened in russia  and export data to myexport.json
+C:\PS> Export-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan .\myexport.json
 ```
 
 ## PARAMETERS
@@ -137,23 +131,6 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Page
--page string{page number}
-go directly to a specific result page (1 to 1000)
-you can set a list of page using x-y like 1-100 to read the first 100 pages
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 10
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -wait
 -Wait int{second}
 wait for x second before sending the request to manage rate limiting restriction
@@ -180,7 +157,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 11
+Position: 10
 Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -196,6 +173,22 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
+Position: 11
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -SaveInfoAsFile
+-SaveInfoAsFile string
+full path to file where json data will be exported.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
 Position: 12
 Default value: None
 Accept pipeline input: False

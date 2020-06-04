@@ -1,5 +1,5 @@
 ---
-external help file: Use-Onyphe-help.xml
+external help file: use-onyphe-help.xml
 Module Name: Use-Onyphe
 online version:
 schema: 2.0.0
@@ -13,9 +13,9 @@ schema: 2.0.0
 ## SYNTAX
 
 ```
-Invoke-OnypheAPIV2 [-request] <String[]> [[-data] <String[]>] [[-Method] <String>] [-APIInfo] <String[]>
- [-APIInput] <String[]> [-APIKeyrequired] <Boolean> [[-page] <String[]>] [-UseBetaFeatures]
- [<CommonParameters>]
+Invoke-OnypheAPIV2 [-request] <String[]> [[-data] <String[]>] [-file <String>] [[-Method] <String>]
+ [-APIInfo] <String[]> [-APIInput] <String[]> [-APIKeyrequired] <Boolean> [[-page] <String[]>]
+ [-UseBetaFeatures] [-Stream] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -24,7 +24,7 @@ Invoke-OnypheAPIV2 [-request] <String[]> [[-data] <String[]>] [[-Method] <String
 ## EXAMPLES
 
 ### Example 1
-```powershell
+```
 PS C:\> {{ Add example code here }}
 ```
 
@@ -103,7 +103,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -153,14 +153,42 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -file
+{{ Fill file Description }}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Stream
+{{ Fill Stream Description }}
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
 ### None
-
 ## OUTPUTS
 
 ### System.Object

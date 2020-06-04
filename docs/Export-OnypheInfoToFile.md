@@ -29,16 +29,14 @@ to be investigated.
 ### EXAMPLE 1
 ```
 Exporting onyphe results containing into $onypheresult object to flat files in folder C:\temp
+C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -inputobject $onypheresult
 ```
-
-C:\PS\> Export-OnypheInfoToFile -tofolder C:\temp -inputobject $onypheresult
 
 ### EXAMPLE 2
 ```
 Exporting onyphe results containing into $onypheresult object to flat files in folder C:\temp using ',' as csv separator
+C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -inputobject $onypheresult -csvdelimiter ","
 ```
-
-C:\PS\> Export-OnypheInfoToFile -tofolder C:\temp -inputobject $onypheresult -csvdelimiter ","
 
 ## PARAMETERS
 
@@ -92,8 +90,7 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

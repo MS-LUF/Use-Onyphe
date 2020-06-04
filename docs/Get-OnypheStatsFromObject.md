@@ -30,7 +30,7 @@ import-module use-onyphe.psm1
 ## PARAMETERS
 
 ### -inputobject
-{{Fill inputobject Description}}
+{{ Fill inputobject Description }}
 
 ```yaml
 Type: Array
@@ -45,7 +45,7 @@ Accept wildcard characters: False
 ```
 
 ### -AdvancedFacets
-{{Fill AdvancedFacets Description}}
+{{ Fill AdvancedFacets Description }}
 
 ```yaml
 Type: Array
@@ -60,7 +60,7 @@ Accept wildcard characters: False
 ```
 
 ### -Facets
-{{Fill Facets Description}}
+{{ Fill Facets Description }}
 
 ```yaml
 Type: String
@@ -75,8 +75,7 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

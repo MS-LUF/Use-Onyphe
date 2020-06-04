@@ -24,9 +24,8 @@ Get facets available for stats on local Onyphe PS Object
 ### EXAMPLE 1
 ```
 Get facets available for stats on local Onyphe PS Object
+C:\PS> Get-OnypheCliFacets
 ```
-
-C:\PS\> Get-OnypheCliFacets
 
 ## PARAMETERS
 
