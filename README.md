@@ -12,11 +12,15 @@ More info about available APIs :
 https://www.onyphe.io/documentation/api
 
 (c) 2018-2020 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
+## Notes version (1.1) - last public version :
+ - add new APIv2, migrate from APIv1 to full APIv2 (except bulk API that will be provided in 1.2)
+   - sample csv files are updated to take into account new API and new api naming convention, please check them and update your current CSV file using the new templates.
+ - remove temporary fix for empty array in APIv2
+ - update deserialization of psobject
 
 ## Notes version (1.00) :
  - fix rate limiting issue on paging
  - manage new API in Export-OnypheInfoToFile
-
 ## Notes version (0.99) :
  - replace $env:appdata with $home for Linux and Powershell Core compatibility
  - create new function to request APIv2 (Invoke-OnypheAPIV2) and managing api key as new header etc...
@@ -63,7 +67,7 @@ https://www.onyphe.io/documentation/api
 - add paging feature on search and info functions
 
 ## How-to
-a new how-to is now available here : https://github.com/MS-LUF/Use-Onyphe/blob/master/Howto.md
+an updated how-to is now available here : https://github.com/MS-LUF/Use-Onyphe/blob/master/Howto.md
 
 ## install use-onyphe from PowerShell Gallery repository
 You can easily install it from powershell gallery repository
@@ -89,39 +93,48 @@ using a simple powershell command and an internet access :-)
 documentation in markdown available here : https://github.com/MS-LUF/Use-Onyphe/tree/master/docs
 ### function
 - Export-OnypheDataShot
+- Export-OnypheInfo
 - Export-OnypheInfoToFile
 - Get-OnypheAlertInfo
-- Get-OnypheAPIName
 - Get-OnypheCliFacets
 - Get-OnypheInfo
 - Get-OnypheInfoFromCSV
 - Get-OnypheSearchCategories
 - Get-OnypheSearchFilters
 - Get-OnypheSearchFunctions
+- Get-OnypheSimpleAPIName
 - Get-OnypheStatsFromObject
+- Get-OnypheSummary
+- Get-OnypheSummaryAPIName
 - Get-OnypheUserInfo
 - Get-ScriptDirectory
 - Import-OnypheEncryptedIKey
 - Invoke-APIOnypheAddAlert
 - Invoke-APIOnypheCtl
 - Invoke-APIOnypheDataScan
+- Invoke-APIOnypheDatascanDataMD5
+- Invoke-APIOnypheDataShot
 - Invoke-APIOnypheDelAlert
-- Invoke-APIOnypheForward
+- Invoke-APIOnypheExport
 - Invoke-APIOnypheGeoloc
 - Invoke-APIOnypheInetnum
-- Invoke-APIOnypheIP
 - Invoke-APIOnypheListAlert
-- Invoke-APIOnypheMD5
-- Invoke-APIOnypheMyIP
 - Invoke-APIOnypheOnionScan
+- Invoke-APIOnypheOnionShot
 - Invoke-APIOnyphePastries
-- Invoke-APIOnypheReverse
+- Invoke-APIOnypheResolver
+- Invoke-APIOnypheResolverForward
+- Invoke-APIOnypheResolverReverse
 - Invoke-APIOnypheSearch
 - Invoke-APIOnypheSniffer
 - Invoke-APIOnypheSynScan
 - Invoke-APIOnypheThreatlist
+- Invoke-APIOnypheTopSite
 - Invoke-APIOnypheUser
-- Invoke-OnypheAPIV1
+- Invoke-APIOnypheVulnscan
+- Invoke-APISummaryOnypheDomain
+- Invoke-APISummaryOnypheHostname
+- Invoke-APISummaryOnypheIP
 - Invoke-OnypheAPIV2
 - Search-OnypheInfo
 - Set-OnypheAlertInfo
@@ -129,6 +142,7 @@ documentation in markdown available here : https://github.com/MS-LUF/Use-Onyphe/
 - Set-OnypheProxy
 - Update-OnypheFacetsFilters
 ### alias
+- Export-Onyphe
 - Get-Onyphe
 - Get-OnypheAlert
 - Get-OnypheFromCSV

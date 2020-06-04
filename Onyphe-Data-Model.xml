@@ -13,39 +13,46 @@
           <T>System.Object</T>
         </TN>
         <LST>
-          <S>/api/ctl</S>
-          <S>/api/datascan</S>
-          <S>/api/forward</S>
-          <S>/api/geoloc</S>
-          <S>/api/inetnum</S>
-          <S>/api/ip</S>
-          <S>/api/md5</S>
-          <S>/api/myip</S>
-          <S>/api/onionscan</S>
-          <S>/api/pastries</S>
-          <S>/api/resolver</S>
-          <S>/api/reverse</S>
-          <S>/api/search/ctl</S>
-          <S>/api/search/datascan</S>
-          <S>/api/search/datashot</S>
-          <S>/api/search/geoloc</S>
-          <S>/api/search/inetnum</S>
-          <S>/api/search/onionscan</S>
-          <S>/api/search/onionshot</S>
-          <S>/api/search/pastries</S>
-          <S>/api/search/resolver</S>
-          <S>/api/search/sniffer</S>
-          <S>/api/search/synscan</S>
-          <S>/api/search/threatlist</S>
-          <S>/api/search/topsite</S>
-          <S>/api/search/vulnscan</S>
-          <S>/api/sniffer</S>
-          <S>/api/synscan</S>
-          <S>/api/threatlist</S>
-          <S>/api/user</S>
-          <S>/api/v2/alert/add</S>
-          <S>/api/v2/alert/del</S>
-          <S>/api/v2/alert/list</S>
+          <S>user</S>
+          <S>simple/ctl</S>
+          <S>simple/datascan</S>
+          <S>simple/geoloc</S>
+          <S>simple/inetnum</S>
+          <S>simple/pastries</S>
+          <S>simple/resolver</S>
+          <S>simple/sniffer</S>
+          <S>simple/synscan</S>
+          <S>simple/threatlist</S>
+          <S>simple/datascan/datamd5</S>
+          <S>simple/resolver/reverse</S>
+          <S>simple/resolver/forward</S>
+          <S>simple/datashot</S>
+          <S>simple/onionscan</S>
+          <S>simple/onionshot</S>
+          <S>simple/topsite</S>
+          <S>search</S>
+          <S>search/ctl</S>
+          <S>search/datascan</S>
+          <S>search/geoloc</S>
+          <S>search/inetnum</S>
+          <S>search/pastries</S>
+          <S>search/resolver</S>
+          <S>search/sniffer</S>
+          <S>search/synscan</S>
+          <S>search/threatlist</S>
+          <S>search/datashot</S>
+          <S>search/onionscan</S>
+          <S>search/onionshot</S>
+          <S>search/topsite</S>
+          <S>alert/list</S>
+          <S>alert/add</S>
+          <S>alert/del</S>
+          <S>search/vulnscan</S>
+          <S>summary/ip</S>
+          <S>summary/domain</S>
+          <S>summary/hostname</S>
+          <S>export</S>
+          <S>simple/vulnscan</S>
         </LST>
       </Obj>
       <Obj N="filters" RefId="2">
@@ -62,6 +69,7 @@
           <S>app.extract.hostname</S>
           <S>app.extract.ip</S>
           <S>app.extract.url</S>
+          <S>app.ftp.anonymous</S>
           <S>app.http.bodymd5</S>
           <S>app.http.component.product</S>
           <S>app.http.component.productvendor</S>
@@ -87,6 +95,7 @@
           <S>app.modbus.productvendor</S>
           <S>app.modbus.productversion</S>
           <S>app.modbus.productversionpatch</S>
+          <S>app.mongodb.database</S>
           <S>app.mongodb.name</S>
           <S>app.ntp.leap</S>
           <S>app.ntp.mode</S>
@@ -99,9 +108,11 @@
           <S>app.smb.nullsession</S>
           <S>app.smb.servername</S>
           <S>app.smb.share</S>
+          <S>app.smb.version</S>
           <S>app.smb.workgroup</S>
           <S>app.snmp.community</S>
           <S>app.snmp.sysdescr</S>
+          <S>app.telnet.fingerprint</S>
           <S>app.vnc.authentication</S>
           <S>app.vnc.desktopname</S>
           <S>app.vnc.screensize</S>
@@ -130,8 +141,10 @@
           <S>information</S>
           <S>ip</S>
           <S>ipv6</S>
+          <S>issuer.city</S>
           <S>issuer.commonname</S>
           <S>issuer.country</S>
+          <S>issuer.email</S>
           <S>issuer.organization</S>
           <S>issuer.organizationalunit</S>
           <S>issuer.serial</S>
@@ -169,12 +182,16 @@
           <S>status</S>
           <S>subdomains</S>
           <S>subject.altname</S>
-          <S>subject.country</S>
+          <S>subject.city</S>
           <S>subject.commonname</S>
+          <S>subject.country</S>
+          <S>subject.email</S>
           <S>subject.organization</S>
           <S>subject.organizationalunit</S>
           <S>subject.serial</S>
           <S>subnet</S>
+          <S>summary</S>
+          <S>summarymd5</S>
           <S>syntax</S>
           <S>threatlist</S>
           <S>title</S>
@@ -207,13 +224,15 @@
       <Obj N="functions" RefId="3">
         <TNRef RefId="1" />
         <LST>
-          <S>-hourago</S>
           <S>-dayago</S>
-          <S>-weekago</S>
-          <S>-monthago</S>
           <S>-exists</S>
-          <S>-wildcard</S>
           <S>-fields</S>
+          <S>-hourago</S>
+          <S>-monthago</S>
+          <S>-notexists</S>
+          <S>-sort</S>
+          <S>-weekago</S>
+          <S>-wildcard</S>
         </LST>
       </Obj>
     </MS>

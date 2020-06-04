@@ -3,7 +3,7 @@
 # Use-Onyphe - How-To
 
 ## ChangeLog
-This documentation has been updated to take into account **new features available with v0.99 including new Alerting APIs**. Enjoy your Onyphe stuff with Power[Shell](Of Love)
+This documentation has been updated to take into account **new features available with v1.1 including new new v2 APIs**. Enjoy your Onyphe stuff with Power[Shell](Of Love)
 
 ## Intro Onyphe
 Onyphe.io provides data about IP address space and publicly available information in just one place.
@@ -19,8 +19,8 @@ https://www.onyphe.io/documentation/api
 ## APIs v1 and v2
 Since a few weeks now, new APIs are available in "v2". Main differences between v1 and v2 APIs are :
 - V1 : accept only GET requests, all inputs must be managed as dedicated parameters (including API Key)
+  - Notes : APIv1 are now deprecated and have been removed from Onyphe. APIv1 are also removed from the PowerShell Module provided.
 - V2 : accept GET and POST requests (using JSON formatted body for POST), API key must be provided as a HTTP Header. No paging for now.
-To manage separated evolutions of V1 and V2 APIs, I am using also 2 different functions (Invoke-OnypheAPIV1, Invoke-OnypheAPIV2)
 
 ## Intro Use-Onyphe
 Use-Onyphe is a free PowerShell module that you can use to simply request Onyphe APIs from a Powershell prompt or script (including PowerShell Core)
@@ -80,9 +80,9 @@ sample output :
 ```
 For the rest, each key of the json output is converted into a powershell object property. the type of the property could be a string,integer,array,hash table
 
-object example for request Get-OnypheInfo -searchvalue 9.9.9.9 (all info available for IP 9.9.9.9) :
+object example for request Get-OnypheSummary -SummaryAPIType ip -searchvalue 9.9.9.9 (all info available for IP 9.9.9.9) :
 ```
-    C:\PS>Get-OnypheInfo -searchvalue 9.9.9.9 -searchtype ip
+    C:\PS> Get-OnypheSummary -SummaryAPIType ip -searchvalue 9.9.9.9
 
     count            : 41
     error            : 0
@@ -105,7 +105,7 @@ object example for request Get-OnypheInfo -searchvalue 9.9.9.9 (all info availab
 ```
 all the results are hosted in the property "results", to open it directly :
 ```
-    C:\PS>(Get-OnypheInfo -searchvalue 9.9.9.9 -searchtype ip).results
+    C:\PS>(Get-OnypheSummary -SummaryAPIType ip -searchvalue 9.9.9.9).results
 
     ...(last 3 entries)
     @category    : datascan
@@ -149,7 +149,7 @@ all the results are hosted in the property "results", to open it directly :
 ```
 If you look at the type of "results" property you will see it's basically an array of other powershell objects
 ```
-    C:\PS>(Get-OnypheInfo -searchvalue 9.9.9.9 -searchtype ip).results | get-member
+    C:\PS>(Get-OnypheSummary -SummaryAPIType ip -searchvalue 9.9.9.9).results | get-member
 
     TypeName : System.Management.Automation.PSCustomObject
 
@@ -179,177 +179,221 @@ If you look at the type of "results" property you will see it's basically an arr
 you can pipe data to functions :-)
 for instance Get-OnypheInfo function will accept string as input for IP parameter
 ```
-    C:\PS>"9.9.9.9" | Get-OnypheInfo -searchtype ip
+    C:\PS> "9.9.9.9" | Get-OnypheSummary -SummaryAPIType ip
 ```
 Search-OnypheInfo function will accept string as input for SearchValue parameter
 ```
-    C:\PS>"OVH SAS" | Search-OnypheInfo -SearchFilter organization -SearchType inetnum
+    C:\PS> "OVH SAS" | Search-OnypheInfo -SearchFilter organization -Category inetnum
 ```
 you can use the "verbose" parameter to show several useful information (like full url requested etc...)
 ```
-    C:\PS>"9.9.9.9" | -searchtype ip -verbose
+    C:\PS> "9.9.9.9" | Get-OnypheSummary -SummaryAPIType ip -verbose
 ```
 sample command line output :
 ```
-    URL Info : ip/9.9.9.9
-    GET https://www.onyphe.io/api/ip/9.9.9.9?apikey=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx with 0-byte payload
-    received 9073-byte response of content type application/json;charset=UTF-8
+    VERBOSE: URL Info : v2/summary/ip/9.9.9.9
+    VERBOSE: using production Onyphe service - https://www.onyphe.io
+    VERBOSE: Request Headers :
+    Name                           Value
+    ----                           -----
+    Authorization                  apikey xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+    VERBOSE: GET https://www.onyphe.io/api/v2/summary/ip/9.9.9.9 with 0-byte payload
+    VERBOSE: received 14999-byte response of content type application/json
+    VERBOSE: Response Headers :
+    Key            Value
+    ---            -----
+    Server         {nginx}
+    Date           {Wed, 03 Jun 2020 21:06:56 GMT}
+    Connection     {keep-alive}
+    Content-Type   {application/json; charset=UTF-8}
+    Content-Length {14999}
 ```
 if you don't want to store your API key and don't set it as global variable, you can use the parameter "APIKey" followed by your APIkey protected with double quotes on the main functions :
 ```
-    C:\PS>Get-OnypheInfo -searchtype ip -searchvalue "9.9.9.9" -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    C:\PS> Get-OnypheSummary -SummaryAPIType ip -searchvalue 9.9.9.9 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
 ## Help on cmdlets / functions
 Get-help is available on all functions, for instance, if you want to consult the help section of Get-OnypheInfo (input, output, description and examples are available)
 ```
-    C:\PS>Get-Help Get-OnypheInfo -full
+    C:\PS> Get-Help Get-OnypheInfo -full
 ```
 
 ## Using Use-Onyphe to use onyphe.io APIs
-5 main functions / cmdlets will be used : 
- - Get-OnypheInfo (or Get-Onyphe) to use Myip,geoloc,ip,inetnum,threatlist,pastries,synscan,datascan,reverse,forward APIs
- - Search-OnypheInfo (or Search-Onyphe) to use all search APIs. Last but not least
+5 main functions / cmdlets will be used :
+ - Get-OnypheSummary to use all v2/summary APIs ip,domain,hostname
+   - These APIs can be used to retrieve all objects linked to an IP, a domain or an hostame (all categories are sent back from summary API) 
+ - Get-OnypheInfo (or Get-Onyphe) to use all v2/simple APIs ctl,datascan,geoloc,inetnum,pastries,resolver,sniffer,synscan,threatlist,datashot,onionscan,onionshot,topsite,vulnscan,resolver/reverse,resolver/forward,datascan/datamd5
+   - These APIs are the 'standard' APIs and object category sent back are limited to API type in use (ctl category object for ctl API etc...)
+ - Search-OnypheInfo (or Search-Onyphe) to make some complex and powerfull request in all Onyphe database
+   - all category types can be retrieved depending on the query used for the search request
  - Get-OnypheUserInfo will be used to follow your API key / user account (user API)
  - Get-OnypheAlertInfo (or Get-OnpyheAlert) to list your alerts using v2/alert/list API
  - Set-OnypheAlertInfo (or Set-OnypheAlert) to create and delete alerts using v2/alert/add or v2/alert/del APIs
+ - Export-OnypheInfo (or Export-Onyphe) to download json file from Onyphe database for a search request
  
 Find hereunder several use cases for all API examples documented on https://www.onyphe.io/documentation/api
 
-API MyIP : return your client public IP address
+API V2/simple/geoloc : Return geolocation * information for the given IPv{4,6} address
 ```
-    C:\PS>Get-OnypheInfo -MyIP
+    C:\PS> Get-OnypheInfo -Searchvalue 9.9.9.9 -Category Geoloc
 ```
-API Geoloc : Return geolocation * information for the given IPv{4,6} address
+API V2/user : Return information about your user account
 ```
-    C:\PS>Get-OnypheInfo -Searchvalue 9.9.9.9 -searchtype Geoloc
+    C:\PS> Get-OnypheUserInfo
 ```
-API User : Return information about your user account
+API V2/summary/ip : Return a summary of all information (all category) available for an IP
 ```
-    C:\PS>Get-OnypheUserInfo
+    C:\PS> Get-OnypheSummary -SummaryAPIType ip -searchvalue 9.9.9.9
 ```
-API IP : Return a summary of all information
+API V2/summary/domain : Return a summary of all information (all category) available for an internet domain
 ```
-    C:\PS>Get-OnypheInfo -searchtype ip -searchvalue 93.184.216.34
+    C:\PS> Get-OnypheSummary -SummaryAPIType domain -searchvalue perdu.com
 ```
-API Inetnum : Return inetnum information
+API V2/summary/hostname : Return a summary of all information (all category) available for an internet hostname
 ```
-    C:\PS>Get-OnypheInfo -searchvalue 93.184.208.1 -searchtype Inetnum
+    C:\PS> Get-OnypheSummary -SummaryAPIType hostname -searchvalue www.perdu.com
 ```
-API Threatlist : Return threatlist information
+API V2/simple/inetnum : Return inetnum information
 ```
-    C:\PS>Get-OnypheInfo -searchvalue 206.81.18.195 -searchtype threatlist
+    C:\PS> Get-OnypheInfo -searchvalue 93.184.208.1 -SimpleAPIType Inetnum
 ```
-API Pastries : Return pastries information
+API V2/simple/topsite : Return topsite information
 ```
-    C:\PS>Get-OnypheInfo -searchvalue 93.184.216.34 -searchtype pastries
+    C:\PS> Get-OnypheInfo -searchvalue 9.9.9.9 -SimpleAPIType topsite
 ```
-API Synscan : Return synscan information
+API V2/simple/vulnscan : Return vulnscan information (CVE detected / exploited on a host)
 ```
-    C:\PS>Get-OnypheInfo -searchvalue 107.164.81.7 -searchtype SynScan
+    C:\PS> Get-OnypheInfo -searchvalue 194.177.55.67 -SimpleAPIType vulnscan
 ```
-API Datascan : Return datascan information
+API V2/simple/threatlist : Return threatlist information
 ```
-    C:\PS>Get-OnypheInfo -searchvalue 107.164.81.7 -searchtype DataScan
+    C:\PS> Get-OnypheInfo -searchvalue 206.81.18.195 -SimpleAPIType threatlist
 ```
+API V2/simple/pastries : Return pastries information
 ```
-    C:\PS>Get-OnypheInfo -searchvalue IIS -searchtype DataScan
+    C:\PS> Get-OnypheInfo -searchvalue 93.184.216.34 -SimpleAPIType pastries
 ```
-API Reverse : Return reverse information
+API V2/simple/synscan : Return synscan information
 ```
-    C:\PS>Get-OnypheInfo -searchvalue 182.59.164.193 -searchtype Reverse
+    C:\PS> Get-OnypheInfo -searchvalue 107.164.81.7 -SimpleAPIType SynScan
 ```
-API Forward : Return forward information
+API V2/simple/datascan : Return datascan information
 ```
-    C:\PS>Get-OnypheInfo -searchvalue 2.22.52.73 -searchtype Reverse
-```
-API sniffer : Return ip history information
-```
-    C:\PS>Get-OnypheInfo -searchvalue 8.8.8.8 -searchtype sniffer
-```
-API onionscan : Return information about an onion url
-```
-    C:\PS>Get-OnypheInfo -searchvalue mh7mkfvezts5j6yu.onion -searchtype onionscan
-```
-API ctl : return information about SSL/TLS certificates related to a domain or fqn
-```
-    C:\PS>Get-OnypheInfo -searchvalue fnac.com -searchtype ctl
-```
-API md5 : return information on a onyphe md5 pattern / signature (SSH version...)
-```
-    C:\PS>Get-OnypheInfo -searchvalue 7a1f20cae067b75a52bc024b83ee4667 -searchtype md5
-```
-API Search/DataScan : Return datascan information
-```
-    C:\PS>Search-OnypheInfo -AdvancedSearch @('product:Apache','port:443','os:Windows') -SearchType datascan
+    C:\PS> Get-OnypheInfo -searchvalue 107.164.81.7 -SimpleAPIType DataScan
 ```
 ```
-    C:\PS>Search-OnypheInfo -SearchValue Windows -SearchFilter os -SearchType datascan
+    C:\PS> Get-OnypheInfo -searchvalue IIS -SimpleAPIType DataScan
 ```
-API Search/Synscan : Return synscan information
+API V2/simple/resolver/reverse : Return resolver/dns information
 ```
-    C:\PS>Search-OnypheInfo -AdvancedSearch @('country:FR','port:23','os:Linux') -SearchType synscan
+    C:\PS> Get-OnypheInfo -searchvalue 9.9.9.9 -SimpleAPIType resolver
+```
+API V2/simple/resolver/reverse : Return reverse information
+```
+    C:\PS> Get-OnypheInfo -searchvalue 182.59.164.193 -SimpleAPIType resolverreverse
+```
+API V2/simple/resolver/forward : Return forward information
+```
+    C:\PS> Get-OnypheInfo -searchvalue 2.22.52.73 -SimpleAPIType resolverforward
+```
+API V2/simple/sniffer : Return ip history information
+```
+    C:\PS> Get-OnypheInfo -searchvalue 8.8.8.8 -SimpleAPIType sniffer
+```
+API V2/simple/onionscan : Return information about an onion url
+```
+    C:\PS> Get-OnypheInfo -searchvalue mh7mkfvezts5j6yu.onion -SimpleAPIType onionscan
+```
+API V2/simple/ctl : return information about SSL/TLS certificates related to a domain or fqdn
+```
+    C:\PS> Get-OnypheInfo -searchvalue fnac.com -SimpleAPIType ctl
+```
+API V2/simple/datashot : return screenshot get from graphical protocol for an ip
+```
+    C:\PS> Get-OnypheInfo -searchvalue 80.11.245.174 -SimpleAPIType datashot
+```
+API V2/simple/datascan/datamd5 : return information on a onyphe md5 pattern / signature (SSH version...)
+```
+    C:\PS> Get-OnypheInfo -searchvalue 7a1f20cae067b75a52bc024b83ee4667 -SimpleAPIType datascandatamd5
+```
+API V2/Search : Return datascan information
+```
+    C:\PS> Search-OnypheInfo -AdvancedSearch @('product:Apache','port:443','os:Windows') -Category datascan
 ```
 ```
-    C:\PS>Search-OnypheInfo -SearchValue 23 -SearchFilter port -SearchType synscan
+    C:\PS> Search-OnypheInfo -SearchValue Windows -SearchFilter os -Category datascan
 ```
-API Search/Inetnum : Return inetnum information
+API V2/Search : Return synscan information
 ```
-    C:\PS>Search-OnypheInfo -SearchValue "OVH SAS" -SearchFilter organization -SearchType inetnum
+    C:\PS> Search-OnypheInfo -AdvancedSearch @('country:FR','port:23','os:Linux') -Category synscan
 ```
-API Search/Threatlist : Return threatlist information
 ```
-    C:\PS>Search-OnypheInfo -SearchValue RU -SearchFilter country -SearchType threatlist
+    C:\PS> Search-OnypheInfo -SearchValue 23 -SearchFilter port -Category synscan
 ```
-API Search/pastries : Return pastries information
+API V2/Search : Return inetnum information
 ```
-    C:\PS>Search-OnypheInfo -SearchValue "195.29.70.0/24" -SearchFilter ip -SearchType pastries
+    C:\PS> Search-OnypheInfo -SearchValue "OVH SAS" -SearchFilter organization -Category inetnum
 ```
-API Search/Resolver : Return resolver information
+API V2/Search : Return threatlist information
 ```
-    C:\PS>Search-OnypheInfo -SearchValue "124.108.0.0/16" -SearchFilter ip -SearchType resolver
+    C:\PS> Search-OnypheInfo -SearchValue RU -SearchFilter country -Category threatlist
 ```
-API Search/sniffer : Return sniffer information
+API V2/Search : Return pastries information
 ```
-    C:\PS>Search-OnypheInfo -SearchValue "14.164.0.0/14" -SearchFilter ip -SearchType sniffer
+    C:\PS> Search-OnypheInfo -SearchValue "195.29.70.0/24" -SearchFilter ip -Category pastries
 ```
-API Search/onionscan : Return onionscan information
+API V2/Search : Return resolver information
 ```
-    C:\PS>Search-OnypheInfo -SearchValue market -SearchFilter data -SearchType onionscan
+    C:\PS> Search-OnypheInfo -SearchValue "124.108.0.0/16" -SearchFilter ip -Category resolver
 ```
-API Search/ctl : Return ctl information
+API V2/Search : Return sniffer information
 ```
-    C:\PS>Search-OnypheInfo -SearchValue vpn -SearchFilter host -SearchType ctl
+    C:\PS> Search-OnypheInfo -SearchValue "14.164.0.0/14" -SearchFilter ip -Category sniffer
 ```
-API Search/datashot : Return datashot information
+API V2/Search : Return onionscan information
 ```
-    C:\PS>Search-OnypheInfo -SearchValue rdp -SearchFilter protocol -SearchType datashot
+    C:\PS> Search-OnypheInfo -SearchValue market -SearchFilter data -Category onionscan
 ```
-API Search/vulnscan : Return vulnerability found on internet asset
+API V2/Search : Return ctl information
 ```
-    C:\PS>Search-OnypheInfo -SearchValue CVE-2019-19781 -SearchFilter cve -SearchType vulnscan
+    C:\PS> Search-OnypheInfo -SearchValue vpn -SearchFilter host -Category ctl
 ```
-API Search/topsite : Return information about a toplist like Alexa (https://www.alexa.com/topsites)
+API V2/Search : Return datashot information
 ```
-    C:\PS>Search-OnypheInfo -SearchValue fr -SearchFilter country -SearchType topsite
+    C:\PS> Search-OnypheInfo -SearchValue rdp -SearchFilter protocol -Category datashot
+```
+API V2/Search : Return vulnerability found on internet asset
+```
+    C:\PS> Search-OnypheInfo -SearchValue CVE-2019-19781 -SearchFilter cve -Category vulnscan
+```
+API V2/Search : Return topsite information
+```
+    C:\PS> Search-OnypheInfo -SearchValue fr -SearchFilter country -Category topsite
 ```
 API V2/Alert/List : List your account alerts already set
 ```
-    C:\PS>Get-OnypheAlert
+    C:\PS> Get-OnypheAlert
 ```
 ```
-    C:\PS>Get-OnypheAlert -SearchValue "jeanclaude.dusse@lesbronzesfontdusk.io" -SearchOperator eq -SearchFilter email
+    C:\PS> Get-OnypheAlert -SearchValue "jeanclaude.dusse@lesbronzesfontdusk.io" -SearchOperator eq -SearchFilter email
 ```
 API V2/Alert/Add : Define a new alert for your account
 ```
-    C:\PS>Set-OnypheAlert -AdvancedSearch @("product:Apache","port:443","os:Windows") -SearchType datascan -AlertAction new -AlertName "windows apache" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"
+    C:\PS> Set-OnypheAlert -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -AlertAction new -AlertName "windows apache" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"
 ```
 ```
-    C:\PS>Set-OnypheAlert -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
+    C:\PS> Set-OnypheAlert -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
 ```
 API V2/Alert/Del : Remove an existing alert from your account
 ```
-    C:\PS>Set-OnypheAlert -AlertAction delete -AlertName "windows apache"
+    C:\PS> Set-OnypheAlert -AlertAction delete -AlertName "windows apache"
+```
+API v2/export : Export search results to file
+```
+    C:\PS> Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -SaveInfoAsFile .\myexport.json
 ```
 
 ## E-mail alerting system
@@ -363,11 +407,11 @@ The parameters are quite the same compared to the Search-Onyphe function. It mea
 Here are several samples to help you understand how it works ;-)
 Create a "simple" alert named "from Paris with love" when a new french IP has been added to Onyphe threatlist (new daily info) and sent back the alert to "jeanclaude.dusse@lesbronzesfontdusk.io"
 ```
-    C:\PS>Set-OnypheAlert -SearchValue FR -SearchType threatlist -SearchFilter country -FilterFunction dayago -FilterValue 0 -AlertAction new -AlertName "from Paris with love" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"
+    C:\PS>Set-OnypheAlert -SearchValue FR -Category threatlist -SearchFilter country -FilterFunction dayago -FilterValue 0 -AlertAction new -AlertName "from Paris with love" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"
 ```
 Create an advanced alert named "FR RDP" when a new IP has been tagged for an open MS-RDP port, in France, from an organization named like *company*, with an available OS property (since the last 2 month) and sent back the alert to "robert.lespinasse@lesbronzesfontdusk.io"
 ```
-    C:\PS> Set-OnypheAlert -AdvancedFilter @("wildcard:organization,*company*","exists:os","monthago:2") -AdvancedSearch @("country:FR","port:3389") -SearchType datascan -AlertAction new -AlertName "FR RDP" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
+    C:\PS> Set-OnypheAlert -AdvancedFilter @("wildcard:organization,*company*","exists:os","monthago:2") -AdvancedSearch @("country:FR","port:3389") -Category datascan -AlertAction new -AlertName "FR RDP" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
 ```
 Delete an existing alert named "FR RDP"
 ```
@@ -386,15 +430,15 @@ Note : default value for SearchFilter parameter is "name"
 ```
 ## Paging and Results
 by default 10 results are available in on object. if you have more than 10 results available, you can consult them ten by ten using pages.
-for instance the following request "Search-OnypheInfo -SearchValue "OVH SAS" -SearchFilter organization -SearchType inetnum" will send back a powershell object with the properties "max_page" to 1000.
+for instance the following request "Search-OnypheInfo -SearchValue "OVH SAS" -SearchFilter organization -category inetnum" will send back a powershell object with the properties "max_page" to 1000.
 by default, the object will embbed the first 10 results available on the first page. to consult the page 2 containing the next 10 results, you can use the property "page" :
 ```
-    C:\PS>Search-OnypheInfo -SearchValue "OVH SAS" -SearchFilter organization -SearchType inetnum -page 2
+    C:\PS> Search-OnypheInfo -SearchValue "OVH SAS" -SearchFilter organization -Category inetnum -page 2
 ```
 You will see that the property "page" will switch to "2" and the "results" properties will be updated with the next 10 results.
 if you want to retrieve all the pages, you can specify first and last page separated with - using page parameter :
 ```
-    C:\PS>Search-OnypheInfo -SearchValue "OVH SAS" -SearchFilter organization -SearchType inetnum -page 1-1000
+    C:\PS> Search-OnypheInfo -SearchValue "OVH SAS" -SearchFilter organization -Category inetnum -page 1-1000
 ```
 Note : parameter "-wait 3" will wait 3 seconds between each request to manage rate limiting.
 
@@ -404,24 +448,24 @@ you can use dayago, weekago, monthago functions to filter the results directly o
 you can use the filter functions on search request but also on alert creation (because an alert is no more a linked between a automate search request and an e-mail address).
 For instance, hereunder we request all objects created since the last 2 months
 ```
-    C:\PS> Search-OnypheInfo -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction monthago -FilterValue 2
+    C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction monthago -FilterValue 2
 ```
 Here are also the filters available currently : dayago, weekago, monthago, exists, wildcard, fields
 exists can be used to send back only result with a property containing a non null value. For instance, I can retrieve only the result containing a property OS set :
 ```
-    C:\PS> Search-OnypheInfo -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction exist -FilterValue os
+    C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os
 ```
 wildcard can be used to search deeply a property, but this is limited to 24 hours period of time to be sure the server won't crash. For instance, to look for all organization starting with company :
 ```
-    C:\PS> Search-OnypheInfo -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction wildcard -FilterValue "organization,company*"
+    C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction wildcard -FilterValue "organization,company*"
 ```
 you can use multiple filter functions at a time using advancedfilter property :
 ```
-    C:\PS> search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan
+    C:\PS> search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan
 ```
 a last sample using the previous request but declared as an alert named "RandR" for robert.lespinasse@lesbronzesfontdusk.io
 ```
-    C:\PS>Set-OnypheAlert -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
+    C:\PS> Set-OnypheAlert -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
 ```
 ## Managing rate limiting
 you can add the parameter "wait" followed by a digit to request to wait x seconds between each request to manage rate limiting feature.
@@ -437,7 +481,7 @@ to do so use the function "Get-OnypheInfoFromCSV"
 ```
 by default the CSV delimieter is ; (made in France ;-) ) to change it, use the parameter -csvde followed by the separator protected by double quotes.
 you can find a csv template on my github here : https://raw.githubusercontent.com/MS-LUF/Use-Onyphe/master/sample_testonyphe.csv
-all apis can be used. currently the pages are not managed, it should be done in the next version of the module (it means only the first 10 results are managed by default).
+all apis can be used.
 
 ## Export results to file (CSV)
 a cmdlet / function is available to export a onyphe powershell object to an external CSV.
@@ -445,7 +489,7 @@ Note : the data or content properties of pastries,datascan ... are exported in d
 Just specify the target folder and several subfolders (on per request) containing csv and txt files will be created.
 to do so use the function Export-OnypheInfoToFile :
 ```
-    C:\PS> $AllResults = Search-OnypheInfo -SearchValue "OVH SAS" -SearchFilter organization -SearchType inetnum -page 1-1000
+    C:\PS> $AllResults = Search-OnypheInfo -SearchValue "OVH SAS" -SearchFilter organization -Category inetnum -page 1-1000
     C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -inputobject $AllResults
 ```
 
@@ -456,8 +500,8 @@ Well, we will do the stats for the first 100 pages of results for the demo :)
 
 First, retrieve the results (all threatlist objects tagged with mirai) :
 ```
-    C:\PS> Search-OnypheInfo -SearchValue mirai -SearchType threatlist -SearchFilter tag
-    C:\PS> Search-OnypheInfo -SearchValue mirai -SearchType threatlist -SearchFilter tag -Page 1-594
+    C:\PS> Search-OnypheInfo -SearchValue mirai -Category threatlist -SearchFilter tag
+    C:\PS> Search-OnypheInfo -SearchValue mirai -Category threatlist -SearchFilter tag -Page 1-594
 ```
 Then, play with the objects :-)
 how many unique ip ?
@@ -483,7 +527,7 @@ Well, quite simple :)
 
 First, retrieve all the results avaialable (all synscan objects linked to Quad9 organization) :
 ```
-    C:\PS> $AllResults = Search-OnypheInfo -SearchValue Quad9 -SearchFilter organization -SearchType synscan -Page 1-2
+    C:\PS> $AllResults = Search-OnypheInfo -SearchValue Quad9 -SearchFilter organization -Category synscan -Page 1-2
 ```
 Then, play with the objects :-)
 What are the open ports ?
@@ -515,7 +559,7 @@ For instance, let's take a CSO from Citrix company, he wants to have, everyweek,
 
 First, retrieve all the results avaialable (all synscan objects linked to citrix organization) :
 ```
-    C:\PS> Search-OnypheInfo -AdvancedSearch @('organization:Citrix') -SearchType synscan -Page 1-7
+    C:\PS> $AllResults = Search-OnypheInfo -AdvancedSearch @('organization:Citrix') -Category synscan -Page 1-7
 ```
 Then, do the stats 
 ```
@@ -534,7 +578,7 @@ Then, do the stats
 
 If you want to have the results by port, it's also simple, we just have to open property 'stats' of the object :
 ```
-    C:\PS>(Get-OnypheStatsFromObject -Facets port -inputobject $AllResults).Stats
+    C:\PS> (Get-OnypheStatsFromObject -Facets port -inputobject $AllResults).Stats
 
     Onyphe-Facet Onyphe-Property-value Onyphe-Property-Count
     ------------ --------------------- ---------------------
@@ -550,7 +594,7 @@ Please Onyphe, I am a in charge of following security KPIs and my boss wants to 
 
 First, retrieve all the results avaialable (all synscan objects linked to your organization, here for instance OVH SAS) :
 ```
-    C:\PS> $allresults = Search-OnypheInfo -AdvancedSearch @('organization:OVH SAS','port:3389') -SearchType datashot -Page 1-1000
+    C:\PS> $allresults = Search-OnypheInfo -AdvancedSearch @('organization:OVH SAS','port:3389') -Category datashot -Page 1-1000
 ```
 Then, export the screenshot of the home RDP login page for more information :)
 ```
@@ -560,13 +604,13 @@ Then, export the screenshot of the home RDP login page for more information :)
 ### Example 5
 Please Onyphe, filter the result and show me only the answer with os property not null for threatlist category for all Russia
 ```
-    C:\PS> Search-OnypheInfo -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction exist -FilterValue os
+    C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os
 ```
 
 ### Example 6
 Please Onyphe, filter the results using multiple filters (only os property known and from all organization like *company*) for tcp port 3389 opened in russia
 ```
-    C:\PS> search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan
+    C:\PS> search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan
 ```
 
 ### Example 7
@@ -574,14 +618,21 @@ Please Onyphe, I have found a very useful search request and I want to create an
 
 Well, we can manage it in different ways, first create the alert 'manually'
 ```
-    C:\PS> set-onyphealert -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
+    C:\PS> set-onyphealert -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
 ```
 Or you can pipe a search object to the set-onyphealert function
 ```
-    C:\PS> search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan | set-onyphealert -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
+    C:\PS> search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan | set-onyphealert -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
 ```
 Or you can import an existing search object result in set-onyphealert function
 ```
-    C:\PS> $test = search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan
+    C:\PS> $test = search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan
     C:\PS> set-onyphealert -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io" -InputOnypheObject $test
+```
+
+### Example 8
+Please Onyphe, I have found a very useful search request and I want to export the raw JSON from it for background analysis.
+Very easy :), the Export-onyphe cmdlets use the exact same parameters as the search-onyphe cmdlets ;)
+```
+    C:\PS> Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -SaveInfoAsFile .\myexport.json
 ```
