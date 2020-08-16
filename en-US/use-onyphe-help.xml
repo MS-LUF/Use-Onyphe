@@ -2,6 +2,189 @@
 <helpItems schema="maml" xmlns="http://msh">
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
     <command:details>
+      <command:name>Export-OnypheBulkInfo</command:name>
+      <command:verb>Export</command:verb>
+      <command:noun>OnypheBulkInfo</command:noun>
+      <maml:description>
+        <maml:para>main function/cmdlet - Export Search information on onyphe.io web service using bulk APIs</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>main function/cmdlet - Export Search information on onyphe.io web service using bulk APIs bulk APIs use input file containing ip, domain or hostname and sends back streamed json as result.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Export-OnypheBulkInfo</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+          <maml:name>FilePath</maml:name>
+          <maml:Description>
+            <maml:para>-FilePath string full path to file to be imported to the bulk API.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>SaveInfoAsFile</maml:name>
+          <maml:Description>
+            <maml:para>-SaveInfoAsFile string full path to file where json data will be exported.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+          <maml:name>APIKey</maml:name>
+          <maml:Description>
+            <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>wait</maml:name>
+          <maml:Description>
+            <maml:para>-Wait int{second} wait for x second before sending the request to manage rate limiting restriction</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+          <dev:type>
+            <maml:name>Int32</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>0</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="BulkAPIType">
+          <maml:name>SearchType</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill SearchType Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+        <maml:name>FilePath</maml:name>
+        <maml:Description>
+          <maml:para>-FilePath string full path to file to be imported to the bulk API.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>SaveInfoAsFile</maml:name>
+        <maml:Description>
+          <maml:para>-SaveInfoAsFile string full path to file where json data will be exported.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <maml:name>APIKey</maml:name>
+        <maml:Description>
+          <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>wait</maml:name>
+        <maml:Description>
+          <maml:para>-Wait int{second} wait for x second before sending the request to manage rate limiting restriction</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+        <dev:type>
+          <maml:name>Int32</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>0</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="BulkAPIType">
+        <maml:name>SearchType</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill SearchType Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>TypeName: System.Management.Automation.PSCustomObject</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>export search for IP information into Json file using myfile.txt as source IPs file
+C:\PS&gt; Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType ip</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
+        <dev:code>export search for domain information into Json file using myfile.txt as source domains file
+C:\PS&gt; Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType domain</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
+        <dev:code>export search for hostname information into Json file using myfileip.txt as source hostnames file
+C:\PS&gt; Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType hostname</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
       <command:name>Export-OnypheDataShot</command:name>
       <command:verb>Export</command:verb>
       <command:noun>OnypheDataShot</command:noun>
@@ -20,17 +203,17 @@
           <maml:Description>
             <maml:para>{{ Fill tofolder Description }}</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>Object</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="2" aliases="input">
-          <maml:name>inputobject</maml:name>
+          <maml:name>InputOnypheObject</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill inputobject Description }}</maml:para>
+            <maml:para>{{ Fill InputOnypheObject Description }}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
           <dev:type>
@@ -47,17 +230,17 @@
         <maml:Description>
           <maml:para>{{ Fill tofolder Description }}</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>Object</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
       <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="2" aliases="input">
-        <maml:name>inputobject</maml:name>
+        <maml:name>InputOnypheObject</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill inputobject Description }}</maml:para>
+          <maml:para>{{ Fill InputOnypheObject Description }}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
         <dev:type>
@@ -87,7 +270,7 @@
       <command:example>
         <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
         <dev:code>Export all screenshots available in powershell object $temp into C:\temp folder
-C:\PS&gt; Export-OnypheDataShot -tofolder C:\temp -inputobject $temp</dev:code>
+C:\PS&gt; Export-OnypheDataShot -tofolder C:\temp -InputOnypheObject $temp</dev:code>
         <dev:remarks>
           <maml:para></maml:para>
         </dev:remarks>
@@ -145,7 +328,19 @@ C:\PS&gt; Export-OnypheDataShot -tofolder C:\temp -inputobject $temp</dev:code>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="3" aliases="none">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="13" aliases="none">
+          <maml:name>InputOnypheObject</maml:name>
+          <maml:Description>
+            <maml:para>-InputOnypheObject PSOnyphe object used a PSOnyphe object generated with Search-Onyphe as input</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
+          <dev:type>
+            <maml:name>Array</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
           <maml:name>SearchValue</maml:name>
           <maml:Description>
             <maml:para>-SearchValue STRING{value} string to be searched with -SearchFilter parameter</maml:para>
@@ -229,7 +424,7 @@ C:\PS&gt; Export-OnypheDataShot -tofolder C:\temp -inputobject $temp</dev:code>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="Category">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="Category">
           <maml:name>SearchType</maml:name>
           <maml:Description>
             <maml:para>{{ Fill SearchType Description }}</maml:para>
@@ -244,7 +439,19 @@ C:\PS&gt; Export-OnypheDataShot -tofolder C:\temp -inputobject $temp</dev:code>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="3" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="13" aliases="none">
+        <maml:name>InputOnypheObject</maml:name>
+        <maml:Description>
+          <maml:para>-InputOnypheObject PSOnyphe object used a PSOnyphe object generated with Search-Onyphe as input</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
+        <dev:type>
+          <maml:name>Array</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
         <maml:name>SearchValue</maml:name>
         <maml:Description>
           <maml:para>-SearchValue STRING{value} string to be searched with -SearchFilter parameter</maml:para>
@@ -364,7 +571,7 @@ C:\PS&gt; Export-OnypheDataShot -tofolder C:\temp -inputobject $temp</dev:code>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="Category">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="Category">
         <maml:name>SearchType</maml:name>
         <maml:Description>
           <maml:para>{{ Fill SearchType Description }}</maml:para>
@@ -398,7 +605,7 @@ C:\PS&gt; Export-OnypheDataShot -tofolder C:\temp -inputobject $temp</dev:code>
         <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
         <dev:code>AdvancedSearch with multiple criteria/filters
 Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows and export data to myexport.json
-C:\PS&gt; Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan .\myexport.json</dev:code>
+C:\PS&gt; Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -SaveInfoAsFile .\myexport.json</dev:code>
         <dev:remarks>
           <maml:para></maml:para>
         </dev:remarks>
@@ -407,7 +614,7 @@ C:\PS&gt; Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Wi
         <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
         <dev:code>simple search with one filter/criteria
 Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and export data to myexport.json
-C:\PS&gt; Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country .\myexport.json</dev:code>
+C:\PS&gt; Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -SaveInfoAsFile .\myexport.json</dev:code>
         <dev:remarks>
           <maml:para></maml:para>
         </dev:remarks>
@@ -425,7 +632,7 @@ C:\PS&gt; Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Wi
         <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
         <dev:code>simple search with one filter/criteria and use a server filter to retrieve only objects indexed since 2 month
 Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and export data to myexport.json
-C:\PS&gt; Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2" .\myexport.json</dev:code>
+C:\PS&gt; Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2" -SaveInfoAsFile .\myexport.json</dev:code>
         <dev:remarks>
           <maml:para></maml:para>
         </dev:remarks>
@@ -433,7 +640,7 @@ C:\PS&gt; Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter c
       <command:example>
         <maml:title>-------------------------- EXAMPLE 5 --------------------------</maml:title>
         <dev:code>filter the result and show me only the answer with os property not null for threatlist category for all Russia  and export data to myexport.json
-C:\PS&gt; Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os .\myexport.json</dev:code>
+C:\PS&gt; Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os -SaveInfoAsFile .\myexport.json</dev:code>
         <dev:remarks>
           <maml:para></maml:para>
         </dev:remarks>
@@ -441,7 +648,15 @@ C:\PS&gt; Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter c
       <command:example>
         <maml:title>-------------------------- EXAMPLE 6 --------------------------</maml:title>
         <dev:code>filter the results using multiple filters (only os property known and from all organization like *company*) for tcp port 3389 opened in russia  and export data to myexport.json
-C:\PS&gt; Export-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan .\myexport.json</dev:code>
+C:\PS&gt; Export-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan -SaveInfoAsFile .\myexport.json</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 7 --------------------------</maml:title>
+        <dev:code>search from onyphe using search-onyphe and pipe the object to export the content to a json file using export-onyphe
+C:\PS&gt; Search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan | Export-onyphe -SaveInfoAsFile .\myexport.json</dev:code>
         <dev:remarks>
           <maml:para></maml:para>
         </dev:remarks>
@@ -477,9 +692,9 @@ C:\PS&gt; Export-onyphe -AdvancedFilter @("wildcard:organization,*company*","exi
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="2" aliases="none">
-          <maml:name>inputobject</maml:name>
+          <maml:name>InputOnypheObject</maml:name>
           <maml:Description>
-            <maml:para>-inputobject $obj{output of Get-OnypheInfo or Get-OnypheInfoFromCSV functions} look for information about my public IP</maml:para>
+            <maml:para>-InputOnypheObject $obj{output of Get-OnypheInfo or Get-OnypheInfoFromCSV functions} look for information about my public IP</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
           <dev:type>
@@ -516,9 +731,9 @@ C:\PS&gt; Export-onyphe -AdvancedFilter @("wildcard:organization,*company*","exi
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
       <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="2" aliases="none">
-        <maml:name>inputobject</maml:name>
+        <maml:name>InputOnypheObject</maml:name>
         <maml:Description>
-          <maml:para>-inputobject $obj{output of Get-OnypheInfo or Get-OnypheInfoFromCSV functions} look for information about my public IP</maml:para>
+          <maml:para>-InputOnypheObject $obj{output of Get-OnypheInfo or Get-OnypheInfoFromCSV functions} look for information about my public IP</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
         <dev:type>
@@ -560,7 +775,7 @@ C:\PS&gt; Export-onyphe -AdvancedFilter @("wildcard:organization,*company*","exi
       <command:example>
         <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
         <dev:code>Exporting onyphe results containing into $onypheresult object to flat files in folder C:\temp
-C:\PS&gt; Export-OnypheInfoToFile -tofolder C:\temp -inputobject $onypheresult</dev:code>
+C:\PS&gt; Export-OnypheInfoToFile -tofolder C:\temp -InputOnypheObject $onypheresult</dev:code>
         <dev:remarks>
           <maml:para></maml:para>
         </dev:remarks>
@@ -568,7 +783,7 @@ C:\PS&gt; Export-OnypheInfoToFile -tofolder C:\temp -inputobject $onypheresult</
       <command:example>
         <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
         <dev:code>Exporting onyphe results containing into $onypheresult object to flat files in folder C:\temp using ',' as csv separator
-C:\PS&gt; Export-OnypheInfoToFile -tofolder C:\temp -inputobject $onypheresult -csvdelimiter ","</dev:code>
+C:\PS&gt; Export-OnypheInfoToFile -tofolder C:\temp -InputOnypheObject $onypheresult -csvdelimiter ","</dev:code>
         <dev:remarks>
           <maml:para></maml:para>
         </dev:remarks>
@@ -1415,9 +1630,9 @@ C:\PS&gt; Get-OnypheSimpleAPIName</dev:code>
       <command:syntaxItem>
         <maml:name>Get-OnypheStatsFromObject</maml:name>
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
-          <maml:name>inputobject</maml:name>
+          <maml:name>InputOnypheObject</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill inputobject Description }}</maml:para>
+            <maml:para>{{ Fill InputOnypheObject Description }}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
           <dev:type>
@@ -1454,9 +1669,9 @@ C:\PS&gt; Get-OnypheSimpleAPIName</dev:code>
     </command:syntax>
     <command:parameters>
       <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
-        <maml:name>inputobject</maml:name>
+        <maml:name>InputOnypheObject</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill inputobject Description }}</maml:para>
+          <maml:para>{{ Fill InputOnypheObject Description }}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
         <dev:type>
@@ -1571,7 +1786,7 @@ C:\PS&gt; Get-OnypheSimpleAPIName</dev:code>
           </dev:type>
           <dev:defaultValue>0</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="SummaryAPIType">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="SummaryAPIType">
           <maml:name>SearchType</maml:name>
           <maml:Description>
             <maml:para>{{ Fill SearchType Description }}</maml:para>
@@ -1634,7 +1849,7 @@ C:\PS&gt; Get-OnypheSimpleAPIName</dev:code>
         </dev:type>
         <dev:defaultValue>0</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="SummaryAPIType">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="SummaryAPIType">
         <maml:name>SearchType</maml:name>
         <maml:Description>
           <maml:para>{{ Fill SearchType Description }}</maml:para>
@@ -1972,6 +2187,459 @@ C:\PS&gt; Import-OnypheEncryptedIKey -MasterPassword (ConvertTo-SecureString -St
   </command:command>
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
     <command:details>
+      <command:name>Invoke-APIBulkSummaryOnypheDomain</command:name>
+      <command:verb>Invoke</command:verb>
+      <command:noun>APIBulkSummaryOnypheDomain</command:noun>
+      <maml:description>
+        <maml:para>create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of domains based on a file input from Bulk/domain API</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>reate several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of domains based on a file input from Bulk/domain API</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Invoke-APIBulkSummaryOnypheDomain</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
+          <maml:name>FilePath</maml:name>
+          <maml:Description>
+            <maml:para>-FilePath string{full path to an existing text file} full path to input file to send to onyphe API</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>OutFile</maml:name>
+          <maml:Description>
+            <maml:para>-OutFile string{full path to a new file for exporting json data} full path to output file used to write json data from Onyphe</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+          <maml:name>APIKey</maml:name>
+          <maml:Description>
+            <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
+        <maml:name>FilePath</maml:name>
+        <maml:Description>
+          <maml:para>-FilePath string{full path to an existing text file} full path to input file to send to onyphe API</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>OutFile</maml:name>
+        <maml:Description>
+          <maml:para>-OutFile string{full path to a new file for exporting json data} full path to output file used to write json data from Onyphe</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <maml:name>APIKey</maml:name>
+        <maml:Description>
+          <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>TypeName: PSOnyphe</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>export all info available as JSON for all domains contained in listdom.txt
+C:\PS&gt; Invoke-APIBulkSummaryOnypheDomain -FilePath .\listdom.txt</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
+        <dev:code>export all info available as JSON for all domains contained in listdom.txt and set the API Key
+C:\PS&gt; Invoke-APIBulkSummaryOnypheDomain -FilePath .\listdom.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Invoke-APIBulkSummaryOnypheHostname</command:name>
+      <command:verb>Invoke</command:verb>
+      <command:noun>APIBulkSummaryOnypheHostname</command:noun>
+      <maml:description>
+        <maml:para>create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of hostnames based on a file input from Bulk/hostname API</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>reate several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of hostnames based on a file input from Bulk/hostname API</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Invoke-APIBulkSummaryOnypheHostname</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
+          <maml:name>FilePath</maml:name>
+          <maml:Description>
+            <maml:para>-FilePath string{full path to an existing text file} full path to input file to send to onyphe API</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>OutFile</maml:name>
+          <maml:Description>
+            <maml:para>-OutFile string{full path to a new file for exporting json data} full path to output file used to write json data from Onyphe</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+          <maml:name>APIKey</maml:name>
+          <maml:Description>
+            <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
+        <maml:name>FilePath</maml:name>
+        <maml:Description>
+          <maml:para>-FilePath string{full path to an existing text file} full path to input file to send to onyphe API</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>OutFile</maml:name>
+        <maml:Description>
+          <maml:para>-OutFile string{full path to a new file for exporting json data} full path to output file used to write json data from Onyphe</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <maml:name>APIKey</maml:name>
+        <maml:Description>
+          <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>TypeName: PSOnyphe</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>export all info available as JSON for all hosts contained in listhost.txt
+C:\PS&gt; Invoke-APIBulkSummaryOnypheHostname -FilePath .\listhost.txt</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
+        <dev:code>export all info available as JSON for all hosts contained in listhost.txt and set the API Key
+C:\PS&gt; Invoke-APIBulkSummaryOnypheHostname -FilePath .\listhost.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Invoke-APIBulkSummaryOnypheIP</command:name>
+      <command:verb>Invoke</command:verb>
+      <command:noun>APIBulkSummaryOnypheIP</command:noun>
+      <maml:description>
+        <maml:para>create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of IPs based on a file input from Bulk/ip API</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>reate several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of IPs based on a file input from Bulk/ip API</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Invoke-APIBulkSummaryOnypheIP</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
+          <maml:name>FilePath</maml:name>
+          <maml:Description>
+            <maml:para>-FilePath string{full path to an existing text file} full path to input file to send to onyphe API</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>OutFile</maml:name>
+          <maml:Description>
+            <maml:para>-OutFile string{full path to a new file for exporting json data} full path to output file used to write json data from Onyphe</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+          <maml:name>APIKey</maml:name>
+          <maml:Description>
+            <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="input">
+        <maml:name>FilePath</maml:name>
+        <maml:Description>
+          <maml:para>-FilePath string{full path to an existing text file} full path to input file to send to onyphe API</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>OutFile</maml:name>
+        <maml:Description>
+          <maml:para>-OutFile string{full path to a new file for exporting json data} full path to output file used to write json data from Onyphe</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <maml:name>APIKey</maml:name>
+        <maml:Description>
+          <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>TypeName: PSOnyphe</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>export all info available as JSON for all IPs contained in listip.txt
+C:\PS&gt; Invoke-APIBulkSummaryOnypheIP -FilePath .\listip.txt</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
+        <dev:code>export all info available as JSON for all IPs contained in listip.txt and set the API Key
+C:\PS&gt; Invoke-APIBulkSummaryOnypheIP -FilePath .\listip.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
       <command:name>Invoke-APIOnypheAddAlert</command:name>
       <command:verb>Invoke</command:verb>
       <command:noun>APIOnypheAddAlert</command:noun>
@@ -2010,13 +2678,13 @@ C:\PS&gt; Import-OnypheEncryptedIKey -MasterPassword (ConvertTo-SecureString -St
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="11" aliases="none">
-          <maml:name>InputOnypheObject</maml:name>
+          <maml:name>FuncInput</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill InputOnypheObject Description }}</maml:para>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
           <dev:type>
-            <maml:name>Object</maml:name>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -2264,13 +2932,13 @@ C:\PS&gt; Import-OnypheEncryptedIKey -MasterPassword (ConvertTo-SecureString -St
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="11" aliases="none">
-        <maml:name>InputOnypheObject</maml:name>
+        <maml:name>FuncInput</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill InputOnypheObject Description }}</maml:para>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
         <dev:type>
-          <maml:name>Object</maml:name>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -2280,7 +2948,7 @@ C:\PS&gt; Import-OnypheEncryptedIKey -MasterPassword (ConvertTo-SecureString -St
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -2358,9 +3026,21 @@ C:\PS&gt; Invoke-APIOnypheAddAlert -AlertEmail "alert@example.com" -AlertName "M
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -2397,9 +3077,21 @@ C:\PS&gt; Invoke-APIOnypheAddAlert -AlertEmail "alert@example.com" -AlertName "M
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -2409,7 +3101,7 @@ C:\PS&gt; Invoke-APIOnypheAddAlert -AlertEmail "alert@example.com" -AlertName "M
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -2461,9 +3153,9 @@ C:\PS&gt; Invoke-APIOnypheCtl -Domain fnac.com -APIKey "xxxxxxxxxxxxxxxxxxxxxxxx
           <maml:Description>
             <maml:para>-IPOrDataScanString string{IP} IP to be used for the DataScan API usage -IPOrDataScanString string string to be used for the DataScan API usage</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -2485,9 +3177,21 @@ C:\PS&gt; Invoke-APIOnypheCtl -Domain fnac.com -APIKey "xxxxxxxxxxxxxxxxxxxxxxxx
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -2500,9 +3204,9 @@ C:\PS&gt; Invoke-APIOnypheCtl -Domain fnac.com -APIKey "xxxxxxxxxxxxxxxxxxxxxxxx
         <maml:Description>
           <maml:para>-IPOrDataScanString string{IP} IP to be used for the DataScan API usage -IPOrDataScanString string string to be used for the DataScan API usage</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -2524,9 +3228,21 @@ C:\PS&gt; Invoke-APIOnypheCtl -Domain fnac.com -APIKey "xxxxxxxxxxxxxxxxxxxxxxxx
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -2536,7 +3252,7 @@ C:\PS&gt; Invoke-APIOnypheCtl -Domain fnac.com -APIKey "xxxxxxxxxxxxxxxxxxxxxxxx
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -2596,9 +3312,9 @@ C:\PS&gt; Invoke-APIOnypheDataScan -IPOrDataScanString 8.8.8.8 -APIKey "xxxxxxxx
           <maml:Description>
             <maml:para>-MD5 string{MD5 Hash} MD5 to be used for the md5 API usage</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -2620,9 +3336,21 @@ C:\PS&gt; Invoke-APIOnypheDataScan -IPOrDataScanString 8.8.8.8 -APIKey "xxxxxxxx
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -2635,9 +3363,9 @@ C:\PS&gt; Invoke-APIOnypheDataScan -IPOrDataScanString 8.8.8.8 -APIKey "xxxxxxxx
         <maml:Description>
           <maml:para>-MD5 string{MD5 Hash} MD5 to be used for the md5 API usage</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -2659,9 +3387,21 @@ C:\PS&gt; Invoke-APIOnypheDataScan -IPOrDataScanString 8.8.8.8 -APIKey "xxxxxxxx
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -2671,7 +3411,7 @@ C:\PS&gt; Invoke-APIOnypheDataScan -IPOrDataScanString 8.8.8.8 -APIKey "xxxxxxxx
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -2723,9 +3463,9 @@ C:\PS&gt; Invoke-APIOnypheDatascanDataMd5 -MD5 7a1f20cae067b75a52bc024b83ee4667 
           <maml:Description>
             <maml:para>-IP string{IP} IP to be used for the Datashot API usage</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -2747,9 +3487,21 @@ C:\PS&gt; Invoke-APIOnypheDatascanDataMd5 -MD5 7a1f20cae067b75a52bc024b83ee4667 
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -2762,9 +3514,9 @@ C:\PS&gt; Invoke-APIOnypheDatascanDataMd5 -MD5 7a1f20cae067b75a52bc024b83ee4667 
         <maml:Description>
           <maml:para>-IP string{IP} IP to be used for the Datashot API usage</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -2786,9 +3538,21 @@ C:\PS&gt; Invoke-APIOnypheDatascanDataMd5 -MD5 7a1f20cae067b75a52bc024b83ee4667 
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -2798,7 +3562,7 @@ C:\PS&gt; Invoke-APIOnypheDatascanDataMd5 -MD5 7a1f20cae067b75a52bc024b83ee4667 
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -2845,18 +3609,7 @@ C:\PS&gt; Invoke-APIOnypheDatashot -IP 178.250.241.22 -APIKey "xxxxxxxxxxxxxxxxx
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Invoke-APIOnypheDelAlert</maml:name>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="11" aliases="none">
-          <maml:name>UseBetaFeatures</maml:name>
-          <maml:Description>
-            <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
-          </maml:Description>
-          <dev:type>
-            <maml:name>SwitchParameter</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>False</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
           <maml:name>APIKey</maml:name>
           <maml:Description>
             <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
@@ -2868,7 +3621,7 @@ C:\PS&gt; Invoke-APIOnypheDatashot -IP 178.250.241.22 -APIKey "xxxxxxxxxxxxxxxxx
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
           <maml:name>AlertID</maml:name>
           <maml:Description>
             <maml:para>-AlertID string{ID}  mandatory input containing the ID of the alert to be deleted</maml:para>
@@ -2880,10 +3633,33 @@ C:\PS&gt; Invoke-APIOnypheDatashot -IP 178.250.241.22 -APIKey "xxxxxxxxxxxxxxxxx
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>UseBetaFeatures</maml:name>
+          <maml:Description>
+            <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
+          </maml:Description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
         <maml:name>APIKey</maml:name>
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
@@ -2895,7 +3671,7 @@ C:\PS&gt; Invoke-APIOnypheDatashot -IP 178.250.241.22 -APIKey "xxxxxxxxxxxxxxxxx
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="11" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>UseBetaFeatures</maml:name>
         <maml:Description>
           <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
@@ -2907,7 +3683,7 @@ C:\PS&gt; Invoke-APIOnypheDatashot -IP 178.250.241.22 -APIKey "xxxxxxxxxxxxxxxxx
         </dev:type>
         <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
         <maml:name>AlertID</maml:name>
         <maml:Description>
           <maml:para>-AlertID string{ID}  mandatory input containing the ID of the alert to be deleted</maml:para>
@@ -2919,12 +3695,24 @@ C:\PS&gt; Invoke-APIOnypheDatashot -IP 178.250.241.22 -APIKey "xxxxxxxxxxxxxxxxx
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
     </command:parameters>
     <command:inputTypes />
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -2975,6 +3763,30 @@ C:\PS&gt; Invoke-APIOnypheDelAlert -AlertID 0</dev:code>
           <maml:name>SearchType</maml:name>
           <maml:Description>
             <maml:para>{{ Fill SearchType Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="10" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="11" aliases="none">
+          <maml:name>OutFile</maml:name>
+          <maml:Description>
+            <maml:para>-OutFile string{full path to a new file for exporting json data} full path to output file used to write json data from Onyphe</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -3213,12 +4025,36 @@ C:\PS&gt; Invoke-APIOnypheDelAlert -AlertID 0</dev:code>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="10" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="11" aliases="none">
+        <maml:name>OutFile</maml:name>
+        <maml:Description>
+          <maml:para>-OutFile string{full path to a new file for exporting json data} full path to output file used to write json data from Onyphe</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
     </command:parameters>
     <command:inputTypes />
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -3693,9 +4529,21 @@ C:\PS&gt; Invoke-APIOnypheSearch -SearchValue RU -Category threatlist -SearchFil
           <maml:Description>
             <maml:para>{{ Fill Page Description }}</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -3732,9 +4580,21 @@ C:\PS&gt; Invoke-APIOnypheSearch -SearchValue RU -Category threatlist -SearchFil
         <maml:Description>
           <maml:para>{{ Fill Page Description }}</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -3744,7 +4604,7 @@ C:\PS&gt; Invoke-APIOnypheSearch -SearchValue RU -Category threatlist -SearchFil
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -3788,9 +4648,9 @@ C:\PS&gt; Invoke-APIOnypheGeoloc -IP 8.8.8.8</dev:code>
           <maml:Description>
             <maml:para>-IP string{IP} IP to be used for the geoloc API usage</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -3812,9 +4672,21 @@ C:\PS&gt; Invoke-APIOnypheGeoloc -IP 8.8.8.8</dev:code>
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -3827,9 +4699,9 @@ C:\PS&gt; Invoke-APIOnypheGeoloc -IP 8.8.8.8</dev:code>
         <maml:Description>
           <maml:para>-IP string{IP} IP to be used for the geoloc API usage</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -3851,9 +4723,21 @@ C:\PS&gt; Invoke-APIOnypheGeoloc -IP 8.8.8.8</dev:code>
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -3863,7 +4747,7 @@ C:\PS&gt; Invoke-APIOnypheGeoloc -IP 8.8.8.8</dev:code>
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -4323,18 +5207,7 @@ C:\PS&gt; Invoke-APIOnypheInetnum -IP 93.184.208.0 -APIKey "xxxxxxxxxxxxxxxxxxxx
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Invoke-APIOnypheListAlert</maml:name>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="11" aliases="none">
-          <maml:name>UseBetaFeatures</maml:name>
-          <maml:Description>
-            <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
-          </maml:Description>
-          <dev:type>
-            <maml:name>SwitchParameter</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>False</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
           <maml:name>APIKey</maml:name>
           <maml:Description>
             <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
@@ -4346,10 +5219,33 @@ C:\PS&gt; Invoke-APIOnypheInetnum -IP 93.184.208.0 -APIKey "xxxxxxxxxxxxxxxxxxxx
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>UseBetaFeatures</maml:name>
+          <maml:Description>
+            <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
+          </maml:Description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
         <maml:name>APIKey</maml:name>
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
@@ -4361,7 +5257,7 @@ C:\PS&gt; Invoke-APIOnypheInetnum -IP 93.184.208.0 -APIKey "xxxxxxxxxxxxxxxxxxxx
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="11" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>UseBetaFeatures</maml:name>
         <maml:Description>
           <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
@@ -4373,12 +5269,24 @@ C:\PS&gt; Invoke-APIOnypheInetnum -IP 93.184.208.0 -APIKey "xxxxxxxxxxxxxxxxxxxx
         </dev:type>
         <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
     </command:parameters>
     <command:inputTypes />
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -5232,9 +6140,9 @@ C:\PS&gt; Invoke-APIOnypheListAlert</dev:code>
           <maml:Description>
             <maml:para>-Onion string{Onion URL} Onion link to be used for the Onion API usage</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -5256,9 +6164,21 @@ C:\PS&gt; Invoke-APIOnypheListAlert</dev:code>
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -5271,9 +6191,9 @@ C:\PS&gt; Invoke-APIOnypheListAlert</dev:code>
         <maml:Description>
           <maml:para>-Onion string{Onion URL} Onion link to be used for the Onion API usage</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -5295,9 +6215,21 @@ C:\PS&gt; Invoke-APIOnypheListAlert</dev:code>
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -5307,7 +6239,7 @@ C:\PS&gt; Invoke-APIOnypheListAlert</dev:code>
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -5359,9 +6291,9 @@ C:\PS&gt; Invoke-APIOnypheOnionScan -Onion "3g2upl4pq6kufc4m.onion" -APIKey "xxx
           <maml:Description>
             <maml:para>-IP string{IP} IP to be used for the Onionshot API usage</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -5383,9 +6315,21 @@ C:\PS&gt; Invoke-APIOnypheOnionScan -Onion "3g2upl4pq6kufc4m.onion" -APIKey "xxx
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -5398,9 +6342,9 @@ C:\PS&gt; Invoke-APIOnypheOnionScan -Onion "3g2upl4pq6kufc4m.onion" -APIKey "xxx
         <maml:Description>
           <maml:para>-IP string{IP} IP to be used for the Onionshot API usage</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -5422,9 +6366,21 @@ C:\PS&gt; Invoke-APIOnypheOnionScan -Onion "3g2upl4pq6kufc4m.onion" -APIKey "xxx
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -5434,7 +6390,7 @@ C:\PS&gt; Invoke-APIOnypheOnionScan -Onion "3g2upl4pq6kufc4m.onion" -APIKey "xxx
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -5510,9 +6466,21 @@ C:\PS&gt; Invoke-APIOnypheOnionshot -IP 178.250.241.22 -APIKey "xxxxxxxxxxxxxxxx
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -5549,9 +6517,21 @@ C:\PS&gt; Invoke-APIOnypheOnionshot -IP 178.250.241.22 -APIKey "xxxxxxxxxxxxxxxx
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -5561,7 +6541,7 @@ C:\PS&gt; Invoke-APIOnypheOnionshot -IP 178.250.241.22 -APIKey "xxxxxxxxxxxxxxxx
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -5613,9 +6593,9 @@ C:\PS&gt; Invoke-APIOnyphePastries -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxx
           <maml:Description>
             <maml:para>-IP string{IP} IP to be used for the resolver API usage</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -5637,9 +6617,21 @@ C:\PS&gt; Invoke-APIOnyphePastries -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxx
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -5652,9 +6644,9 @@ C:\PS&gt; Invoke-APIOnyphePastries -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxx
         <maml:Description>
           <maml:para>-IP string{IP} IP to be used for the resolver API usage</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -5676,9 +6668,21 @@ C:\PS&gt; Invoke-APIOnyphePastries -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxx
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -5688,7 +6692,7 @@ C:\PS&gt; Invoke-APIOnyphePastries -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxx
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -5740,9 +6744,9 @@ C:\PS&gt; Invoke-APIOnypheResolver -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxx
           <maml:Description>
             <maml:para>-IP string{IP} IP to be used for the forward API usage</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -5764,9 +6768,21 @@ C:\PS&gt; Invoke-APIOnypheResolver -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxx
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -5779,9 +6795,9 @@ C:\PS&gt; Invoke-APIOnypheResolver -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxx
         <maml:Description>
           <maml:para>-IP string{IP} IP to be used for the forward API usage</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -5803,9 +6819,21 @@ C:\PS&gt; Invoke-APIOnypheResolver -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxx
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -5815,7 +6843,7 @@ C:\PS&gt; Invoke-APIOnypheResolver -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxx
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -5867,9 +6895,9 @@ C:\PS&gt; Invoke-APIOnypheResolverForward -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxx
           <maml:Description>
             <maml:para>-IP string{IP} IP to be used for the reverse API usage</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -5891,9 +6919,21 @@ C:\PS&gt; Invoke-APIOnypheResolverForward -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxx
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -5906,9 +6946,9 @@ C:\PS&gt; Invoke-APIOnypheResolverForward -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxx
         <maml:Description>
           <maml:para>-IP string{IP} IP to be used for the reverse API usage</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -5930,9 +6970,21 @@ C:\PS&gt; Invoke-APIOnypheResolverForward -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxx
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -5942,7 +6994,7 @@ C:\PS&gt; Invoke-APIOnypheResolverForward -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxx
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -6418,6 +7470,18 @@ C:\PS&gt; Invoke-APIOnypheResolverReverse -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxx
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="11" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
           <maml:name>SearchValue</maml:name>
           <maml:Description>
@@ -6660,356 +7724,24 @@ C:\PS&gt; Invoke-APIOnypheResolverReverse -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxx
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="11" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
     </command:parameters>
     <command:inputTypes />
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>Name             MemberType   Definition</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>----             ----------   ----------</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>Equals           Method       bool Equals(System.Object obj)</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>GetHashCode      Method       int GetHashCode()</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>GetType          Method       type GetType()</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>ToString         Method       string ToString()</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>cli-API_info     NoteProperty string[] cli-API_info=System.String[]</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>cli-API_input    NoteProperty string[] cli-API_input=System.String[]</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>cli-key_required NoteProperty bool[] cli-key_required=System.Boolean[]</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>cli-Request_Date NoteProperty datetime cli-Request_Date=15/08/2018 15:05:25</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>count            NoteProperty int count=10</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>error            NoteProperty int error=0</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>max_page         NoteProperty decimal max_page=1000,0</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>myip             NoteProperty string myip=192.168.6.66</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>page             NoteProperty int page=1000</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>results          NoteProperty Object[] results=System.Object[]</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>status           NoteProperty string status=ok</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>took             NoteProperty string took=0.066</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>total            NoteProperty int total=157611</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>count            : 10</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>error            : 0</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>max_page         : 1000,0</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>myip             : 192.168.6.66</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>page             : 1000</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>results          : {@{@category=inetnum; @timestamp=2018-08-12T01:35:21.000Z; @type=ip; asn=AS16276; country=GB;</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>	information=System.Object[]; ipv6=false; location=51.4964,-0.1224; netname=reduk2; organization=OVH</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>	SAS; seen_date=2018-08-12; source=RIPE; subnet=213.32.105.0/26}, @{@category=inetnum;</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>	@timestamp=2018-08-12T01:35:21.000Z; @type=ip; asn=AS16276; country=FR;</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>	information=System.Object[]; ipv6=false; location=48.8582,2.3387; netname=OVH_121297930;</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>	organization=OVH SAS; seen_date=2018-08-12; source=RIPE; subnet=149.202.133.104/30},</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>	@{@category=inetnum; @timestamp=2018-08-12T01:35:21.000Z; @type=ip; asn=AS16276; country=FR;</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>	information=System.Object[]; ipv6=false; location=48.8582,2.3387; netname=OVH_121298047;</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>	organization=OVH SAS; seen_date=2018-08-12; source=RIPE; subnet=149.202.133.108/30},</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>	@{@category=inetnum; @timestamp=2018-08-12T01:35:21.000Z; @type=ip; asn=AS16276; country=FR;</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>	information=System.Object[]; ipv6=false; location=48.8582,2.3387; netname=OVH_121298490;</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>	organization=OVH SAS; seen_date=2018-08-12; source=RIPE; subnet=51.254.51.84/30}...}</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>status           : ok</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>took             : 0.066</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>total            : 157611</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>cli-API_info     : {search/inetnum}</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>cli-API_input    : {organization:"OVH SAS"}</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>cli-key_required : {True}</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>cli-Request_Date : 15/08/2018 15:05:25</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -7087,9 +7819,21 @@ C:\PS&gt; Invoke-APIOnypheSearch -SearchValue RU -Category threatlist -SearchFil
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -7126,9 +7870,21 @@ C:\PS&gt; Invoke-APIOnypheSearch -SearchValue RU -Category threatlist -SearchFil
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -7138,7 +7894,7 @@ C:\PS&gt; Invoke-APIOnypheSearch -SearchValue RU -Category threatlist -SearchFil
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -7214,9 +7970,21 @@ C:\PS&gt; Invoke-APIOnypheSniffer -IP 217.138.28.194 -APIKey "xxxxxxxxxxxxxxxxxx
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -7253,9 +8021,21 @@ C:\PS&gt; Invoke-APIOnypheSniffer -IP 217.138.28.194 -APIKey "xxxxxxxxxxxxxxxxxx
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -7265,7 +8045,7 @@ C:\PS&gt; Invoke-APIOnypheSniffer -IP 217.138.28.194 -APIKey "xxxxxxxxxxxxxxxxxx
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -7317,9 +8097,9 @@ C:\PS&gt; Invoke-APIOnypheSynScan -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxx
           <maml:Description>
             <maml:para>-IP string{IP} IP to be used for the threatlist API usage</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -7341,9 +8121,21 @@ C:\PS&gt; Invoke-APIOnypheSynScan -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxx
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -7356,9 +8148,9 @@ C:\PS&gt; Invoke-APIOnypheSynScan -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxx
         <maml:Description>
           <maml:para>-IP string{IP} IP to be used for the threatlist API usage</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -7380,9 +8172,21 @@ C:\PS&gt; Invoke-APIOnypheSynScan -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxx
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -7392,7 +8196,7 @@ C:\PS&gt; Invoke-APIOnypheSynScan -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxx
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -7444,9 +8248,9 @@ C:\PS&gt; Invoke-APIOnypheThreatlist -IP 201.111.50.232 -APIKey "xxxxxxxxxxxxxxx
           <maml:Description>
             <maml:para>-IP string{IP} IP to be used for the topsite API usage</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -7468,9 +8272,21 @@ C:\PS&gt; Invoke-APIOnypheThreatlist -IP 201.111.50.232 -APIKey "xxxxxxxxxxxxxxx
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -7483,9 +8299,9 @@ C:\PS&gt; Invoke-APIOnypheThreatlist -IP 201.111.50.232 -APIKey "xxxxxxxxxxxxxxx
         <maml:Description>
           <maml:para>-IP string{IP} IP to be used for the topsite API usage</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -7507,9 +8323,21 @@ C:\PS&gt; Invoke-APIOnypheThreatlist -IP 201.111.50.232 -APIKey "xxxxxxxxxxxxxxx
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -7519,7 +8347,7 @@ C:\PS&gt; Invoke-APIOnypheThreatlist -IP 201.111.50.232 -APIKey "xxxxxxxxxxxxxxx
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -7566,18 +8394,7 @@ C:\PS&gt; Invoke-APIOnypheTopsite -IP 178.250.241.22 -APIKey "xxxxxxxxxxxxxxxxxx
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Invoke-APIOnypheUser</maml:name>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="11" aliases="none">
-          <maml:name>UseBetaFeatures</maml:name>
-          <maml:Description>
-            <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
-          </maml:Description>
-          <dev:type>
-            <maml:name>SwitchParameter</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>False</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
           <maml:name>APIKey</maml:name>
           <maml:Description>
             <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
@@ -7589,10 +8406,33 @@ C:\PS&gt; Invoke-APIOnypheTopsite -IP 178.250.241.22 -APIKey "xxxxxxxxxxxxxxxxxx
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>UseBetaFeatures</maml:name>
+          <maml:Description>
+            <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
+          </maml:Description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
         <maml:name>APIKey</maml:name>
         <maml:Description>
           <maml:para>-APIKey string{APIKEY} Set APIKEY as global variable.</maml:para>
@@ -7604,7 +8444,7 @@ C:\PS&gt; Invoke-APIOnypheTopsite -IP 178.250.241.22 -APIKey "xxxxxxxxxxxxxxxxxx
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="11" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>UseBetaFeatures</maml:name>
         <maml:Description>
           <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
@@ -7616,12 +8456,24 @@ C:\PS&gt; Invoke-APIOnypheTopsite -IP 178.250.241.22 -APIKey "xxxxxxxxxxxxxxxxxx
         </dev:type>
         <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
     </command:parameters>
     <command:inputTypes />
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -7673,9 +8525,9 @@ C:\PS&gt; Invoke-APIOnypheUser</dev:code>
           <maml:Description>
             <maml:para>-IP string{IP} IP to be used for the vulnscan API usage</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -7697,9 +8549,21 @@ C:\PS&gt; Invoke-APIOnypheUser</dev:code>
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -7712,9 +8576,9 @@ C:\PS&gt; Invoke-APIOnypheUser</dev:code>
         <maml:Description>
           <maml:para>-IP string{IP} IP to be used for the vulnscan API usage</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -7736,9 +8600,21 @@ C:\PS&gt; Invoke-APIOnypheUser</dev:code>
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -7748,7 +8624,7 @@ C:\PS&gt; Invoke-APIOnypheUser</dev:code>
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -7800,9 +8676,9 @@ C:\PS&gt; Invoke-APIOnypheVulnscan -IP 178.250.241.22 -APIKey "xxxxxxxxxxxxxxxxx
           <maml:Description>
             <maml:para>-Domain string{Domain} Domain to be used for the Summary/domain API API usage</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -7824,9 +8700,21 @@ C:\PS&gt; Invoke-APIOnypheVulnscan -IP 178.250.241.22 -APIKey "xxxxxxxxxxxxxxxxx
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -7839,9 +8727,9 @@ C:\PS&gt; Invoke-APIOnypheVulnscan -IP 178.250.241.22 -APIKey "xxxxxxxxxxxxxxxxx
         <maml:Description>
           <maml:para>-Domain string{Domain} Domain to be used for the Summary/domain API API usage</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -7863,9 +8751,21 @@ C:\PS&gt; Invoke-APIOnypheVulnscan -IP 178.250.241.22 -APIKey "xxxxxxxxxxxxxxxxx
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -7875,7 +8775,7 @@ C:\PS&gt; Invoke-APIOnypheVulnscan -IP 178.250.241.22 -APIKey "xxxxxxxxxxxxxxxxx
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -7927,9 +8827,9 @@ C:\PS&gt; Invoke-APISummaryOnypheDomain -Domain perdu.com -APIKey "xxxxxxxxxxxxx
           <maml:Description>
             <maml:para>-Hostname string{Hostname} Hostname to be used for the Summary/hostname API usage</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -7951,9 +8851,21 @@ C:\PS&gt; Invoke-APISummaryOnypheDomain -Domain perdu.com -APIKey "xxxxxxxxxxxxx
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -7966,9 +8878,9 @@ C:\PS&gt; Invoke-APISummaryOnypheDomain -Domain perdu.com -APIKey "xxxxxxxxxxxxx
         <maml:Description>
           <maml:para>-Hostname string{Hostname} Hostname to be used for the Summary/hostname API usage</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -7990,9 +8902,21 @@ C:\PS&gt; Invoke-APISummaryOnypheDomain -Domain perdu.com -APIKey "xxxxxxxxxxxxx
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -8002,7 +8926,7 @@ C:\PS&gt; Invoke-APISummaryOnypheDomain -Domain perdu.com -APIKey "xxxxxxxxxxxxx
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -8078,9 +9002,21 @@ C:\PS&gt; Invoke-APISummaryOnypheHostname -Hostname www.perdu.com -APIKey "xxxxx
           <maml:Description>
             <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>String[]</maml:name>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -8117,9 +9053,21 @@ C:\PS&gt; Invoke-APISummaryOnypheHostname -Hostname www.perdu.com -APIKey "xxxxx
         <maml:Description>
           <maml:para>-page string{page number} go directly to a specific result page (1 to 1000)</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
-          <maml:name>String[]</maml:name>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -8129,7 +9077,7 @@ C:\PS&gt; Invoke-APISummaryOnypheHostname -Hostname www.perdu.com -APIKey "xxxxx
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>TypeName : System.Management.Automation.PSCustomObject</maml:name>
+          <maml:name>TypeName: PSOnyphe</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -8694,6 +9642,30 @@ C:\PS&gt; Invoke-APISummaryOnypheIP -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxx
           </dev:type>
           <dev:defaultValue>False</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>FuncInput</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill FuncInput Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+          <dev:type>
+            <maml:name>Hashtable</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>OutFile</maml:name>
+          <maml:Description>
+            <maml:para>{{ Fill OutFile Description }}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
@@ -8816,6 +9788,30 @@ C:\PS&gt; Invoke-APISummaryOnypheIP -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxx
           <maml:uri />
         </dev:type>
         <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>FuncInput</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill FuncInput Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+        <dev:type>
+          <maml:name>Hashtable</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>OutFile</maml:name>
+        <maml:Description>
+          <maml:para>{{ Fill OutFile Description }}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
     </command:parameters>
     <command:inputTypes>
@@ -9344,9 +10340,9 @@ C:\PS&gt; search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exi
           <maml:Description>
             <maml:para>{{ Fill InputOnypheObject Description }}</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
           <dev:type>
-            <maml:name>Object</maml:name>
+            <maml:name>Array</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -9503,9 +10499,9 @@ C:\PS&gt; search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exi
         <maml:Description>
           <maml:para>{{ Fill InputOnypheObject Description }}</maml:para>
         </maml:Description>
-        <command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
+        <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
         <dev:type>
-          <maml:name>Object</maml:name>
+          <maml:name>Array</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
