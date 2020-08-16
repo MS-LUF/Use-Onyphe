@@ -48,14 +48,23 @@
 # v1.0 :
 # - fix rate limiting issue on paging
 # - manage new API in Export-OnypheInfoToFile
-#
-# released on 06/2020
-# v1.1 : Last public release
-# - add new APIv2, migrate from APIv1 to full APIv2 (except bulk API that will be provided in 1.2)
+# v1.1 : 
+# - add new APIv2, migrate from APIv1 to full APIv2
 # - remove temporary fix for empty array in APIv2
 # - update deserialization of psobject
 #
+# released on 08/2020
+# v1.2 : Last public release
+# - add bulk API
+# - update code to optimize file export (decrease memory to write file directly)
+# - update object type to PSOnyphe
+# - update inputobject parameter to InputOnypheObject
+# - fix various bug found 
+
+#
 #'(c) 2018-2020 lucas-cueff.com - Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).'
+
+# dev : comment on fonction missing
 
 <#
 	.SYNOPSIS 
@@ -76,8 +85,8 @@
 	.DESCRIPTION
 	Get Some stats (count, total, min, max, average) for one or multiple properties of a onyphe result powershell object
 	
-	.PARAMETER inputobject
-	-inputobject PSCustomObject{Onyphe result PSCustomObject}
+	.PARAMETER InputOnypheObject
+	-InputOnypheObject PSCustomObject{Onyphe result PSCustomObject}
 	Onyphe object used for the stat
 	
 	.PARAMETER AdvancedFacets
@@ -89,7 +98,7 @@
 	Onyphe result object's property requested for the stat
 	
 	.OUTPUTS
-   	TypeName : System.Management.Automation.PSCustomObject
+   	TypeName: PSOnyphe
 		
 	.EXAMPLE
 	Search SynScan info and request stats for 'ip','port','tag' and 'organization' properties
@@ -98,13 +107,13 @@
 	.EXAMPLE
 	Search SynScan info and request stats for 'ip' property
 	C:\PS> $onypheobj = Search-OnypheInfo -AdvancedSearch @('country:FR','port:23','os:Linux') -SearchType synscan
-	C:\PS> Get-OnypheStatsFromObject -Facets 'ip' -inputobject $onypheobj
+	C:\PS> Get-OnypheStatsFromObject -Facets 'ip' -InputOnypheObject $onypheobj
 #>
 	[cmdletbinding()]
 	Param (
 		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
 		[ValidateScript({$_ -is [System.Management.Automation.PSCustomObject]})]
-			[array]$inputobject,
+			[array]$InputOnypheObject,
 		[parameter(Mandatory=$false)] 
 		[ValidateNotNullOrEmpty()]
 			[Array]$AdvancedFacets
@@ -140,13 +149,13 @@
 		}
 		If ($AdvancedFacets) {
 			foreach ($facet in $AdvancedFacets) {
-				$tmp = $inputobject.results."$($Facet)" | sort-object | get-unique
+				$tmp = $InputOnypheObject.results."$($Facet)" | sort-object | get-unique
 				$script:AllFacetObjects = @()
 				foreach ($object in $tmp) {
 					$tmpobj = $script:TemplateFacetObject | Select-Object *
 					$tmpobj.'Onyphe-Property-value' = $object
-					if (($inputobject.results | Where-Object {$_."$($Facet)" -eq "$($object)"}).count) {
-						$tmpobj.'Onyphe-Property-Count' = ($inputobject.results | Where-Object {$_."$($Facet)" -eq "$($object)"}).count
+					if (($InputOnypheObject.results | Where-Object {$_."$($Facet)" -eq "$($object)"}).count) {
+						$tmpobj.'Onyphe-Property-Count' = ($InputOnypheObject.results | Where-Object {$_."$($Facet)" -eq "$($object)"}).count
 					} Else {
 						$tmpobj.'Onyphe-Property-Count' = 1
 					}
@@ -165,12 +174,12 @@
 			}
 		} Else {
 			$script:AllFacetObjects = @()
-			$tmp = $inputobject.results."$($Facets)" | sort-object | get-unique
+			$tmp = $InputOnypheObject.results."$($Facets)" | sort-object | get-unique
 			foreach ($object in $tmp) {
 				$tmpobj = $script:TemplateFacetObject | Select-Object *
 				$tmpobj.'Onyphe-Property-value' = $object
-				if (($inputobject.results | Where-Object {$_."$($Facets)" -eq "$($object)"}).count) {
-					$tmpobj.'Onyphe-Property-Count' = ($inputobject.results | Where-Object {$_."$($Facets)" -eq "$($object)"}).count
+				if (($InputOnypheObject.results | Where-Object {$_."$($Facets)" -eq "$($object)"}).count) {
+					$tmpobj.'Onyphe-Property-Count' = ($InputOnypheObject.results | Where-Object {$_."$($Facets)" -eq "$($object)"}).count
 				} Else {
 					$tmpobj.'Onyphe-Property-Count' = 1
 				}
@@ -295,6 +304,10 @@
 		 .DESCRIPTION
 		 main function/cmdlet - Export Search information on onyphe.io web service using search export API
 		 send HTTP request to onyphe.io web service and convert back JSON information to a powershell custom object
+
+		 .PARAMETER InputOnypheObject
+		 -InputOnypheObject PSOnyphe object
+		 used a PSOnyphe object generated with Search-Onyphe as input
 	 
 		 .PARAMETER AdvancedSearch
 		 -AdvancedSearch ARRAY{filter:value,filter:value}
@@ -327,12 +340,7 @@
 		 .PARAMETER APIKey
 		 -APIKey string{APIKEY}
 		 set your APIKEY to be able to use Onyphe API.
-	 
-		 .PARAMETER Page
-		 -page string{page number}
-		 go directly to a specific result page (1 to 1000)
-		 you can set a list of page using x-y like 1-100 to read the first 100 pages
-	 
+	 	 
 		 .PARAMETER Wait
 		 -Wait int{second}
 		 wait for x second before sending the request to manage rate limiting restriction
@@ -375,10 +383,17 @@
 		 .EXAMPLE
 		 filter the results using multiple filters (only os property known and from all organization like *company*) for tcp port 3389 opened in russia  and export data to myexport.json
 		 C:\PS> Export-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan -SaveInfoAsFile .\myexport.json
+
+		.EXAMPLE
+		 search from onyphe using search-onyphe and pipe the object to export the content to a json file using export-onyphe
+		 C:\PS> Search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan | Export-onyphe -SaveInfoAsFile .\myexport.json
 	 #>
 		 [cmdletbinding()]
 		 param(
-			 [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$false,Position=2)]
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$false,Position=12)]
+			[ValidateScript({($_ -is [System.Management.Automation.PSCustomObject]) -or ($_ -is [Deserialized.System.Management.Automation.PSCustomObject])})]
+				  [array]$InputOnypheObject,
+		 	 [parameter(Mandatory=$false,Position=2)]
 			 [ValidateNotNullOrEmpty()]  
 				 [string]$SearchValue,
 			 [parameter(Mandatory=$false,Position=5)] 
@@ -408,7 +423,7 @@
 			 $ParameterAttribute = New-Object System.Management.Automation.ParameterAttribute
 			 $ParameterAttribute.ValueFromPipeline = $false
 			 $ParameterAttribute.ValueFromPipelineByPropertyName = $false
-			 $ParameterAttribute.Mandatory = $true
+			 $ParameterAttribute.Mandatory = $false
 			 $ParameterAttribute.Position = 1
 			 $AttributeCollection.Add($ParameterAttribute)
 			 $arrSet = Get-OnypheSearchCategories
@@ -450,44 +465,144 @@
 			 return $RuntimeParameterDictionary
 		}
 		Process {
-			$SearchType = $PsBoundParameters[$ParameterNameType]
-			$SearchFilter = $PsBoundParameters[$ParameterNameFilter]
-			$SearchFunction = $PsBoundParameters[$ParameterNameFunction]
-			$params = @{
-				SearchType = $SearchType
-			}
-			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
-			if ($wait) {start-sleep -s $wait}
-			if ($SearchFilter -and !($SearchValue)) {
-				throw "please use the SearchValue parameter when using SearchFilter parameter or used AdvancedSearch instead"
-			}
-			if ($SearchFunction -and !($FilterValue)) {
-				throw "please use the FilterValue parameter when using FilterFunction parameter"
-			}
-			if ($AdvancedSearch) {
-				 $params.add('AdvancedSearch',$AdvancedSearch)
-			} elseif ($SearchValue) {
-				$params.add('SearchValue',$SearchValue)
-				$params.add('SearchFilter',$SearchFilter)
-			}
-			if ($AdvancedFilter) {
-				$params.add('AdvancedFilter',$AdvancedFilter)
-			} elseif ($SearchFunction) {
-				$params.add('FilterFunction', $SearchFunction)
-				$params.add('FilterValue',$FilterValue)
-			}
-			if ($UseBetaFeatures) {
-				$params.add('UseBetaFeatures', $true)
-			}
-			$responsestream = Invoke-APIOnypheExport @params
-			try {
-				if ($host.Version.Major -lt 6) {
-					$responsestream | Set-Content -Path $SaveInfoAsFile -Encoding Byte -Force
-				} else {
-					$responsestream | Set-Content -Path $SaveInfoAsFile -AsByteStream -Force
+			if (!($InputOnypheObject)) {
+				$SearchType = $PsBoundParameters[$ParameterNameType]
+				$SearchFilter = $PsBoundParameters[$ParameterNameFilter]
+				$SearchFunction = $PsBoundParameters[$ParameterNameFunction]
+				if ((!($SearchValue) -and !($AdvancedSearch)) -or !($SearchType)) {
+					Throw "SearchValue or AdvancedSearch parameters and SearchType parameter are mandatory"
 				}
-			} catch {
-				throw "not able to save web stream content to $($SaveInfoAsFile)"
+				$params = @{
+					SearchType = $SearchType
+				}
+				if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+				if ($wait) {start-sleep -s $wait}
+				if ($SearchFilter -and !($SearchValue)) {
+					throw "please use the SearchValue parameter when using SearchFilter parameter or used AdvancedSearch instead"
+				}
+				if ($SearchFunction -and !($FilterValue)) {
+					throw "please use the FilterValue parameter when using FilterFunction parameter"
+				}
+				if ($AdvancedSearch) {
+					$params.add('AdvancedSearch',$AdvancedSearch)
+				} elseif ($SearchValue) {
+					$params.add('SearchValue',$SearchValue)
+					$params.add('SearchFilter',$SearchFilter)
+				}
+				if ($AdvancedFilter) {
+					$params.add('AdvancedFilter',$AdvancedFilter)
+				} elseif ($SearchFunction) {
+					$params.add('FilterFunction', $SearchFunction)
+					$params.add('FilterValue',$FilterValue)
+				}
+				if ($UseBetaFeatures) {
+					$params.add('UseBetaFeatures', $true)
+				}
+				$params.add('FuncInput', $PsBoundParameters)
+			} else {
+				if ($InputOnypheObject.'cli-func_input') {
+					$params = $InputOnypheObject.'cli-func_input'.clone()
+					$params.add('FuncInput', $InputOnypheObject.'cli-func_input'.clone())
+					if ($params.Page) {
+						$params.remove('Page')
+					}
+				} else {
+					throw "invalid input object, missing property cli-func_input"
+				}
+			}
+			$params.add('OutFile', $SaveInfoAsFile)
+			Invoke-APIOnypheExport @params
+		}
+	}
+	Function Export-OnypheBulkInfo {
+		<#
+		 .SYNOPSIS 
+		 main function/cmdlet - Export Search information on onyphe.io web service using bulk APIs
+	 
+		 .DESCRIPTION
+		 main function/cmdlet - Export Search information on onyphe.io web service using bulk APIs
+		 bulk APIs use input file containing ip, domain or hostname and sends back streamed json as result.
+	 	 
+		 .PARAMETER APIKey
+		 -APIKey string{APIKEY}
+		 set your APIKEY to be able to use Onyphe API.
+	 	 
+		 .PARAMETER Wait
+		 -Wait int{second}
+		 wait for x second before sending the request to manage rate limiting restriction
+	
+		 .PARAMETER SaveInfoAsFile
+		 -SaveInfoAsFile string
+		 full path to file where json data will be exported.
+
+		 .PARAMETER FilePath
+		 -FilePath string
+		 full path to file to be imported to the bulk API.
+
+		 .PARAMETER BulkAPIType
+		 -BulkAPIType string {Get-OnypheSummaryAPIName}
+		 Bulk API to be used : ip, domain, hostname
+		 
+		 .OUTPUTS
+		 TypeName: System.Management.Automation.PSCustomObject
+		 	 
+		 .EXAMPLE
+		 export search for IP information into Json file using myfile.txt as source IPs file
+		 C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType ip
+	 
+		 .EXAMPLE
+		 export search for domain information into Json file using myfile.txt as source domains file
+		 C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType domain
+	 
+		 .EXAMPLE
+		 export search for hostname information into Json file using myfileip.txt as source hostnames file
+		 C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType hostname
+	 #>
+		[cmdletbinding()]
+		param(
+			[parameter(Mandatory=$true)]
+			[ValidateScript({test-path "$($_)"})]
+				[string]$FilePath,
+			[parameter(Mandatory=$true)]
+				[string]$SaveInfoAsFile,
+			[parameter(Mandatory=$false)]
+			[ValidateLength(40,40)]
+				[string]$APIKey,
+			[parameter(Mandatory=$false)]
+				[int]$wait
+		)
+		DynamicParam
+		{
+			$ParameterNameType = 'SearchType'
+			$RuntimeParameterDictionary = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
+			$AttributeCollection = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
+			$ParameterAttribute = New-Object System.Management.Automation.ParameterAttribute
+			$ParameterAttribute.ValueFromPipeline = $false
+			$ParameterAttribute.ValueFromPipelineByPropertyName = $false
+			$ParameterAttribute.Mandatory = $true
+			$ParameterAttribute.Position = 2
+			$AttributeCollection.Add($ParameterAttribute)
+			$arrSet =  Get-OnypheSummaryAPIName
+			$ValidateSetAttribute = New-Object System.Management.Automation.ValidateSetAttribute($arrSet)
+			$AttributeCollection.Add($ValidateSetAttribute)
+			$ParameterNameAlias = New-Object System.Management.Automation.AliasAttribute -ArgumentList @("BulkAPIType")
+			$AttributeCollection.Add($ParameterNameAlias)
+			$RuntimeParameter = New-Object System.Management.Automation.RuntimeDefinedParameter($ParameterNameType, [string], $AttributeCollection)
+			$RuntimeParameterDictionary.Add($ParameterNameType, $RuntimeParameter)
+			return $RuntimeParameterDictionary
+	 	}
+		Process {
+			$SearchType = $PsBoundParameters[$ParameterNameType]
+			if ($wait) {start-sleep -s $wait}
+			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+			$params = @{
+				OutFile = $SaveInfoAsFile
+				FilePath = $FilePath
+			}
+			if (test-path function:\"Invoke-APIBulkSummaryOnyphe$($Searchtype)") {
+				$responsestream = invoke-expression "Invoke-APIBulkSummaryOnyphe$($Searchtype) `@params"
+			} else {
+				throw "API $($Searchtype) not implemented yet in this version of Use-Onyphe pwsh module"
 			}
 		}
 	}
@@ -661,6 +776,7 @@
 		$SearchFunction = $PsBoundParameters[$ParameterNameFunction]
 		$params = @{
 			SearchType = $SearchType
+			FuncInput = $PsBoundParameters
 		}
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
 		if ($wait) {start-sleep -s $wait}
@@ -932,7 +1048,7 @@
 			  $ParameterAttribute = New-Object System.Management.Automation.ParameterAttribute
 			  $ParameterAttribute.ValueFromPipeline = $false
 			  $ParameterAttribute.ValueFromPipelineByPropertyName = $false
-			  $ParameterAttribute.Mandatory = $false
+			  $ParameterAttribute.Mandatory = $true
 			  $ParameterAttribute.Position = 2
 			  $AttributeCollection.Add($ParameterAttribute)
 			  $arrSet =  Get-OnypheSummaryAPIName
@@ -1037,7 +1153,11 @@
 				UseBetaFeatures = $true
 			}
 		}
-		Invoke-APIOnypheUser @params
+		if ($params) {
+			Invoke-APIOnypheUser @params
+		} else {
+			Invoke-APIOnypheUser
+		}
 	}
 	}
 	Function Get-OnypheAlertInfo {
@@ -1237,9 +1357,9 @@
 			[parameter(Mandatory=$false,Position=10)] 
 			[ValidateNotNullOrEmpty()]
 				[Array]$AdvancedFilter,
-			[parameter(Mandatory=$false,ValueFromPipeline=$true,ValueFromPipelineByPropertyName=$true)]
-			[ValidateScript({($_ -is [System.Management.Automation.PSCustomObject]) -and ($_.'cli-API_info')})]
-				$InputOnypheObject
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$false)]
+			[ValidateScript({($_ -is [System.Management.Automation.PSCustomObject]) -or ($_ -is [Deserialized.System.Management.Automation.PSCustomObject])})]
+				[array]$InputOnypheObject
 		)
 		DynamicParam
 		{
@@ -1300,15 +1420,22 @@
 					SearchType = $SearchType
 					AlertName = $AlertName
 					AlertEmail = $AlertMail
+					FuncInput = $PsBoundParameters
 				}
 			} elseif ($InputOnypheObject) {
 				if (!$AlertName -and !$AlertMail) {
 					throw "please use AlertName, AlertMail and AlertAction parameters when using InputOnypheObject parameter"
 				} else {
-					$params = @{
-						InputOnypheObject = $InputOnypheObject
-						AlertName = $AlertName
-						AlertEmail = $AlertMail
+					if ($InputOnypheObject.'cli-func_input') {
+						$params = $InputOnypheObject.'cli-func_input'.clone()
+						$params.add('FuncInput', $InputOnypheObject.'cli-func_input'.clone())
+						$params.add('AlertName',$AlertName)
+						$params.add('AlertEmail',$Alertmail)
+						if ($params.Page) {
+							$params.remove('Page')
+						}
+					} else {
+						throw "invalid input object, missing property cli-func_input"
 					}
 				}
 			}
@@ -1389,7 +1516,7 @@
 	  use test.onyphe.io to use new beat features of Onyphe
 	  
 	  .OUTPUTS
-		 TypeName : System.Management.Automation.PSCustomObject
+		 TypeName: PSOnyphe
   
 	  .EXAMPLE
 	  get user account info for api key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx and set the api key
@@ -1404,8 +1531,11 @@
 		[parameter(Mandatory=$false)]
 		[ValidateLength(40,40)]
 			[string]$APIKey,
-		[parameter(Mandatory=$false,Position=10)]
-			[switch]$UseBetaFeatures
+		[parameter(Mandatory=$false)]
+			[switch]$UseBetaFeatures,
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[hashtable]$FuncInput
 	)  
 	  Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -1414,6 +1544,9 @@
 				APIInfo = "user"
 				APIInput = "none"
 				APIKeyrequired = $true
+			}
+			if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
 			}
 			if ($UseBetaFeatures) {
 				$params.add("UseBetaFeatures", $true)
@@ -1443,7 +1576,7 @@
 	go directly to a specific result page (1 to 1000)
 	
 	.OUTPUTS
-	TypeName : System.Management.Automation.PSCustomObject
+	TypeName: PSOnyphe
 
 	.EXAMPLE
 	get inetnum info for subnet 93.184.208.0
@@ -1458,13 +1591,16 @@
 		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
 		[Alias("input")]
 		[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
-			[string[]]$IP, 
+			[string]$IP, 
 		[parameter(Mandatory=$false)]
 		[ValidateLength(40,40)]
 			[string]$APIKey,
 		[parameter(Mandatory=$false)]
 		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
-			[string[]]$Page
+			[string]$Page,
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[hashtable]$FuncInput
   )
 	Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -1473,6 +1609,9 @@
 			APIInfo = "inetnum"
 			APIInput = @("$($IP)")
 			APIKeyrequired = $true
+		}
+		if ($FuncInput) {
+			$params.add("FuncInput", $FuncInput)
 		}
 		if ($page) {$params.add('page',$page)}
 		Write-Verbose -message "URL Info : $($params.request)"
@@ -1500,7 +1639,7 @@
 	go directly to a specific result page (1 to 1000)
 	
 	.OUTPUTS
-	TypeName : System.Management.Automation.PSCustomObject
+	TypeName: PSOnyphe
 
 	.EXAMPLE
 	get all pastries info for IP 8.8.8.8
@@ -1521,7 +1660,10 @@
 			[string]$APIKey,
 		[parameter(Mandatory=$false)]
 		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
-			[string[]]$Page
+			[string]$Page,
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[hashtable]$FuncInput
   )
 	Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -1530,6 +1672,9 @@
 			APIInfo = "patries"
 			APIInput = @("$($IP)")
 			APIKeyrequired = $true
+		}
+		if ($FuncInput) {
+			$params.add("FuncInput", $FuncInput)
 		}
 		if ($page) {$params.add('page',$page)}
 		Write-Verbose -message "URL Info : $($params.request)"
@@ -1557,7 +1702,7 @@
 	go directly to a specific result page (1 to 1000)
 	
 	.OUTPUTS
-	TypeName : System.Management.Automation.PSCustomObject
+	TypeName: PSOnyphe
 
 	.EXAMPLE
 	get syn scan info for IP 8.8.8.8
@@ -1578,7 +1723,10 @@
 			[string]$APIKey,
 		[parameter(Mandatory=$false)]
 		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
-			[string[]]$Page
+			[string]$Page,
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[hashtable]$FuncInput
   )
 	Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -1589,6 +1737,9 @@
 			APIKeyrequired = $true
 		}
 		if ($page) {$params.add('page',$page)}
+		if ($FuncInput) {
+			$params.add("FuncInput", $FuncInput)
+		}
 		Write-Verbose -message "URL Info : $($params.request)"
 		Invoke-OnypheAPIV2 @params
 	}
@@ -1614,7 +1765,7 @@
 	go directly to a specific result page (1 to 1000)
 	
 	.OUTPUTS
-	TypeName : System.Management.Automation.PSCustomObject
+	TypeName: PSOnyphe
 
 	.EXAMPLE
 	get sniffer info for IP 217.138.28.194
@@ -1635,7 +1786,10 @@
 				[string]$APIKey,
 			[parameter(Mandatory=$false)]
 			[ValidateScript({$_ -match "^((?!0)\d+)$"})]
-				[string[]]$Page
+				[string]$Page,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
 		)
 		Process {
 			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -1646,6 +1800,9 @@
 				APIKeyrequired = $true
 			}
 			if ($page) {$params.add('page',$page)}
+			if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			}
 			Write-Verbose -message "URL Info : $($params.request)"
 			Invoke-OnypheAPIV2 @params
 		}
@@ -1671,7 +1828,7 @@
 	go directly to a specific result page (1 to 1000)
 	
 	.OUTPUTS
-	TypeName : System.Management.Automation.PSCustomObject
+	TypeName: PSOnyphe
 
 	.EXAMPLE
 	get CTL info for fnac.com
@@ -1692,7 +1849,10 @@
 				[string]$APIKey,
 			[parameter(Mandatory=$false)]
 			[ValidateScript({$_ -match "^((?!0)\d+)$"})]
-				[string[]]$Page
+				[string]$Page,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
 		)
 		Process {
 			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -1703,6 +1863,9 @@
 				APIKeyrequired = $true
 			}
 			if ($page) {$params.add('page',$page)}
+			if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			}
 			Write-Verbose -message "URL Info : $($params.request)"
 			Invoke-OnypheAPIV2 @params
 		}
@@ -1728,7 +1891,7 @@
 	go directly to a specific result page (1 to 1000)
 	
 	.OUTPUTS
-	TypeName : System.Management.Automation.PSCustomObject
+	TypeName: PSOnyphe
 
 	.EXAMPLE
 	get md5 info for 7a1f20cae067b75a52bc024b83ee4667 hash
@@ -1743,13 +1906,16 @@
 			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
 			[Alias("input")]
 			[ValidateScript({($_ -match "^[a-f0-9]{32}$")})]
-				[string[]]$MD5, 
+				[string]$MD5, 
 			[parameter(Mandatory=$false)]
 			[ValidateLength(40,40)]
 				[string]$APIKey,
 			[parameter(Mandatory=$false)]
 			[ValidateScript({$_ -match "^((?!0)\d+)$"})]
-				[string[]]$Page
+				[string]$Page,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
 		)
 		Process {
 			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -1760,6 +1926,9 @@
 				APIKeyrequired = $true
 			}
 			if ($page) {$params.add('page',$page)}
+			if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			}
 			Write-Verbose -message "URL Info : $($params.request)"
 			Invoke-OnypheAPIV2 @params
 		}
@@ -1785,7 +1954,7 @@
 		go directly to a specific result page (1 to 1000)
 		
 		.OUTPUTS
-		TypeName : System.Management.Automation.PSCustomObject
+		TypeName: PSOnyphe
 
 		.EXAMPLE
 		get md5 info for 3g2upl4pq6kufc4m.onion URL
@@ -1800,13 +1969,16 @@
 			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
 			[Alias("input")]
 			[ValidateScript({($_ -match "[a-z2-7]{16}\.onion") -or ($_ -match "[a-z2-7]{56}\.onion")})]
-				[string[]]$Onion, 
+				[string]$Onion, 
 			[parameter(Mandatory=$false)]
 			[ValidateLength(40,40)]
 				[string]$APIKey,
 			[parameter(Mandatory=$false)]
 			[ValidateScript({$_ -match "^((?!0)\d+)$"})]
-				[string[]]$Page
+				[string]$Page,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
 		)
 		Process {
 			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -1817,6 +1989,9 @@
 				APIKeyrequired = $true
 			}
 			if ($page) {$params.add('page',$page)}
+			if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			}
 			Write-Verbose -message "URL Info : $($params.request)"
 			Invoke-OnypheAPIV2 @params
 		}
@@ -1842,7 +2017,7 @@
 			  go directly to a specific result page (1 to 1000)
 			  
 			  .OUTPUTS
-			   TypeName : System.Management.Automation.PSCustomObject
+			   TypeName: PSOnyphe
 	  			  
 			  .EXAMPLE
 			  get dns info info for IP 8.8.8.8
@@ -1857,13 +2032,16 @@
 			  [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
 			  [Alias("input")]
 			  [ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
-				  [string[]]$IP, 
+				  [string]$IP, 
 			  [parameter(Mandatory=$false)]
 			  [ValidateLength(40,40)]
 				  [string]$APIKey,
 			  [parameter(Mandatory=$false)]
 			  [ValidateScript({$_ -match "^((?!0)\d+)$"})]
-				  [string[]]$Page
+				  [string]$Page,
+				[parameter(Mandatory=$false)]
+				[ValidateNotNullOrEmpty()]
+					[hashtable]$FuncInput
 		)
 		  Process {
 			  if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -1874,6 +2052,9 @@
 				  APIKeyrequired = $true
 			  }
 			  if ($page) {$params.add('page',$page)}
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			}
 			  Write-Verbose -message "URL Info : $($params.request)"
 			  Invoke-OnypheAPIV2 @params
 		  }
@@ -1899,7 +2080,7 @@
 		go directly to a specific result page (1 to 1000)
 		
 		.OUTPUTS
-		TypeName : System.Management.Automation.PSCustomObject
+		TypeName: PSOnyphe
 		
 		.EXAMPLE
 		get reverse dns info info for IP 8.8.8.8
@@ -1914,13 +2095,16 @@
 		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
 		[Alias("input")]
 		[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
-			[string[]]$IP, 
+			[string]$IP, 
 		[parameter(Mandatory=$false)]
 		[ValidateLength(40,40)]
 			[string]$APIKey,
 		[parameter(Mandatory=$false)]
 		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
-			[string[]]$Page
+			[string]$Page,
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[hashtable]$FuncInput
   )
 	Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -1931,6 +2115,9 @@
 			APIKeyrequired = $true
 		}
 		if ($page) {$params.add('page',$page)}
+		if ($FuncInput) {
+			$params.add("FuncInput", $FuncInput)
+		}
 		Write-Verbose -message "URL Info : $($params.request)"
 		Invoke-OnypheAPIV2 @params
 	}
@@ -1956,7 +2143,7 @@
 		go directly to a specific result page (1 to 1000)
 		
 		.OUTPUTS
-		TypeName : System.Management.Automation.PSCustomObject
+		TypeName: PSOnyphe
 		
 		.EXAMPLE
 		get all forward dns info for IP 8.8.8.8
@@ -1971,13 +2158,16 @@
 		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
 		[Alias("input")]
 		[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
-			[string[]]$IP, 
+			[string]$IP, 
 		[parameter(Mandatory=$false)]
 		[ValidateLength(40,40)]
 			[string]$APIKey,
 		[parameter(Mandatory=$false)]
 		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
-			[string[]]$Page
+			[string]$Page,
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[hashtable]$FuncInput
   )
 	Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -1988,6 +2178,9 @@
 			APIKeyrequired = $true
 		}
 		if ($page) {$params.add('page',$page)}
+		if ($FuncInput) {
+			$params.add("FuncInput", $FuncInput)
+		}
 		Write-Verbose -message "URL Info : $($params.request)"
 		Invoke-OnypheAPIV2 @params
 	}
@@ -2013,7 +2206,7 @@
 		go directly to a specific result page (1 to 1000)
 			
 		.OUTPUTS
-		TypeName : System.Management.Automation.PSCustomObject
+		TypeName: PSOnyphe
 
 		.EXAMPLE
 		get all threat info for IP 	201.111.50.232
@@ -2028,13 +2221,16 @@
 		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
 		[Alias("input")]
 		[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
-			[string[]]$IP, 
+			[string]$IP, 
 		[parameter(Mandatory=$false)]
 		[ValidateLength(40,40)]
 			[string]$APIKey,
 		[parameter(Mandatory=$false)]
 		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
-			[string[]]$Page
+			[string]$Page,
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[hashtable]$FuncInput
   )
 	Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -2045,6 +2241,9 @@
 			APIKeyrequired = $true
 		}
 		if ($page) {$params.add('page',$page)}
+		if ($FuncInput) {
+			$params.add("FuncInput", $FuncInput)
+		}
 		Write-Verbose -message "URL Info : $($params.request)"
 		Invoke-OnypheAPIV2 @params
 	}
@@ -2070,7 +2269,7 @@
 			  go directly to a specific result page (1 to 1000)
 				  
 			  .OUTPUTS
-			  TypeName : System.Management.Automation.PSCustomObject
+			  TypeName: PSOnyphe
 	  
 			  .EXAMPLE
 			  get all topsite info for IP 178.250.241.22
@@ -2085,13 +2284,16 @@
 			  [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
 			  [Alias("input")]
 			  [ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
-				  [string[]]$IP, 
+				  [string]$IP, 
 			  [parameter(Mandatory=$false)]
 			  [ValidateLength(40,40)]
 				  [string]$APIKey,
 			  [parameter(Mandatory=$false)]
 			  [ValidateScript({$_ -match "^((?!0)\d+)$"})]
-				  [string[]]$Page
+				  [string]$Page,
+				[parameter(Mandatory=$false)]
+				[ValidateNotNullOrEmpty()]
+					[hashtable]$FuncInput
 		)
 		  Process {
 			  if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -2102,6 +2304,9 @@
 				  APIKeyrequired = $true
 			  }
 			  if ($page) {$params.add('page',$page)}
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
 			  Write-Verbose -message "URL Info : $($params.request)"
 			  Invoke-OnypheAPIV2 @params
 		  }
@@ -2127,7 +2332,7 @@
 			  go directly to a specific result page (1 to 1000)
 				  
 			  .OUTPUTS
-			  TypeName : System.Management.Automation.PSCustomObject
+			  TypeName: PSOnyphe
 	  
 			  .EXAMPLE
 			  get all CVE info for IP 178.250.241.22
@@ -2142,13 +2347,16 @@
 			  [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
 			  [Alias("input")]
 			  [ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
-				  [string[]]$IP, 
+				  [string]$IP, 
 			  [parameter(Mandatory=$false)]
 			  [ValidateLength(40,40)]
 				  [string]$APIKey,
 			  [parameter(Mandatory=$false)]
 			  [ValidateScript({$_ -match "^((?!0)\d+)$"})]
-				  [string[]]$Page
+				  [string]$Page,
+				[parameter(Mandatory=$false)]
+				[ValidateNotNullOrEmpty()]
+					[hashtable]$FuncInput
 		)
 		  Process {
 			  if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -2159,6 +2367,9 @@
 				  APIKeyrequired = $true
 			  }
 			  if ($page) {$params.add('page',$page)}
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
 			  Write-Verbose -message "URL Info : $($params.request)"
 			  Invoke-OnypheAPIV2 @params
 		  }
@@ -2186,7 +2397,7 @@
 		go directly to a specific result page (1 to 1000)
 		
 		.OUTPUTS
-		TypeName : System.Management.Automation.PSCustomObject
+		TypeName: PSOnyphe
 
 		.EXAMPLE
 		get all data scan info for IP 27.251.29.154
@@ -2205,13 +2416,16 @@
 		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
 		[Alias("input")]
 		[ValidateNotNullOrEmpty()]
-			[string[]]$IPOrDataScanString,
+			[string]$IPOrDataScanString,
 		[parameter(Mandatory=$false)]
 		[ValidateLength(40,40)]
 			[string]$APIKey,
 		[parameter(Mandatory=$false)]
 		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
-			[string[]]$Page
+			[string]$Page,
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[hashtable]$FuncInput
   )
 	Process {
 		$script:DateRequest = get-date
@@ -2223,6 +2437,9 @@
 			APIKeyrequired = $true
 		}
 		if ($page) {$params.add('page',$page)}
+		if ($FuncInput) {
+			$params.add("FuncInput", $FuncInput)
+		}
 		Write-Verbose -message "URL Info : $($params.request)"
 		Invoke-OnypheAPIV2 @params
 	}
@@ -2248,7 +2465,7 @@
 		go directly to a specific result page (1 to 1000)
 			
 		.OUTPUTS
-		TypeName : System.Management.Automation.PSCustomObject
+		TypeName: PSOnyphe
 
 		.EXAMPLE
 		get all datashot for IP 178.250.241.22
@@ -2263,13 +2480,16 @@
 			  [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
 			  [Alias("input")]
 			  [ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
-				  [string[]]$IP, 
+				  [string]$IP, 
 			  [parameter(Mandatory=$false)]
 			  [ValidateLength(40,40)]
 				  [string]$APIKey,
 			  [parameter(Mandatory=$false)]
 			  [ValidateScript({$_ -match "^((?!0)\d+)$"})]
-				  [string[]]$Page
+				  [string]$Page,
+				[parameter(Mandatory=$false)]
+				[ValidateNotNullOrEmpty()]
+					[hashtable]$FuncInput
 		)
 		  Process {
 			  if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -2280,6 +2500,9 @@
 				  APIKeyrequired = $true
 			  }
 			  if ($page) {$params.add('page',$page)}
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
 			  Write-Verbose -message "URL Info : $($params.request)"
 			  Invoke-OnypheAPIV2 @params
 		  }
@@ -2305,7 +2528,7 @@
 	  go directly to a specific result page (1 to 1000)
 		  
 	  .OUTPUTS
-	  TypeName : System.Management.Automation.PSCustomObject
+	  TypeName: PSOnyphe
 
 	  .EXAMPLE
 	  get all onionshot for IP 178.250.241.22
@@ -2320,13 +2543,16 @@
 			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
 			[Alias("input")]
 			[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
-				[string[]]$IP, 
+				[string]$IP, 
 			[parameter(Mandatory=$false)]
 			[ValidateLength(40,40)]
 				[string]$APIKey,
 			[parameter(Mandatory=$false)]
 			[ValidateScript({$_ -match "^((?!0)\d+)$"})]
-				[string[]]$Page
+				[string]$Page,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
 	  )
 		Process {
 			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -2337,6 +2563,9 @@
 				APIKeyrequired = $true
 			}
 			if ($page) {$params.add('page',$page)}
+			if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			}
 			Write-Verbose -message "URL Info : $($params.request)"
 			Invoke-OnypheAPIV2 @params
 		}
@@ -2353,7 +2582,7 @@
 		  IP to be used for the geoloc API usage
 		  
 		  .OUTPUTS
-		  TypeName : System.Management.Automation.PSCustomObject
+		  TypeName: PSOnyphe
 		  
 		  .EXAMPLE
 		  get geoloc info for IP 8.8.8.8
@@ -2370,7 +2599,10 @@
 			  [string]$APIKey,
 		  [parameter(Mandatory=$false)]
 		  [ValidateScript({$_ -match "^((?!0)\d+)$"})]
-			  [string[]]$Page
+			  [string]$Page,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
 	)
 	process {
 		 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
@@ -2381,6 +2613,9 @@
 			  APIKeyrequired = $true
 		  }
 		  if ($page) {$params.add('page',$page)}
+		  if ($FuncInput) {
+			$params.add("FuncInput", $FuncInput)
+		  }
 		  Write-Verbose -message "URL Info : $($params.request)"
 		  Invoke-OnypheAPIV2 @params
 	}
@@ -2405,7 +2640,7 @@
 	      go directly to a specific result page (1 to 1000)
 
 		  .OUTPUTS
-		  TypeName : System.Management.Automation.PSCustomObject
+		  TypeName: PSOnyphe
 		  
 		  .EXAMPLE
 		  get all onyphe info for IP 8.8.8.8
@@ -2426,7 +2661,10 @@
 				  [string]$APIKey,
 			  [parameter(Mandatory=$false)]
 			  [ValidateScript({$_ -match "^((?!0)\d+)$"})]
-				  [string[]]$Page
+				  [string]$Page,
+				[parameter(Mandatory=$false)]
+				[ValidateNotNullOrEmpty()]
+					[hashtable]$FuncInput
 		)
 		process {
 			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
@@ -2437,6 +2675,9 @@
 				  APIKeyrequired = $true
 			  }
 			  if ($page) {$params.add('page',$page)}
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
 			  Write-Verbose -message "URL Info : $($params.request)"
 			  Invoke-OnypheAPIV2 @params
 		}
@@ -2461,7 +2702,7 @@
 	      go directly to a specific result page (1 to 1000)
 
 		  .OUTPUTS
-		  TypeName : System.Management.Automation.PSCustomObject
+		  TypeName: PSOnyphe
 		  
 		  .EXAMPLE
 		  get all onyphe info for hostname www.perdu.com
@@ -2476,13 +2717,16 @@
 			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
 			[Alias("input")]
 			[ValidateScript({($_ -match "^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$")})]
-				[string[]]$Hostname, 
+				[string]$Hostname, 
 			[parameter(Mandatory=$false)]
 			[ValidateLength(40,40)]
 				[string]$APIKey,
 			[parameter(Mandatory=$false)]
 			[ValidateScript({$_ -match "^((?!0)\d+)$"})]
-				[string[]]$Page
+				[string]$Page,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
 		)
 		Process {
 			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -2493,6 +2737,9 @@
 				APIKeyrequired = $true
 			}
 			if ($page) {$params.add('page',$page)}
+			if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			}
 			Write-Verbose -message "URL Info : $($params.request)"
 			Invoke-OnypheAPIV2 @params
 		}
@@ -2517,7 +2764,7 @@
 	      go directly to a specific result page (1 to 1000)
 
 		  .OUTPUTS
-		  TypeName : System.Management.Automation.PSCustomObject
+		  TypeName: PSOnyphe
 		  
 		  .EXAMPLE
 		  get all onyphe info for domain perdu.com
@@ -2532,13 +2779,16 @@
 			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
 			[Alias("input")]
 			[ValidateScript({($_ -match "^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$")})]
-				[string[]]$Domain, 
+				[string]$Domain, 
 			[parameter(Mandatory=$false)]
 			[ValidateLength(40,40)]
 				[string]$APIKey,
 			[parameter(Mandatory=$false)]
 			[ValidateScript({$_ -match "^((?!0)\d+)$"})]
-				[string[]]$Page
+				[string]$Page,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
 		)
 		Process {
 			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -2549,44 +2799,210 @@
 				APIKeyrequired = $true
 			}
 			if ($page) {$params.add('page',$page)}
+			if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			}
 			Write-Verbose -message "URL Info : $($params.request)"
 			Invoke-OnypheAPIV2 @params
 		}
 	}
 	Function Invoke-APIBulkSummaryOnypheIP {
-		### Dev ongoing ###
+		<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of IPs based on a file input from Bulk/ip API
+		  .DESCRIPTION
+		  reate several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of IPs based on a file input from Bulk/ip API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		  -APIKey string{APIKEY}
+		  Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: PSOnyphe
+		  
+		  .EXAMPLE
+		  export all info available as JSON for all IPs contained in listip.txt
+		  C:\PS> Invoke-APIBulkSummaryOnypheIP -FilePath .\listip.txt
+
+		  .EXAMPLE
+		  export all info available as JSON for all IPs contained in listip.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSummaryOnypheIP -FilePath .\listip.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	#>
 		[cmdletbinding()]
 		Param (
 			  [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
 			  [Alias("input")]
 			  [ValidateScript({(test-path $_)})]
-			  	  [string]$IPFilePath,
+				  [string]$FilePath,
+			  [parameter(Mandatory=$true)]
+			  [ValidateScript({!(test-path $_)})]
+				  [string]$OutFile,
 			  [parameter(Mandatory=$false)]
 			  [ValidateLength(40,40)]
 				  [string]$APIKey,
-			  [parameter(Mandatory=$false)]
-			  [ValidateScript({$_ -match "^((?!0)\d+)$"})]
-				  [string[]]$Page
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
 		)
 		process {
 			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
 			 $params = @{
 				  request = "v2/bulk/summary/ip"
 				  APIInfo = "bulk/summary/ip"
-				  APIInput = @("File:$($ipfilepath)")
-				  file = $IPFilePath
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
 				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
 			  }
-			  if ($page) {$params.add('page',$page)}
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
 			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
 			  Invoke-OnypheAPIV2 @params
 		}
 	}
 	Function Invoke-APIBulkSummaryOnypheHostname {
-		### Dev ongoing ###
+		<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of hostnames based on a file input from Bulk/hostname API
+		  .DESCRIPTION
+		  reate several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of hostnames based on a file input from Bulk/hostname API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		 -APIKey string{APIKEY}
+		 Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: PSOnyphe
+		  
+		  .EXAMPLE
+		  export all info available as JSON for all hosts contained in listhost.txt
+		  C:\PS> Invoke-APIBulkSummaryOnypheHostname -FilePath .\listhost.txt
+
+		  .EXAMPLE
+		  export all info available as JSON for all hosts contained in listhost.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSummaryOnypheHostname -FilePath .\listhost.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	#>
+		[cmdletbinding()]
+		Param (
+			  [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			  [Alias("input")]
+			  [ValidateScript({(test-path $_)})]
+					[string]$FilePath,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile,
+			  [parameter(Mandatory=$false)]
+			  [ValidateLength(40,40)]
+				  [string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+			 $params = @{
+				  request = "v2/bulk/summary/hostname"
+				  APIInfo = "bulk/summary/hostname"
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
+				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
+			  }
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
+			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
+			  Invoke-OnypheAPIV2 @params
+		}
 	}
 	Function Invoke-APIBulkSummaryOnypheDomain {
-		### Dev ongoing ###
+		<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of domains based on a file input from Bulk/domain API
+		  .DESCRIPTION
+		  reate several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of domains based on a file input from Bulk/domain API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		 -APIKey string{APIKEY}
+		 Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: PSOnyphe
+		  
+		  .EXAMPLE
+		  export all info available as JSON for all domains contained in listdom.txt
+		  C:\PS> Invoke-APIBulkSummaryOnypheDomain -FilePath .\listdom.txt
+
+		  .EXAMPLE
+		  export all info available as JSON for all domains contained in listdom.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSummaryOnypheDomain -FilePath .\listdom.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	#>
+		[cmdletbinding()]
+		Param (
+			  [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			  [Alias("input")]
+			  [ValidateScript({(test-path $_)})]
+					[string]$FilePath,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile,
+			  [parameter(Mandatory=$false)]
+			  [ValidateLength(40,40)]
+				  [string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+			 $params = @{
+				  request = "v2/bulk/summary/domain"
+				  APIInfo = "bulk/summary/domain"
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
+				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
+			  }
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
+			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
+			  Invoke-OnypheAPIV2 @params
+		}
 	}
 	Function Invoke-OnypheAPIV2 {
 	[cmdletbinding()]
@@ -2611,13 +3027,18 @@
 			  [string[]]$APIInput,
 		  [parameter(Mandatory=$true)]
 			  [Bool]$APIKeyrequired,
+		  [parameter(mandatory=$false)]
+		  [ValidateNotNullOrEmpty()]
+		  	  [hashtable]$FuncInput,
 		  [parameter(Mandatory=$false)]
 		  [ValidateScript({$_ -match "^((?!0)\d+)$"})] 
 			  [string[]]$page,
 		  [parameter(Mandatory=$false)]
 			  [switch]$UseBetaFeatures,
 		  [parameter(Mandatory=$false)]
-			  [switch]$Stream
+			  [switch]$Stream,
+		  [parameter(Mandatory=$false)]
+		  	  [string]$OutFile
 	)
 	Process {
 	  if ($UseBetaFeatures) {
@@ -2632,7 +3053,7 @@
 		  write-verbose -message "incorrect parameter - Please provide an APIKey with -APIKEY parameter"
 		  throw "Please provide an APIKey with -APIKEY parameter"
 	  }
-	try {
+	  try {
 		  $fullonypheurl = "$($onypheurl)$($request)"
 		  if ($page) {
 			  $fullonypheurl = "$($fullonypheurl)?page=$($page)"
@@ -2708,6 +3129,9 @@
 		  if ($APIKeyrequired) {
 			  $params.add('Headers', @{'Authorization' = 'apikey {0}' -f $global:OnypheAPIKey}) 
 		  }
+		  if ($Stream -and $OutFile) {
+			$params.add('OutFile', $OutFile)
+		  }
 		  write-verbose -message "Request Headers : $($params.Headers | out-string)"
 		  $onypheresult = invoke-webrequest @params
 	  } catch {
@@ -2720,22 +3144,15 @@
 			  if (($errorcode -eq 429) -or ($errorcode -eq 200) -or ($errorcode -eq 400)) {
 				  if ($_.ErrorDetails.Message) {
 					  $errorvalue = $_.ErrorDetails.Message | Convertfrom-Json
-				  } 
-				  elseif (get-member -InputObject $_.Exception.Response -MemberType Method | Where-Object {$_.name -eq "GetResponseStream"}){
+				  } elseif (get-member -InputOnypheObject $_.Exception.Response -MemberType Method | Where-Object {$_.name -eq "GetResponseStream"}){
 					$result = $_.Exception.Response.GetResponseStream()
 					$reader = New-Object System.IO.StreamReader($result)
 					$reader.BaseStream.Position = 0
 					$httpbody = $reader.ReadToEnd()
 					$errorvalue = $httpbody | Convertfrom-Json
-				  }
-				  else {
+				  } else {
 					$errorvalue = [PSCustomObject]@{}
 				  }
-				  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-API_info' -Value $APIInfo
-				  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-API_input' -Value $APIInput
-				  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-API_version' -Value "2"
-				  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-key_required' -Value $APIKeyrequired
-				  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-Request_Date' -Value $script:DateRequest
 			  } else {
 				  $errorvalue = [PSCustomObject]@{
 					  Count = 0
@@ -2746,54 +3163,44 @@
 					  status = "ko"
 					  took = 0
 					  total = 0
-					  'cli-API_info' = $APIInfo
-					  'cli-API_input' = $APIInput
-					  'cli-API_version' = "2"
-					  'cli-key_required' = $APIKeyrequired
-					  'cli-Request_Date' = $script:DateRequest
 				  }
 			  }
-		  }
-		  if (-not $errorvalue) {
-			  try {
-				write-verbose -message "Response Headers : $($onypheresult.Headers | out-string)"  
-				write-verbose -message "Web Content : $($onypheresult.Content)"
-				  if ($Stream) {
-					$temp = $onypheresult.Content
-				  } else {
-					$temp = $onypheresult.Content | convertfrom-json
-					$temp | add-member -MemberType NoteProperty -Name 'cli-API_info' -Value $APIInfo
-					$temp | add-member -MemberType NoteProperty -Name 'cli-API_input' -Value $APIInput
-					$temp | add-member -MemberType NoteProperty -Name 'cli-API_version' -Value "2"
-					$temp | add-member -MemberType NoteProperty -Name 'cli-key_required' -Value $APIKeyrequired
-					$temp | add-member -MemberType NoteProperty -Name 'cli-Request_Date' -Value $script:DateRequest
-				  }
-			  } catch {
-				  write-verbose -message "unable to convert result into a powershell object - json error"
-				  write-verbose -message "Error Type: $($_.Exception.GetType().FullName)"
-				  write-verbose -message "Error Message: $($_.Exception.Message)"
-				  $errorvalue = [PSCustomObject]@{
-					  Count = 0
-					  error = ""
-					  myip = 0
-					  results = ''
-					  'cli-error_results' = "$($_.Exception.GetType().FullName) - $($_.Exception.Message) : $($onypheresult.Content)"
-					  status = "ko"
-					  took = 0
-					  total = 0
-					  'cli-API_info' = $APIInfo
-					  'cli-API_input' = $APIInput
-					  'cli-API_version' = "2"
-					  'cli-key_required' = $APIKeyrequired
-					  'cli-Request_Date' = $script:DateRequest
-				  }
-			  }
-		  }
-		  if ($errorvalue) {
+	  }
+	  if ((-not $errorvalue) -and $onypheresult.Content) {
+			write-verbose -message "Response Headers : $($onypheresult.Headers | out-string)"  
+			write-verbose -message "Web Content : $($onypheresult.Content)"
+			$reqresult = $onypheresult.Content
+	   } else {
+		$reqresult = $null
+	   }
+	   if ($errorvalue) {
+			  $errorvalue.PSObject.TypeNames.Insert(0,"PSOnyphe")
+			  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-API_info' -Value $APIInfo
+			  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-API_input' -Value $APIInput
+			  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-API_version' -Value "2"
+			  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-key_required' -Value $APIKeyrequired
+			  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-Request_Date' -Value $script:DateRequest
+			  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-func_input' -value $FuncInput
+			  $defaultDisplaySet = $errorvalue.psobject.properties.name | Where-Object {$_ -notlike "cli-*"}
+			  $defaultDisplayPropertySet = New-Object System.Management.Automation.PSPropertySet("DefaultDisplayPropertySet",[string[]]$defaultDisplaySet)
+			  $PSStandardMembers = [System.Management.Automation.PSMemberInfo[]]@($defaultDisplayPropertySet)
+			  $errorvalue | Add-Member MemberSet PSStandardMembers $PSStandardMembers
 			  $errorvalue
-		  } elseif ($temp) {
-			$temp
-		  }
+		} elseif ($reqresult) {
+				$tempobj = $reqresult | Convertfrom-Json
+				$tempobj.PSObject.TypeNames.Insert(0,"PSOnyphe")
+				$tempobj | add-member -MemberType NoteProperty -Name 'cli-API_info' -Value $APIInfo
+				$tempobj | add-member -MemberType NoteProperty -Name 'cli-API_input' -Value $APIInput
+				$tempobj | add-member -MemberType NoteProperty -Name 'cli-API_version' -Value "2"
+				$tempobj | add-member -MemberType NoteProperty -Name 'cli-key_required' -Value $APIKeyrequired
+				$tempobj | add-member -MemberType NoteProperty -Name 'cli-Request_Date' -Value $script:DateRequest
+				$tempobj | add-member -MemberType NoteProperty -Name 'cli-func_input' -value $FuncInput
+				$defaultDisplaySet = $tempobj.psobject.properties.name | Where-Object {$_ -notlike "cli-*"}
+				$defaultDisplayPropertySet = New-Object System.Management.Automation.PSPropertySet("DefaultDisplayPropertySet",[string[]]$defaultDisplaySet)
+				$PSStandardMembers = [System.Management.Automation.PSMemberInfo[]]@($defaultDisplayPropertySet)
+				$tempobj | Add-Member MemberSet PSStandardMembers $PSStandardMembers
+				$tempobj
+		}
 	  }
 	}
 	Function Export-OnypheInfoToFile {
@@ -2811,8 +3218,8 @@
 		-tofolcer string{target folder}
 		path to the target folder where you want to export onyphe data
 
-		.PARAMETER inputobject
-		-inputobject $obj{output of Get-OnypheInfo or Get-OnypheInfoFromCSV functions}
+		.PARAMETER InputOnypheObject
+		-InputOnypheObject $obj{output of Get-OnypheInfo or Get-OnypheInfoFromCSV functions}
 		look for information about my public IP
 
 		.PARAMETER csvdelimiter
@@ -2824,11 +3231,11 @@
 		
 		.EXAMPLE
 		Exporting onyphe results containing into $onypheresult object to flat files in folder C:\temp
-		C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -inputobject $onypheresult
+		C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -InputOnypheObject $onypheresult
 
 		.EXAMPLE
 		Exporting onyphe results containing into $onypheresult object to flat files in folder C:\temp using ',' as csv separator
-		C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -inputobject $onypheresult -csvdelimiter ","
+		C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -InputOnypheObject $onypheresult -csvdelimiter ","
 	#>
   [cmdletbinding()]
   Param (
@@ -2837,18 +3244,20 @@
 		$tofolder,
   [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
   [ValidateScript({($_ -is [System.Management.Automation.PSCustomObject]) -or ($_ -is [Deserialized.System.Management.Automation.PSCustomObject])})]
-		[array]$inputobject,
+		[array]$InputOnypheObject,
   [parameter(Mandatory=$false)]
     $csvdelimiter
   )
   process {
 	if (!$csvdelimiter) {$csvdelimiter = ";"}
 	$ticks = (get-date).ticks.ToString()
-	If (($inputobject | Get-Member | Select-Object -ExpandProperty TypeName -Unique) -eq 'System.Management.Automation.PSCustomObject') {
-		$tmpinputobject = [Management.Automation.PSSerializer]::Serialize($inputobject)
-		$inputobject = [Management.Automation.PSSerializer]::DeSerialize($tmpinputobject)
+	If ($InputOnypheObject.'cli-API_info') {
+		$tmpinputobject = [Management.Automation.PSSerializer]::Serialize($InputOnypheObject)
+		$InputOnypheObject = [Management.Automation.PSSerializer]::DeSerialize($tmpinputobject)
+	} else {
+		throw "invalid Onyphe PSObject provided"
 	}
-	foreach ($result in $inputobject) {
+	foreach ($result in $InputOnypheObject) {
 	  $tempfolder = $null
 	  $tempattrib = $result.'cli-API_input' -replace ("[{0}]"-f (([System.IO.Path]::GetInvalidFileNameChars() | ForEach-Object {[regex]::Escape($_)}) -join '|')),'_'
 	  $tempfolder = "Onyphe-result-$($tempattrib)"
@@ -2960,7 +3369,7 @@
 				$filteredobj = $result.results | where-object {$_.'@category' -eq 'datashot'} | sort-object -property seen_date
 				$tempfilename = join-path $tempfolder "$($ticks)_$($ip)_datashot.csv"
 				$filteredobj | Export-Csv -NoTypeInformation -path "$($tempfilename)" -delimiter $csvdelimiter
-				Export-OnypheDataShot -tofolder $tempfolder -inputobject $result
+				Export-OnypheDataShot -tofolder $tempfolder -InputOnypheObject $result
 			}
 			'vulnscan' {
 				$filteredobj = $result.results | where-object {$_.'@category' -eq 'vulnscan'} | sort-object -property seen_date
@@ -2983,9 +3392,17 @@
 
 		.DESCRIPTION
 		retrieve current script directory
-
 	#>
-	Split-Path -Parent $PSCommandPath
+		[cmdletbinding()]
+		Param ()
+		if ($psISE) {
+			$ScriptPath = Split-Path -Parent $psISE.CurrentFile.FullPath
+		} elseif($PSVersionTable.PSVersion.Major -gt 3) {
+			$ScriptPath = $PSScriptRoot
+		} else {
+			$ScriptPath = split-path -parent $MyInvocation.MyCommand.Path
+		}
+		$ScriptPath
 	}
 	Function Set-OnypheAPIKey {
   <#
@@ -3383,52 +3800,7 @@
 	  use test.onyphe.io to use new beat features of Onyphe
 
 	  .OUTPUTS
-	     TypeName : System.Management.Automation.PSCustomObject
-
-			Name             MemberType   Definition
-			----             ----------   ----------
-			Equals           Method       bool Equals(System.Object obj)
-			GetHashCode      Method       int GetHashCode()
-			GetType          Method       type GetType()
-			ToString         Method       string ToString()
-			cli-API_info     NoteProperty string[] cli-API_info=System.String[]
-			cli-API_input    NoteProperty string[] cli-API_input=System.String[]
-			cli-key_required NoteProperty bool[] cli-key_required=System.Boolean[]
-			cli-Request_Date NoteProperty datetime cli-Request_Date=15/08/2018 15:05:25
-			count            NoteProperty int count=10
-			error            NoteProperty int error=0
-			max_page         NoteProperty decimal max_page=1000,0
-			myip             NoteProperty string myip=192.168.6.66
-			page             NoteProperty int page=1000
-			results          NoteProperty Object[] results=System.Object[]
-			status           NoteProperty string status=ok
-			took             NoteProperty string took=0.066
-			total            NoteProperty int total=157611
-
-			count            : 10
-			error            : 0
-			max_page         : 1000,0
-			myip             : 192.168.6.66
-			page             : 1000
-			results          : {@{@category=inetnum; @timestamp=2018-08-12T01:35:21.000Z; @type=ip; asn=AS16276; country=GB;
-							information=System.Object[]; ipv6=false; location=51.4964,-0.1224; netname=reduk2; organization=OVH
-							SAS; seen_date=2018-08-12; source=RIPE; subnet=213.32.105.0/26}, @{@category=inetnum;
-							@timestamp=2018-08-12T01:35:21.000Z; @type=ip; asn=AS16276; country=FR;
-							information=System.Object[]; ipv6=false; location=48.8582,2.3387; netname=OVH_121297930;
-							organization=OVH SAS; seen_date=2018-08-12; source=RIPE; subnet=149.202.133.104/30},
-							@{@category=inetnum; @timestamp=2018-08-12T01:35:21.000Z; @type=ip; asn=AS16276; country=FR;
-							information=System.Object[]; ipv6=false; location=48.8582,2.3387; netname=OVH_121298047;
-							organization=OVH SAS; seen_date=2018-08-12; source=RIPE; subnet=149.202.133.108/30},
-							@{@category=inetnum; @timestamp=2018-08-12T01:35:21.000Z; @type=ip; asn=AS16276; country=FR;
-							information=System.Object[]; ipv6=false; location=48.8582,2.3387; netname=OVH_121298490;
-							organization=OVH SAS; seen_date=2018-08-12; source=RIPE; subnet=51.254.51.84/30}...}
-			status           : ok
-			took             : 0.066
-			total            : 157611
-			cli-API_info     : {search/inetnum}
-			cli-API_input    : {organization:"OVH SAS"}
-			cli-key_required : {True}
-			cli-Request_Date : 15/08/2018 15:05:25
+	     TypeName: PSOnyphe
 	  
 	  .EXAMPLE
 	  AdvancedSearch with multiple criteria/filters
@@ -3473,7 +3845,10 @@
 			[switch]$UseBetaFeatures,
 		[parameter(Mandatory=$false)] 
 		[ValidateNotNullOrEmpty()]
-			[Array]$AdvancedFilter
+			[Array]$AdvancedFilter,
+		[parameter(mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[hashtable]$FuncInput
     )
     Process {		
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -3526,6 +3901,9 @@
 			APIKeyrequired = $true
 			APIInput = $APIInput
 		}
+		if ($FuncInput) {
+			$params.add("FuncInput", $FuncInput)
+		}
 		if ($page) {
 			$params.add('page',$page)
 		}
@@ -3575,17 +3953,17 @@
 		  .PARAMETER APIKEY
 		  -APIKey string{APIKEY}
 		  Set APIKEY as global variable
-	
-		  .PARAMETER Page
-		  -page string{page number}
-		  go directly to a specific result page (1 to 1000)
-			
+				
 		  .PARAMETER UseBetaFeatures
 		  -UseBetaFeatures switch
 		  use test.onyphe.io to use new beat features of Onyphe
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
 	
 		  .OUTPUTS
-		   TypeName : System.Management.Automation.PSCustomObject
+		   TypeName: PSOnyphe
 		  
 		  .EXAMPLE
 		  AdvancedSearch export with multiple criteria/filters
@@ -3627,7 +4005,13 @@
 				[switch]$UseBetaFeatures,
 			[parameter(Mandatory=$false)] 
 			[ValidateNotNullOrEmpty()]
-				[Array]$AdvancedFilter
+				[Array]$AdvancedFilter,
+			[parameter(Mandatory=$false)] 
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile
 		)
 		Process {		
 			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -3680,6 +4064,10 @@
 				APIKeyrequired = $true
 				APIInput = $APIInput
 				Stream = $true
+				OutFile = $OutFile
+			}
+			if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
 			}
 			if ($UseBetaFeatures) {
 				$params.add('UseBetaFeatures', $true)
@@ -3705,7 +4093,7 @@
 	  use test.onyphe.io to use new beat features of Onyphe
 	  
 	  .OUTPUTS
-	   TypeName : System.Management.Automation.PSCustomObject
+	   TypeName: PSOnyphe
 
 	  .EXAMPLE
 	  get alert set and set api key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -3720,8 +4108,11 @@
 		[parameter(Mandatory=$false)]
 		[ValidateLength(40,40)]
 			[string]$APIKey,
-		[parameter(Mandatory=$false,Position=10)]
-			[switch]$UseBetaFeatures
+		[parameter(Mandatory=$false)]
+			[switch]$UseBetaFeatures,
+		[parameter(mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[hashtable]$FuncInput
 	)  
 	  Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -3733,6 +4124,9 @@
 		}
 		if ($UseBetaFeatures) {
 			$params.add("UseBetaFeatures", $true)
+		}
+		if ($FuncInput) {
+			$params.add("FuncInput", $FuncInput)
 		}
 		Write-Verbose -message "URL Info : $($params.request)"
 		Invoke-OnypheAPIV2 @params
@@ -3759,7 +4153,7 @@
 	  use test.onyphe.io to use new beat features of Onyphe
 	  
 	  .OUTPUTS
-	   TypeName : System.Management.Automation.PSCustomObject
+	   TypeName: PSOnyphe
 
 	  .EXAMPLE
 	  Delete Onyphe Alert with ID 0 and set api key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -3774,11 +4168,14 @@
 		[parameter(Mandatory=$false)]
 		[ValidateLength(40,40)]
 			[string]$APIKey,
-		[parameter(Mandatory=$false,Position=10)]
+		[parameter(Mandatory=$false)]
 			[switch]$UseBetaFeatures,
 		[parameter(Mandatory=$true)]
 		[ValidateScript({($_ -match "^[0-9]*$")})]
-			[string]$AlertID
+			[string]$AlertID,
+		[parameter(mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[hashtable]$FuncInput
 	) 
 	  Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -3791,6 +4188,9 @@
 		}
 		if ($UseBetaFeatures) {
 			$params.add("UseBetaFeatures", $true)
+		}
+		if ($FuncInput) {
+			$params.add("FuncInput", $FuncInput)
 		}
 		Write-Verbose -message "URL Info : $($params.request)"
 		Invoke-OnypheAPIV2 @params
@@ -3857,7 +4257,7 @@
 	   use PSObject as input with the alert query already defined
 
 	  .OUTPUTS
-	  TypeName : System.Management.Automation.PSCustomObject
+	  TypeName: PSOnyphe
   
 	  .EXAMPLE
 	  New alert based on AdvancedSearch with multiple criteria/filters
@@ -3904,9 +4304,9 @@
 		[parameter(Mandatory=$false)] 
 		[ValidateNotNullOrEmpty()]
 			[Array]$AdvancedFilter,
-		[parameter(Mandatory=$false)]
+		[parameter(mandatory=$false)]
 		[ValidateNotNullOrEmpty()]
-			$InputOnypheObject
+			[hashtable]$FuncInput
 	)  
 	  Process {
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -3956,13 +4356,7 @@
 		$Data = [PSCustomObject]@{
 			name = $AlertName
 			email = $AlertEmail
-		}
-		if ($InputOnypheObject.'cli-API_input' -and $InputOnypheObject.'cli-API_info') {
-			if ($InputOnypheObject.'cli-API_info' -like "search*") {
-				$Data | add-member -MemberType NoteProperty -Name query -Value "category:$(($InputOnypheObject.'cli-API_info' -split "/")[($InputOnypheObject.'cli-API_info' -split "/").count -1]) $($InputOnypheObject.'cli-API_input')"
-			}
-		} else {
-			$Data | add-member -MemberType NoteProperty -Name query -Value "category:$($SearchType) $($NewSearchValue)"
+			query = "category:$($SearchType)" + " " + $APIInput
 		}
 		$params = @{
 			request = "v2/alert/add/"
@@ -3973,6 +4367,9 @@
 		}
 		if ($UseBetaFeatures) {
 			$params.add("UseBetaFeatures", $true)
+		}
+		if ($FuncInput) {
+			$params.add("FuncInput", $FuncInput)
 		}
 		write-verbose -message "POST JSON Data : $($Data | ConvertTo-Json)"
 		Write-Verbose -message "URL Info : $($params.request)" 
@@ -4041,21 +4438,21 @@
 	  
 	  .EXAMPLE
 	  Export all screenshots available in powershell object $temp into C:\temp folder
-	  C:\PS> Export-OnypheDataShot -tofolder C:\temp -inputobject $temp
+	  C:\PS> Export-OnypheDataShot -tofolder C:\temp -InputOnypheObject $temp
 	#>
 		[cmdletbinding()]
 		Param (
 			[parameter(Mandatory=$true)]
 			[ValidateScript({test-path "$($_)"})]
-				$tofolder,
+				[string]$tofolder,
 			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
 			[Alias("input")]
 			[ValidateScript({($_ -is [System.Management.Automation.PSCustomObject]) -or ($_ -is [Deserialized.System.Management.Automation.PSCustomObject])})]
-				[array]$inputobject
+				[array]$InputOnypheObject
 			)
 			Process {
 				$ticks = (get-date).ticks.ToString()
-				foreach ($result in $inputobject) {
+				foreach ($result in $InputOnypheObject) {
 					$datashotsfilter = $result.results | Where-Object {($_.'@category' -eq 'datashot') -or ($_.'@category' -eq 'onionshot')}
 					foreach ($datashot in $datashotsfilter) {
 						if ($datashot.app.screenshot.image) {
@@ -4084,6 +4481,7 @@
 									Invoke-APIOnypheExport, Invoke-APIOnypheGeoloc, Invoke-APIOnypheTopSite, Invoke-APIOnypheVulnscan, Invoke-APIOnypheOnionShot, Invoke-APIOnypheDataShot, Invoke-APIOnypheOnionScan, Invoke-APIOnypheCtl, Invoke-APIOnypheSniffer, Invoke-APIOnypheUser, Invoke-APIOnypheSearch, Invoke-APIOnypheDataScan, Invoke-APIOnypheDatascanDataMd5, 
 									Invoke-APIOnypheResolver, Invoke-APIOnypheResolverForward, Invoke-APIOnypheInetnum, Invoke-APIOnyphePastries, Invoke-APIOnypheResolverReverse, Invoke-APIOnypheSynScan, Invoke-APIOnypheThreatlist, Invoke-APIOnypheListAlert, 
 									Invoke-APISummaryOnypheIP, Invoke-APISummaryOnypheHostname, Invoke-APISummaryOnypheDomain,
+									Invoke-APIBulkSummaryOnypheIP, Invoke-APIBulkSummaryOnypheHostname, Invoke-APIBulkSummaryOnypheDomain, Export-OnypheBulkInfo,
 									Invoke-OnypheAPIV2, 
 									Invoke-APIOnypheAddAlert, Invoke-APIOnypheDelAlert,
 									Export-OnypheInfo,

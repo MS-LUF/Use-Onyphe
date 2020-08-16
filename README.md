@@ -12,12 +12,18 @@ More info about available APIs :
 https://www.onyphe.io/documentation/api
 
 (c) 2018-2020 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
-## Notes version (1.1) - last public version :
+## Notes version (1.2) - last public version :
+ - add bulk APIs
+ - update code to optimize file export (best memory management)
+ - update object type to PSOnyphe
+ - update inputobject parameter to InputOnypheObject on all functions
+ - fix various bug found 
+
+## Notes version (1.1) :
  - add new APIv2, migrate from APIv1 to full APIv2 (except bulk API that will be provided in 1.2)
    - sample csv files are updated to take into account new API and new api naming convention, please check them and update your current CSV file using the new templates.
  - remove temporary fix for empty array in APIv2
  - update deserialization of psobject
-
 ## Notes version (1.00) :
  - fix rate limiting issue on paging
  - manage new API in Export-OnypheInfoToFile
@@ -92,6 +98,7 @@ using a simple powershell command and an internet access :-)
 ## module content
 documentation in markdown available here : https://github.com/MS-LUF/Use-Onyphe/tree/master/docs
 ### function
+- Export-OnypheBulkInfo
 - Export-OnypheDataShot
 - Export-OnypheInfo
 - Export-OnypheInfoToFile
@@ -109,6 +116,9 @@ documentation in markdown available here : https://github.com/MS-LUF/Use-Onyphe/
 - Get-OnypheUserInfo
 - Get-ScriptDirectory
 - Import-OnypheEncryptedIKey
+- Invoke-APIBulkSummaryOnypheDomain
+- Invoke-APIBulkSummaryOnypheHostname
+- Invoke-APIBulkSummaryOnypheIP
 - Invoke-APIOnypheAddAlert
 - Invoke-APIOnypheCtl
 - Invoke-APIOnypheDataScan
@@ -140,7 +150,8 @@ documentation in markdown available here : https://github.com/MS-LUF/Use-Onyphe/
 - Set-OnypheAlertInfo
 - Set-OnypheAPIKey
 - Set-OnypheProxy
-- Update-OnypheFacetsFilters
+- Update-OnypheFacetsFilters  
+
 ### alias
 - Export-Onyphe
 - Get-Onyphe

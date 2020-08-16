@@ -12,7 +12,7 @@
 RootModule = 'use-onyphe.psm1'
 
 # Numero de version de ce module.
-ModuleVersion = '1.1'
+ModuleVersion = '1.2'
 
 # editions PS prises en charge
 # CompatiblePSEditions = @()
@@ -69,16 +69,7 @@ PowerShellVersion = '4.0'
 # NestedModules = @()
 
 # Fonctions a exporter a partir de ce module. Pour de meilleures performances, neutilisez pas de caracteres generiques et ne supprimez pas leentree. Utilisez un tableau vide si vous neavez aucune fonction a exporter.
-FunctionsToExport = 'Export-OnypheDataShot', 'Export-OnypheInfo', 'Export-OnypheInfoToFile',
-                    'Get-OnypheAlertInfo','Get-OnypheCliFacets','Get-OnypheInfo','Get-OnypheInfoFromCSV','Get-OnypheSearchCategories','Get-OnypheSearchFilters','Get-OnypheSearchFunctions','Get-OnypheSimpleAPIName','Get-OnypheStatsFromObject','Get-OnypheSummary','Get-OnypheSummaryAPIName','Get-OnypheUserInfo','Get-ScriptDirectory',
-                    'Import-OnypheEncryptedIKey',
-                    'Invoke-APIOnypheAddAlert','Invoke-APIOnypheCtl','Invoke-APIOnypheDataScan','Invoke-APIOnypheDatascanDataMD5','Invoke-APIOnypheDataShot','Invoke-APIOnypheDelAlert','Invoke-APIOnypheExport','Invoke-APIOnypheGeoloc','Invoke-APIOnypheInetnum',
-                    'Invoke-APIOnypheListAlert','Invoke-APIOnypheOnionScan','Invoke-APIOnypheOnionShot','Invoke-APIOnyphePastries','Invoke-APIOnypheResolver','Invoke-APIOnypheResolverForward','Invoke-APIOnypheResolverReverse','Invoke-APIOnypheSearch','Invoke-APIOnypheSniffer',
-                    'Invoke-APIOnypheSynScan','Invoke-APIOnypheThreatlist','Invoke-APIOnypheTopSite','Invoke-APIOnypheUser','Invoke-APIOnypheVulnscan','Invoke-APISummaryOnypheDomain','Invoke-APISummaryOnypheHostname','Invoke-APISummaryOnypheIP',
-                    'Invoke-OnypheAPIV2',
-                    'Search-OnypheInfo',
-                    'Set-OnypheAlertInfo','Set-OnypheAPIKey','Set-OnypheProxy',
-                    'Update-OnypheFacetsFilters'
+FunctionsToExport = 'Export-OnypheBulkInfo','Export-OnypheDataShot','Export-OnypheInfo','Export-OnypheInfoToFile','Get-OnypheAlertInfo','Get-OnypheCliFacets','Get-OnypheInfo','Get-OnypheInfoFromCSV','Get-OnypheSearchCategories','Get-OnypheSearchFilters','Get-OnypheSearchFunctions','Get-OnypheSimpleAPIName','Get-OnypheStatsFromObject','Get-OnypheSummary','Get-OnypheSummaryAPIName','Get-OnypheUserInfo','Get-ScriptDirectory','Import-OnypheEncryptedIKey','Invoke-APIBulkSummaryOnypheDomain','Invoke-APIBulkSummaryOnypheHostname','Invoke-APIBulkSummaryOnypheIP','Invoke-APIOnypheAddAlert','Invoke-APIOnypheCtl','Invoke-APIOnypheDataScan','Invoke-APIOnypheDatascanDataMD5','Invoke-APIOnypheDataShot','Invoke-APIOnypheDelAlert','Invoke-APIOnypheExport','Invoke-APIOnypheGeoloc','Invoke-APIOnypheInetnum','Invoke-APIOnypheListAlert','Invoke-APIOnypheOnionScan','Invoke-APIOnypheOnionShot','Invoke-APIOnyphePastries','Invoke-APIOnypheResolver','Invoke-APIOnypheResolverForward','Invoke-APIOnypheResolverReverse','Invoke-APIOnypheSearch','Invoke-APIOnypheSniffer','Invoke-APIOnypheSynScan','Invoke-APIOnypheThreatlist','Invoke-APIOnypheTopSite','Invoke-APIOnypheUser','Invoke-APIOnypheVulnscan','Invoke-APISummaryOnypheDomain','Invoke-APISummaryOnypheHostname','Invoke-APISummaryOnypheIP','Invoke-OnypheAPIV2','Search-OnypheInfo','Set-OnypheAlertInfo','Set-OnypheAPIKey','Set-OnypheProxy','Update-OnypheFacetsFilters'
                     
 # Applets de commande a exporter a partir de ce module. Pour de meilleures performances, neutilisez pas de caracteres generiques et ne supprimez pas l entree. Utilisez un tableau vide si vous neavez aucune applet de commande e exporter.
 CmdletsToExport = @()
@@ -87,7 +78,7 @@ CmdletsToExport = @()
 # VariablesToExport = @()
 
 # Alias a exporter a partir de ce module. Pour de meilleures performances, neutilisez pas de caracteres generiques et ne supprimez pas leentree. Utilisez un tableau vide si vous n avez aucun alias a exporter.
-AliasesToExport = @('Update-OnypheLocalData','Get-Onyphe', 'Search-Onyphe','Get-OnypheFromCSV','Get-OnypheAlert','Set-OnypheAlert','Export-Onyphe')
+AliasesToExport = @('Export-Onyphe','Get-Onyphe','Get-OnypheAlert','Get-OnypheFromCSV','Search-Onyphe','Set-OnypheAlert','Update-OnypheLocalData')
 
 # Ressources DSC a exporter depuis ce module
 # DscResourcesToExport = @()
@@ -116,7 +107,7 @@ PrivateData = @{
         IconUri = 'https://www.onyphe.io/img/logo-solo.png'
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'v1.1 : add new APIv2, migrate from APIv1 to full APIv2 (except bulk API that will be provided in 1.2);remove temporary fix for empty array in APIv2;update deserialization of psobject'
+        ReleaseNotes = 'v1.2 : add bulk API, update code to optimize file export, update object type to PSOnyphe, update inputobject parameter to InputOnypheObject, fix various bug found'
         # External dependent modules of this module
         # ExternalModuleDependencies = ''
 

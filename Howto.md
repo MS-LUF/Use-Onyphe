@@ -3,7 +3,7 @@
 # Use-Onyphe - How-To
 
 ## ChangeLog
-This documentation has been updated to take into account **new features available with v1.1 including new new v2 APIs**. Enjoy your Onyphe stuff with Power[Shell](Of Love)
+This documentation has been updated to take into account **new features available with v1.2 including bulk v2 APIs**. Enjoy your Onyphe stuff with Power[Shell](Of Love)
 
 ## Intro Onyphe
 Onyphe.io provides data about IP address space and publicly available information in just one place.
@@ -214,7 +214,13 @@ if you don't want to store your API key and don't set it as global variable, you
 ```
     C:\PS> Get-OnypheSummary -SummaryAPIType ip -searchvalue 9.9.9.9 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
-
+the function Search-OnypheInfo can be used as an input for Export-OnypheInfo and Set-OnypheAlertInfo
+```
+    C:\PS> Search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan | Export-onyphe -SaveInfoAsFile .\myexport.json
+```
+```
+    C:\PS> Search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan | set-onyphealert -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
+```
 ## Help on cmdlets / functions
 Get-help is available on all functions, for instance, if you want to consult the help section of Get-OnypheInfo (input, output, description and examples are available)
 ```
@@ -222,7 +228,7 @@ Get-help is available on all functions, for instance, if you want to consult the
 ```
 
 ## Using Use-Onyphe to use onyphe.io APIs
-5 main functions / cmdlets will be used :
+6 main functions / cmdlets will be used :
  - Get-OnypheSummary to use all v2/summary APIs ip,domain,hostname
    - These APIs can be used to retrieve all objects linked to an IP, a domain or an hostame (all categories are sent back from summary API) 
  - Get-OnypheInfo (or Get-Onyphe) to use all v2/simple APIs ctl,datascan,geoloc,inetnum,pastries,resolver,sniffer,synscan,threatlist,datashot,onionscan,onionshot,topsite,vulnscan,resolver/reverse,resolver/forward,datascan/datamd5
@@ -233,6 +239,7 @@ Get-help is available on all functions, for instance, if you want to consult the
  - Get-OnypheAlertInfo (or Get-OnpyheAlert) to list your alerts using v2/alert/list API
  - Set-OnypheAlertInfo (or Set-OnypheAlert) to create and delete alerts using v2/alert/add or v2/alert/del APIs
  - Export-OnypheInfo (or Export-Onyphe) to download json file from Onyphe database for a search request
+ - Export-OnypheBulkInfo to download json file fron onyphe database for a summary request including multiple entries (through a txt file provided, on entry per line)
  
 Find hereunder several use cases for all API examples documented on https://www.onyphe.io/documentation/api
 
@@ -395,7 +402,21 @@ API v2/export : Export search results to file
 ```
     C:\PS> Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -SaveInfoAsFile .\myexport.json
 ```
-
+```
+    C:\PS> Search-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan | Export-OnypheInfo -SaveInfoAsFile .\myexport.json
+```
+API v2/bulk/summary/ip : export summary for IPs infos in a JSON file
+```
+    C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType ip
+```
+API v2/bulk/summary/hostname : export summary for hostnames infos in a JSON file
+```
+    C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType hostname
+```
+API v2/bulk/summary/domain : export summary for domains infos in a JSON file
+```
+    C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType domain
+```
 ## E-mail alerting system
 Since a few weeks now, 3 new APIs (V2) are available to manage automatic e-mail alerts for your Onyphe account. It means you can automate search request at Onyphe server side and received an e-mail alerts when new events are available (especially when using timeline filter functions in your request).
 Of course this new feature requires an API Key (non free).
@@ -490,7 +511,17 @@ Just specify the target folder and several subfolders (on per request) containin
 to do so use the function Export-OnypheInfoToFile :
 ```
     C:\PS> $AllResults = Search-OnypheInfo -SearchValue "OVH SAS" -SearchFilter organization -Category inetnum -page 1-1000
-    C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -inputobject $AllResults
+    C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -InputOnypheObject $AllResults
+```
+
+## Bulk APIs, send multiple summary requests at a time and get back a Json file
+you can now use bulk summary APIs to send several requests at a time based on a txt input file containing one entry per line (no space, no coma etc...)
+3 bulk summary apis are available right now : ip, host, domain
+the output is not an object but a json flat file.
+**Only the 10 latest results per category will be returned**
+find below an example to get summary info for ten IPs contained in myfile.txt
+```
+    C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType ip
 ```
 
 ## Playing with Onyphe and PowerShell objects
@@ -563,7 +594,7 @@ First, retrieve all the results avaialable (all synscan objects linked to citrix
 ```
 Then, do the stats 
 ```
-    C:\PS> Get-OnypheStatsFromObject -Facets port -inputobject $AllResults
+    C:\PS> Get-OnypheStatsFromObject -Facets port -InputOnypheObject $AllResults
 
     Sum     : 420
     Count   : 5
@@ -578,7 +609,7 @@ Then, do the stats
 
 If you want to have the results by port, it's also simple, we just have to open property 'stats' of the object :
 ```
-    C:\PS> (Get-OnypheStatsFromObject -Facets port -inputobject $AllResults).Stats
+    C:\PS> (Get-OnypheStatsFromObject -Facets port -InputOnypheObject $AllResults).Stats
 
     Onyphe-Facet Onyphe-Property-value Onyphe-Property-Count
     ------------ --------------------- ---------------------
