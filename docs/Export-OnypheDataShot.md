@@ -1,5 +1,5 @@
 ---
-external help file: Use-Onyphe-help.xml
+external help file: use-onyphe-help.xml
 Module Name: Use-Onyphe
 online version:
 schema: 2.0.0
@@ -13,7 +13,7 @@ Export encoded base64 jpg file from a datashot category object
 ## SYNTAX
 
 ```
-Export-OnypheDataShot [-tofolder] <Object> [-inputobject] <Array> [<CommonParameters>]
+Export-OnypheDataShot [-tofolder] <String> [-InputOnypheObject] <Array> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -24,7 +24,7 @@ Export encoded base64 jpg file from a datashot category object
 ### EXAMPLE 1
 ```
 Export all screenshots available in powershell object $temp into C:\temp folder
-C:\PS> Export-OnypheDataShot -tofolder C:\temp -inputobject $temp
+C:\PS> Export-OnypheDataShot -tofolder C:\temp -InputOnypheObject $temp
 ```
 
 ## PARAMETERS
@@ -33,7 +33,7 @@ C:\PS> Export-OnypheDataShot -tofolder C:\temp -inputobject $temp
 {{ Fill tofolder Description }}
 
 ```yaml
-Type: Object
+Type: String
 Parameter Sets: (All)
 Aliases:
 
@@ -44,8 +44,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -inputobject
-{{ Fill inputobject Description }}
+### -InputOnypheObject
+{{ Fill InputOnypheObject Description }}
 
 ```yaml
 Type: Array

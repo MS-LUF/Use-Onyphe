@@ -1,5 +1,5 @@
 ---
-external help file: Use-Onyphe-help.xml
+external help file: use-onyphe-help.xml
 Module Name: Use-Onyphe
 online version:
 schema: 2.0.0
@@ -16,7 +16,7 @@ create several input for Invoke-OnypheAPIv2 function and then call it to add new
 Invoke-APIOnypheAddAlert [[-AlertName] <String>] [[-AlertEmail] <String>] [[-SearchType] <String>]
  [[-SearchValue] <String>] [[-SearchFilter] <String>] [[-FilterFunction] <String>] [[-FilterValue] <String[]>]
  [[-AdvancedSearch] <Array>] [[-APIKey] <String>] [-UseBetaFeatures] [[-AdvancedFilter] <Array>]
- [[-InputOnypheObject] <Object>] [<CommonParameters>]
+ [[-FuncInput] <Hashtable>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -215,11 +215,11 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -InputOnypheObject
-{{ Fill InputOnypheObject Description }}
+### -FuncInput
+{{ Fill FuncInput Description }}
 
 ```yaml
-Type: Object
+Type: Hashtable
 Parameter Sets: (All)
 Aliases:
 
@@ -237,7 +237,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
-### TypeName : System.Management.Automation.PSCustomObject
+### TypeName: PSOnyphe
 ## NOTES
 
 ## RELATED LINKS

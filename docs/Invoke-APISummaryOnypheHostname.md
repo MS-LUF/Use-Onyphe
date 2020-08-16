@@ -1,5 +1,5 @@
 ---
-external help file: Use-Onyphe-help.xml
+external help file: use-onyphe-help.xml
 Module Name: Use-Onyphe
 online version:
 schema: 2.0.0
@@ -13,8 +13,8 @@ create several input for Invoke-OnypheAPIV2 function and then call it to get the
 ## SYNTAX
 
 ```
-Invoke-APISummaryOnypheHostname [-Hostname] <String[]> [[-APIKey] <String>] [[-Page] <String[]>]
- [<CommonParameters>]
+Invoke-APISummaryOnypheHostname [-Hostname] <String> [[-APIKey] <String>] [[-Page] <String>]
+ [[-FuncInput] <Hashtable>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -41,7 +41,7 @@ C:\PS> Invoke-APISummaryOnypheHostname -Hostname www.perdu.com -APIKey "xxxxxxxx
 Hostname to be used for the Summary/hostname API usage
 
 ```yaml
-Type: String[]
+Type: String
 Parameter Sets: (All)
 Aliases: input
 
@@ -73,12 +73,27 @@ Accept wildcard characters: False
 go directly to a specific result page (1 to 1000)
 
 ```yaml
-Type: String[]
+Type: String
 Parameter Sets: (All)
 Aliases:
 
 Required: False
 Position: 3
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -FuncInput
+{{ Fill FuncInput Description }}
+
+```yaml
+Type: Hashtable
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 4
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -91,7 +106,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
-### TypeName : System.Management.Automation.PSCustomObject
+### TypeName: PSOnyphe
 ## NOTES
 
 ## RELATED LINKS

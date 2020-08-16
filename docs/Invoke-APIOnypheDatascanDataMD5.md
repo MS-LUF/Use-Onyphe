@@ -1,5 +1,5 @@
 ---
-external help file: Use-Onyphe-help.xml
+external help file: use-onyphe-help.xml
 Module Name: Use-Onyphe
 online version:
 schema: 2.0.0
@@ -13,8 +13,8 @@ create several input for Invoke-OnypheAPIV2 function and then call it to get inf
 ## SYNTAX
 
 ```
-Invoke-APIOnypheDatascanDataMD5 [-MD5] <String[]> [[-APIKey] <String>] [[-Page] <String[]>]
- [<CommonParameters>]
+Invoke-APIOnypheDatascanDataMD5 [-MD5] <String> [[-APIKey] <String>] [[-Page] <String>]
+ [[-FuncInput] <Hashtable>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -41,7 +41,7 @@ C:\PS> Invoke-APIOnypheDatascanDataMd5 -MD5 7a1f20cae067b75a52bc024b83ee4667 -AP
 MD5 to be used for the md5 API usage
 
 ```yaml
-Type: String[]
+Type: String
 Parameter Sets: (All)
 Aliases: input
 
@@ -73,12 +73,27 @@ Accept wildcard characters: False
 go directly to a specific result page (1 to 1000)
 
 ```yaml
-Type: String[]
+Type: String
 Parameter Sets: (All)
 Aliases:
 
 Required: False
 Position: 3
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -FuncInput
+{{ Fill FuncInput Description }}
+
+```yaml
+Type: Hashtable
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 4
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -91,7 +106,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
-### TypeName : System.Management.Automation.PSCustomObject
+### TypeName: PSOnyphe
 ## NOTES
 
 ## RELATED LINKS

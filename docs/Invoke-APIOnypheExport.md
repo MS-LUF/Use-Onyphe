@@ -1,5 +1,5 @@
 ---
-external help file: Use-Onyphe-help.xml
+external help file: use-onyphe-help.xml
 Module Name: Use-Onyphe
 online version:
 schema: 2.0.0
@@ -15,7 +15,8 @@ create several input for Invoke-OnypheAPIV2 function and then call it to export 
 ```
 Invoke-APIOnypheExport [-SearchType] <String> [[-SearchValue] <String>] [[-SearchFilter] <String>]
  [[-FilterFunction] <String>] [[-FilterValue] <String[]>] [[-AdvancedSearch] <Array>] [[-APIKey] <String>]
- [[-wait] <Int32>] [-UseBetaFeatures] [[-AdvancedFilter] <Array>] [<CommonParameters>]
+ [[-wait] <Int32>] [-UseBetaFeatures] [[-AdvancedFilter] <Array>] [[-FuncInput] <Hashtable>]
+ [-OutFile] <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -197,6 +198,37 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -FuncInput
+{{ Fill FuncInput Description }}
+
+```yaml
+Type: Hashtable
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 10
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -OutFile
+-OutFile string{full path to a new file for exporting json data}
+full path to output file used to write json data from Onyphe
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: 11
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
@@ -204,7 +236,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
-### TypeName : System.Management.Automation.PSCustomObject
+### TypeName: PSOnyphe
 ## NOTES
 
 ## RELATED LINKS

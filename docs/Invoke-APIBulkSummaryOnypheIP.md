@@ -5,40 +5,40 @@ online version:
 schema: 2.0.0
 ---
 
-# Invoke-APISummaryOnypheDomain
+# Invoke-APIBulkSummaryOnypheIP
 
 ## SYNOPSIS
-create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an internet domain from Geoloc Summary/domain API
+create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of IPs based on a file input from Bulk/ip API
 
 ## SYNTAX
 
 ```
-Invoke-APISummaryOnypheDomain [-Domain] <String> [[-APIKey] <String>] [[-Page] <String>]
+Invoke-APIBulkSummaryOnypheIP [-FilePath] <String> [-OutFile] <String> [[-APIKey] <String>]
  [[-FuncInput] <Hashtable>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an internet domain from Geoloc Summary/domain API
+reate several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of IPs based on a file input from Bulk/ip API
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-get all onyphe info for domain perdu.com
-C:\PS> Invoke-APISummaryOnypheDomain -Domain perdu.com
+export all info available as JSON for all IPs contained in listip.txt
+C:\PS> Invoke-APIBulkSummaryOnypheIP -FilePath .\listip.txt
 ```
 
 ### EXAMPLE 2
 ```
-get all onyphe info for domain perdu.com and set the API Key
-C:\PS> Invoke-APISummaryOnypheDomain -Domain perdu.com -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+export all info available as JSON for all IPs contained in listip.txt and set the API Key
+C:\PS> Invoke-APIBulkSummaryOnypheIP -FilePath .\listip.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
 ## PARAMETERS
 
-### -Domain
--Domain string{Domain}
-Domain to be used for the Summary/domain API API usage
+### -FilePath
+-FilePath string{full path to an existing text file}
+full path to input file to send to onyphe API
 
 ```yaml
 Type: String
@@ -52,25 +52,25 @@ Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```
 
-### -APIKey
--APIKey string{APIKEY}
-Set APIKEY as global variable.
+### -OutFile
+-OutFile string{full path to a new file for exporting json data}
+full path to output file used to write json data from Onyphe
 
 ```yaml
 Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: False
+Required: True
 Position: 2
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Page
--page string{page number}
-go directly to a specific result page (1 to 1000)
+### -APIKey
+-APIKey string{APIKEY}
+Set APIKEY as global variable.
 
 ```yaml
 Type: String

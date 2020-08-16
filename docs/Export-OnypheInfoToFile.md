@@ -1,5 +1,5 @@
 ---
-external help file: Use-Onyphe-help.xml
+external help file: use-onyphe-help.xml
 Module Name: Use-Onyphe
 online version:
 schema: 2.0.0
@@ -13,7 +13,7 @@ Export psobject containing Onyphe info to files
 ## SYNTAX
 
 ```
-Export-OnypheInfoToFile [-tofolder] <Object> [-inputobject] <Array> [[-csvdelimiter] <Object>]
+Export-OnypheInfoToFile [-tofolder] <Object> [-InputOnypheObject] <Array> [[-csvdelimiter] <Object>]
  [<CommonParameters>]
 ```
 
@@ -29,13 +29,13 @@ to be investigated.
 ### EXAMPLE 1
 ```
 Exporting onyphe results containing into $onypheresult object to flat files in folder C:\temp
-C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -inputobject $onypheresult
+C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -InputOnypheObject $onypheresult
 ```
 
 ### EXAMPLE 2
 ```
 Exporting onyphe results containing into $onypheresult object to flat files in folder C:\temp using ',' as csv separator
-C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -inputobject $onypheresult -csvdelimiter ","
+C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -InputOnypheObject $onypheresult -csvdelimiter ","
 ```
 
 ## PARAMETERS
@@ -56,8 +56,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -inputobject
--inputobject $obj{output of Get-OnypheInfo or Get-OnypheInfoFromCSV functions}
+### -InputOnypheObject
+-InputOnypheObject $obj{output of Get-OnypheInfo or Get-OnypheInfoFromCSV functions}
 look for information about my public IP
 
 ```yaml

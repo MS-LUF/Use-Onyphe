@@ -14,8 +14,8 @@ schema: 2.0.0
 
 ```
 Invoke-OnypheAPIV2 [-request] <String[]> [[-data] <String[]>] [-file <String>] [[-Method] <String>]
- [-APIInfo] <String[]> [-APIInput] <String[]> [-APIKeyrequired] <Boolean> [[-page] <String[]>]
- [-UseBetaFeatures] [-Stream] [<CommonParameters>]
+ [-APIInfo] <String[]> [-APIInput] <String[]> [-APIKeyrequired] <Boolean> [-FuncInput <Hashtable>]
+ [[-page] <String[]>] [-UseBetaFeatures] [-Stream] [-OutFile <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -173,6 +173,36 @@ Accept wildcard characters: False
 
 ```yaml
 Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -FuncInput
+{{ Fill FuncInput Description }}
+
+```yaml
+Type: Hashtable
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -OutFile
+{{ Fill OutFile Description }}
+
+```yaml
+Type: String
 Parameter Sets: (All)
 Aliases:
 

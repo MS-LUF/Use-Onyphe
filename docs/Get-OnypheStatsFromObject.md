@@ -1,5 +1,5 @@
 ---
-external help file: Use-Onyphe-help.xml
+external help file: use-onyphe-help.xml
 Module Name: Use-Onyphe
 online version:
 schema: 2.0.0
@@ -13,7 +13,7 @@ commandline interface to use onyphe.io web service
 ## SYNTAX
 
 ```
-Get-OnypheStatsFromObject [-inputobject] <Array> [[-AdvancedFacets] <Array>] [-Facets <String>]
+Get-OnypheStatsFromObject [-InputOnypheObject] <Array> [[-AdvancedFacets] <Array>] [-Facets <String>]
  [<CommonParameters>]
 ```
 
@@ -29,8 +29,8 @@ import-module use-onyphe.psm1
 
 ## PARAMETERS
 
-### -inputobject
-{{ Fill inputobject Description }}
+### -InputOnypheObject
+{{ Fill InputOnypheObject Description }}
 
 ```yaml
 Type: Array

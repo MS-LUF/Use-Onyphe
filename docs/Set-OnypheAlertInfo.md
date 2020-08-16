@@ -1,5 +1,5 @@
 ---
-external help file: Use-Onyphe-help.xml
+external help file: use-onyphe-help.xml
 Module Name: Use-Onyphe
 online version:
 schema: 2.0.0
@@ -15,7 +15,7 @@ main function/cmdlet - create, modify, delete an alert on onyphe.io web service 
 ```
 Set-OnypheAlertInfo [[-SearchValue] <String>] [[-FilterValue] <String[]>] [[-AdvancedSearch] <Array>]
  [-AlertAction] <String> [[-AlertMail] <String>] [-AlertName] <String> [[-APIKey] <String>] [-UseBetaFeatures]
- [[-AdvancedFilter] <Array>] [-InputOnypheObject <Object>] [-SearchType <String>] [-SearchFilter <String>]
+ [[-AdvancedFilter] <Array>] [-InputOnypheObject <Array>] [-SearchType <String>] [-SearchFilter <String>]
  [-FilterFunction <String>] [<CommonParameters>]
 ```
 
@@ -217,7 +217,7 @@ Accept wildcard characters: False
 {{ Fill InputOnypheObject Description }}
 
 ```yaml
-Type: Object
+Type: Array
 Parameter Sets: (All)
 Aliases:
 
