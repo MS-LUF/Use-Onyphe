@@ -1,5 +1,5 @@
 ---
-external help file: Use-Onyphe-help.xml
+external help file: use-onyphe-help.xml
 Module Name: Use-Onyphe
 online version:
 schema: 2.0.0
@@ -21,11 +21,12 @@ Get Summary API available for Onyphe
 
 ## EXAMPLES
 
-### EXAMPLE 1
+### EXEMPLE 1
 ```
 Get API available for Onyphe
-C:\PS> Get-OnypheSummaryAPIName
 ```
+
+C:\PS\> Get-OnypheSummaryAPIName
 
 ## PARAMETERS
 

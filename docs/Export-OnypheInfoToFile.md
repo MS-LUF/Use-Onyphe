@@ -26,17 +26,19 @@ to be investigated.
 
 ## EXAMPLES
 
-### EXAMPLE 1
+### EXEMPLE 1
 ```
 Exporting onyphe results containing into $onypheresult object to flat files in folder C:\temp
-C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -InputOnypheObject $onypheresult
 ```
 
-### EXAMPLE 2
+C:\PS\> Export-OnypheInfoToFile -tofolder C:\temp -InputOnypheObject $onypheresult
+
+### EXEMPLE 2
 ```
 Exporting onyphe results containing into $onypheresult object to flat files in folder C:\temp using ',' as csv separator
-C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -InputOnypheObject $onypheresult -csvdelimiter ","
 ```
+
+C:\PS\> Export-OnypheInfoToFile -tofolder C:\temp -InputOnypheObject $onypheresult -csvdelimiter ","
 
 ## PARAMETERS
 
@@ -90,7 +92,8 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
+For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

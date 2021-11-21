@@ -5,28 +5,28 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-OnypheSearchFilters
+# Get-OnypheBulkCategories
 
 ## SYNOPSIS
-Get filters available for search APIs of Onyphe
+Get Bulk category available for Onyphe
 
 ## SYNTAX
 
 ```
-Get-OnypheSearchFilters
+Get-OnypheBulkCategories
 ```
 
 ## DESCRIPTION
-Get filters available for search APIs of Onyphe
+Get Bulk category available for Onyphe
 
 ## EXAMPLES
 
 ### EXEMPLE 1
 ```
-Get filters available for search APIs of Onyphe
+Get Bulk category available for Onyphe
 ```
 
-C:\PS\> Get-OnypheSearchFilters
+C:\PS\> Get-OnypheBulkCategories
 
 ## PARAMETERS
 
@@ -34,7 +34,7 @@ C:\PS\> Get-OnypheSearchFilters
 
 ## OUTPUTS
 
-### filters as string
+### Bulk category as string
 ## NOTES
 
 ## RELATED LINKS

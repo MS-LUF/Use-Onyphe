@@ -5,28 +5,28 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-OnypheSearchFilters
+# Get-OnypheSimpleBestAPIName
 
 ## SYNOPSIS
-Get filters available for search APIs of Onyphe
+Get Simple Best API available for Onyphe
 
 ## SYNTAX
 
 ```
-Get-OnypheSearchFilters
+Get-OnypheSimpleBestAPIName
 ```
 
 ## DESCRIPTION
-Get filters available for search APIs of Onyphe
+Get Simple Best API available for Onyphe
 
 ## EXAMPLES
 
 ### EXEMPLE 1
 ```
-Get filters available for search APIs of Onyphe
+Get API available for Onyphe
 ```
 
-C:\PS\> Get-OnypheSearchFilters
+C:\PS\> Get-OnypheSimpleBestAPIName
 
 ## PARAMETERS
 
@@ -34,7 +34,7 @@ C:\PS\> Get-OnypheSearchFilters
 
 ## OUTPUTS
 
-### filters as string
+### Simple Best API as string
 ## NOTES
 
 ## RELATED LINKS

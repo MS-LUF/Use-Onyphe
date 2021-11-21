@@ -1,5 +1,5 @@
 ---
-external help file: Use-Onyphe-help.xml
+external help file: use-onyphe-help.xml
 Module Name: Use-Onyphe
 online version:
 schema: 2.0.0
@@ -21,23 +21,26 @@ get various ip data information from onyphe.io web service using as an input a c
 
 ## EXAMPLES
 
-### EXAMPLE 1
+### EXEMPLE 1
 ```
 Request info for several IP information from a csv formated file and your API key is already set as global variable
-C:\PS> Get-onypheinfofromcsv -fromcsv .\input.csv
 ```
 
-### EXAMPLE 2
+C:\PS\> Get-onypheinfofromcsv -fromcsv .\input.csv
+
+### EXEMPLE 2
 ```
 Request info for several IP information from a csv formated file and set the API key as global variable
-C:\PS> Get-onypheinfofromcsv -fromcsv .\input.csv -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
-### EXAMPLE 3
+C:\PS\> Get-onypheinfofromcsv -fromcsv .\input.csv -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+### EXEMPLE 3
 ```
 Request info for several IP information from a csv formated file using ',' separator and set the API key as global variable
-C:\PS> Get-onypheinfofromcsv -fromcsv .\input.csv -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -csvdelimiter ","
 ```
+
+C:\PS\> Get-onypheinfofromcsv -fromcsv .\input.csv -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -csvdelimiter ","
 
 ## PARAMETERS
 
@@ -91,7 +94,8 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
+For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

@@ -25,51 +25,58 @@ send HTTP request to onyphe.io web service and convert back JSON information to 
 
 ## EXAMPLES
 
-### EXAMPLE 1
+### EXEMPLE 1
 ```
 AdvancedSearch with multiple criteria/filters
-Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows and export data to myexport.json
-C:\PS> Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -SaveInfoAsFile .\myexport.json
 ```
 
-### EXAMPLE 2
+Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows and export data to myexport.json
+C:\PS\> Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -SaveInfoAsFile .\myexport.json
+
+### EXEMPLE 2
 ```
 simple search with one filter/criteria
-Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and export data to myexport.json
-C:\PS> Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -SaveInfoAsFile .\myexport.json
 ```
 
-### EXAMPLE 3
+Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and export data to myexport.json
+C:\PS\> Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -SaveInfoAsFile .\myexport.json
+
+### EXEMPLE 3
 ```
 AdvancedSearch with multiple criteria/filters and set the API key
-Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows and export data to myexport.json
-C:\PS> Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -SaveInfoAsFile .\myexport.json
 ```
 
-### EXAMPLE 4
+Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows and export data to myexport.json
+C:\PS\> Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -SaveInfoAsFile .\myexport.json
+
+### EXEMPLE 4
 ```
 simple search with one filter/criteria and use a server filter to retrieve only objects indexed since 2 month
-Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and export data to myexport.json
-C:\PS> Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2" -SaveInfoAsFile .\myexport.json
 ```
 
-### EXAMPLE 5
+Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and export data to myexport.json
+C:\PS\> Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2" -SaveInfoAsFile .\myexport.json
+
+### EXEMPLE 5
 ```
 filter the result and show me only the answer with os property not null for threatlist category for all Russia  and export data to myexport.json
-C:\PS> Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os -SaveInfoAsFile .\myexport.json
 ```
 
-### EXAMPLE 6
+C:\PS\> Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os -SaveInfoAsFile .\myexport.json
+
+### EXEMPLE 6
 ```
 filter the results using multiple filters (only os property known and from all organization like *company*) for tcp port 3389 opened in russia  and export data to myexport.json
-C:\PS> Export-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan -SaveInfoAsFile .\myexport.json
 ```
 
-### EXAMPLE 7
+C:\PS\> Export-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan -SaveInfoAsFile .\myexport.json
+
+### EXEMPLE 7
 ```
 search from onyphe using search-onyphe and pipe the object to export the content to a json file using export-onyphe
-C:\PS> Search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan | Export-onyphe -SaveInfoAsFile .\myexport.json
 ```
+
+C:\PS\> Search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan | Export-onyphe -SaveInfoAsFile .\myexport.json
 
 ## PARAMETERS
 
@@ -218,7 +225,7 @@ Accept wildcard characters: False
 ```
 
 ### -FilterFunction
-{{ Fill FilterFunction Description }}
+{{Fill FilterFunction Description}}
 
 ```yaml
 Type: String
@@ -233,7 +240,7 @@ Accept wildcard characters: False
 ```
 
 ### -SearchFilter
-{{ Fill SearchFilter Description }}
+{{Fill SearchFilter Description}}
 
 ```yaml
 Type: String
@@ -248,7 +255,7 @@ Accept wildcard characters: False
 ```
 
 ### -SearchType
-{{ Fill SearchType Description }}
+{{Fill SearchType Description}}
 
 ```yaml
 Type: String
@@ -263,7 +270,8 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
+For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

@@ -1,5 +1,5 @@
 ---
-external help file: Use-Onyphe-help.xml
+external help file: use-onyphe-help.xml
 Module Name: Use-Onyphe
 online version:
 schema: 2.0.0
@@ -21,11 +21,12 @@ Update Onyphe-Data-Model.xml local file containing a cache of available APIs, fu
 
 ## EXAMPLES
 
-### EXAMPLE 1
+### EXEMPLE 1
 ```
 Update Onyphe-Data-Model.xml local file containing a cache of available APIs, functions, filters from user API
-C:\PS> Update-OnypheFacetsFilters
 ```
+
+C:\PS\> Update-OnypheFacetsFilters
 
 ## PARAMETERS
 
@@ -62,7 +63,8 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
+For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

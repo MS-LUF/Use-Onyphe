@@ -1,5 +1,5 @@
 ---
-external help file: Use-Onyphe-help.xml
+external help file: use-onyphe-help.xml
 Module Name: Use-Onyphe
 online version:
 schema: 2.0.0
@@ -24,52 +24,59 @@ send HTTP request to onyphe.io web service and convert back JSON information to 
 
 ## EXAMPLES
 
-### EXAMPLE 1
+### EXEMPLE 1
 ```
 AdvancedSearch with multiple criteria/filters
-Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows
-C:\PS> Search-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan
 ```
 
-### EXAMPLE 2
+Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows
+C:\PS\> Search-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan
+
+### EXEMPLE 2
 ```
 simple search with one filter/criteria
-Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
-C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country
 ```
 
-### EXAMPLE 3
+Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
+C:\PS\> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country
+
+### EXEMPLE 3
 ```
 AdvancedSearch with multiple criteria/filters and set the API key
-Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows
-C:\PS> Search-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
-### EXAMPLE 4
+Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows
+C:\PS\> Search-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+### EXEMPLE 4
 ```
 simple search with one filter/criteria and request page 2 of the results
-Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
-C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -page "2"
 ```
 
-### EXAMPLE 5
+Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
+C:\PS\> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -page "2"
+
+### EXEMPLE 5
 ```
 simple search with one filter/criteria and use a server filter to retrieve only objects indexed since 2 month
-Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
-C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2"
 ```
 
-### EXAMPLE 6
+Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
+C:\PS\> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2"
+
+### EXEMPLE 6
 ```
 filter the result and show me only the answer with os property not null for threatlist category for all Russia
-C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os
 ```
 
-### EXAMPLE 7
+C:\PS\> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os
+
+### EXEMPLE 7
 ```
 filter the results using multiple filters (only os property known and from all organization like *company*) for tcp port 3389 opened in russia
-C:\PS> search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan
 ```
+
+C:\PS\> search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan
 
 ## PARAMETERS
 
@@ -203,7 +210,7 @@ Accept wildcard characters: False
 ```
 
 ### -FilterFunction
-{{ Fill FilterFunction Description }}
+{{Fill FilterFunction Description}}
 
 ```yaml
 Type: String
@@ -218,7 +225,7 @@ Accept wildcard characters: False
 ```
 
 ### -SearchFilter
-{{ Fill SearchFilter Description }}
+{{Fill SearchFilter Description}}
 
 ```yaml
 Type: String
@@ -233,7 +240,7 @@ Accept wildcard characters: False
 ```
 
 ### -SearchType
-{{ Fill SearchType Description }}
+{{Fill SearchType Description}}
 
 ```yaml
 Type: String
@@ -248,7 +255,8 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
+For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

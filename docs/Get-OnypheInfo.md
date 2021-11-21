@@ -1,5 +1,5 @@
 ---
-external help file: Use-Onyphe-help.xml
+external help file: use-onyphe-help.xml
 Module Name: Use-Onyphe
 online version:
 schema: 2.0.0
@@ -13,7 +13,7 @@ main function/cmdlet - Get information from onyphe.io web service using dedicate
 ## SYNTAX
 
 ```
-Get-OnypheInfo [[-SearchValue] <String>] [[-APIKey] <String>] [[-Page] <String[]>] [[-wait] <Int32>]
+Get-OnypheInfo [[-SearchValue] <String>] [-Best] [[-APIKey] <String>] [[-Page] <String[]>] [[-wait] <Int32>]
  [-SearchType <String>] [<CommonParameters>]
 ```
 
@@ -23,70 +23,86 @@ send HTTP request to onyphe.io web service and convert back JSON information to 
 
 ## EXAMPLES
 
-### EXAMPLE 1
+### EXEMPLE 1
 ```
-Request geoloc information for ip 8.8.8.8 
-C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Geoloc
-```
-
-### EXAMPLE 2
-```
-Request dns reverse information for ip 8.8.8.8 
-C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType ResolverReverse -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+Request geoloc information for ip 8.8.8.8
 ```
 
-### EXAMPLE 3
+C:\PS\> Get-OnypheInfo -SearchValue "8.8.8.8" -Category Geoloc
+
+### EXEMPLE 2
+```
+Request dns reverse information for ip 8.8.8.8
+```
+
+C:\PS\> Get-OnypheInfo -SearchValue "8.8.8.8" -Category ResolverReverse -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+### EXEMPLE 3
 ```
 request IIS keyword datascan information
-C:\PS> Get-OnypheInfo -SimpleAPIType DataScan -SearchValue "IIS" -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
-### EXAMPLE 4
+C:\PS\> Get-OnypheInfo -Category DataScan -SearchValue "IIS" -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+### EXEMPLE 4
 ```
-request datascan information for ip 8.8.8.8 
-C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType DataScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+request datascan information for ip 8.8.8.8
 ```
 
-### EXAMPLE 5
+C:\PS\> Get-OnypheInfo -SearchValue "8.8.8.8" -Category DataScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+### EXEMPLE 5
 ```
-Request pastebin content information for ip 8.8.8.8 
-C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+Request pastebin content information for ip 8.8.8.8
 ```
 
-### EXAMPLE 6
+C:\PS\> Get-OnypheInfo -SearchValue "8.8.8.8" -Category Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+### EXEMPLE 6
 ```
 Request pastebin content information for ip 8.8.8.8 and see page 2 of results
-C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -page "2"
 ```
 
-### EXAMPLE 7
+C:\PS\> Get-OnypheInfo -SearchValue "8.8.8.8" -Category Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -page "2"
+
+### EXEMPLE 7
 ```
-Request dns forward information for ip 8.8.8.8 
-C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType ResolverForward -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+Request dns forward information for ip 8.8.8.8
 ```
 
-### EXAMPLE 8
+C:\PS\> Get-OnypheInfo -SearchValue "8.8.8.8" -Category ResolverForward -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+### EXEMPLE 8
 ```
-Request threatlist information for ip 8.8.8.8 
-C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Threatlist -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+Request threatlist information for ip 8.8.8.8
 ```
 
-### EXAMPLE 9
+C:\PS\> Get-OnypheInfo -SearchValue "8.8.8.8" -Category Threatlist -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+### EXEMPLE 9
 ```
-Request inetnum information for ip 8.8.8.8 
-C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Inetnum -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+Request inetnum information for ip 8.8.8.8
 ```
 
-### EXAMPLE 10
+C:\PS\> Get-OnypheInfo -SearchValue "8.8.8.8" -Category Inetnum -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+### EXEMPLE 10
 ```
-Request synscan information for ip 8.8.8.8 
-C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType SynScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+Request synscan information for ip 8.8.8.8
 ```
+
+C:\PS\> Get-OnypheInfo -SearchValue "8.8.8.8" -Category SynScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 ## PARAMETERS
 
 ### -SearchValue
-{{ Fill SearchValue Description }}
+-SearchValue string -Category Inetnum -APIKey string{APIKEY}
+look for an ip address in onyphe database
+-SearchValue string -Category Threatlist -APIKey string{APIKEY}
+look for threat info about a specific IP in onyphe database.
+-SearchValue string -Category Pastries -APIKey string{APIKEY}
+look for an pastbin data about a specific IP in onyphe database.
+-SearchValue string -Category Synscan -APIKey string{APIKEY}
 
 ```yaml
 Type: String
@@ -97,6 +113,22 @@ Required: False
 Position: 1
 Default value: None
 Accept pipeline input: True (ByPropertyName, ByValue)
+Accept wildcard characters: False
+```
+
+### -Best
+-best
+enable best mode when supported by simple API
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
@@ -150,12 +182,12 @@ Accept wildcard characters: False
 ```
 
 ### -SearchType
-{{ Fill SearchType Description }}
+{{Fill SearchType Description}}
 
 ```yaml
 Type: String
 Parameter Sets: (All)
-Aliases: SimpleAPIType
+Aliases: SimpleAPIType, Category
 
 Required: False
 Position: Named
@@ -165,7 +197,8 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
+For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

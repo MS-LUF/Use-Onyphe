@@ -8,44 +8,54 @@ schema: 2.0.0
 # Export-OnypheBulkInfo
 
 ## SYNOPSIS
-main function/cmdlet - Export Search information on onyphe.io web service using bulk APIs
+main function/cmdlet - Export Search information on onyphe.io web service using bulk simple APIs
 
 ## SYNTAX
 
 ```
-Export-OnypheBulkInfo [-FilePath] <String> [-SaveInfoAsFile] <String> [[-APIKey] <String>] [[-wait] <Int32>]
- -SearchType <String> [<CommonParameters>]
+Export-OnypheBulkInfo [-FilePath] <String> [[-SaveInfoAsFile] <String>] [-Best] [[-APIKey] <String>]
+ [[-wait] <Int32>] -Category <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-main function/cmdlet - Export Search information on onyphe.io web service using bulk APIs
-bulk APIs use input file containing ip, domain or hostname and sends back streamed json as result.
+main function/cmdlet - Export Search information on onyphe.io web service using bulk simple APIs
+bulk APIs use input file containing ip sends back streamed json as result.
 
 ## EXAMPLES
 
-### EXAMPLE 1
+### EXEMPLE 1
 ```
-export search for IP information into Json file using myfile.txt as source IPs file
-C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType ip
-```
-
-### EXAMPLE 2
-```
-export search for domain information into Json file using myfile.txt as source domains file
-C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType domain
+export ctl information into Json file using myfile.txt as source IPs file
 ```
 
-### EXAMPLE 3
+C:\PS\> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -Category ctl
+
+### EXEMPLE 2
 ```
-export search for hostname information into Json file using myfileip.txt as source hostnames file
-C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType hostname
+export datascan information into Json file using myfile.txt as source IPs file
 ```
+
+C:\PS\> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -Category datascan
+
+### EXEMPLE 3
+```
+export threatlist information into Json file using myfileip.txt as source IPs file
+```
+
+C:\PS\> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -Category threatlist
+
+### EXEMPLE 4
+```
+export threatlist information into object file using myfileip.txt as source IPs file
+```
+
+C:\PS\> Export-OnypheBulkInfo -FilePath .\myfile.txt -Category threatlist
 
 ## PARAMETERS
 
 ### -FilePath
 -FilePath string
-full path to file to be imported to the bulk API.
+full path to file to be imported to the bulk simple APIs.
 
 ```yaml
 Type: String
@@ -68,9 +78,25 @@ Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
 Position: 2
 Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Best
+-Best switch
+Enable Best mode for Simple API
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -107,13 +133,13 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -SearchType
-{{ Fill SearchType Description }}
+### -Category
+{{Fill Category Description}}
 
 ```yaml
 Type: String
 Parameter Sets: (All)
-Aliases: BulkAPIType
+Aliases: BulkCategory
 
 Required: True
 Position: Named
@@ -123,7 +149,8 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
+For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

@@ -1,5 +1,5 @@
 ---
-external help file: Use-Onyphe-help.xml
+external help file: use-onyphe-help.xml
 Module Name: Use-Onyphe
 online version:
 schema: 2.0.0
@@ -22,30 +22,34 @@ Set an internet proxy to use onyphe web api
 
 ## EXAMPLES
 
-### EXAMPLE 1
+### EXEMPLE 1
 ```
 Remove Internet Proxy and set a direct connection
-C:\PS> Set-OnypheProxy -DirectNoProxy
 ```
 
-### EXAMPLE 2
+C:\PS\> Set-OnypheProxy -DirectNoProxy
+
+### EXEMPLE 2
 ```
 Set Internet Proxy and with manual authentication
-$credentials = get-credential 
-C:\PS> Set-OnypheProxy -Proxy "http://myproxy:8080" -ProxyCredential $credentials
 ```
 
-### EXAMPLE 3
+$credentials = get-credential 
+C:\PS\> Set-OnypheProxy -Proxy "http://myproxy:8080" -ProxyCredential $credentials
+
+### EXEMPLE 3
 ```
 Set Internet Proxy and with automatic authentication based on current security context
-C:\PS> Set-OnypheProxy -Proxy "http://myproxy:8080" -ProxyUseDefaultCredentials
 ```
 
-### EXAMPLE 4
+C:\PS\> Set-OnypheProxy -Proxy "http://myproxy:8080" -ProxyUseDefaultCredentials
+
+### EXEMPLE 4
 ```
-Set Internet Proxy and with no authentication 
-C:\PS> Set-OnypheProxy -Proxy "http://myproxy:8080" -AnonymousProxy
+Set Internet Proxy and with no authentication
 ```
+
+C:\PS\> Set-OnypheProxy -Proxy "http://myproxy:8080" -AnonymousProxy
 
 ## PARAMETERS
 
@@ -130,7 +134,8 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
+For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

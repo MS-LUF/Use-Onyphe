@@ -5,65 +5,73 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-OnypheSummary
+# Export-OnypheBulkSummaryInfo
 
 ## SYNOPSIS
-main function/cmdlet - Get information from onyphe.io web service using dedicated subfunctions by Summary API available
+main function/cmdlet - Export Search information on onyphe.io web service using bulk APIs
 
 ## SYNTAX
 
 ```
-Get-OnypheSummary [[-SearchValue] <String>] [[-APIKey] <String>] [[-Page] <String[]>] [[-wait] <Int32>]
- -SearchType <String> [<CommonParameters>]
+Export-OnypheBulkSummaryInfo [-FilePath] <String> [[-SaveInfoAsFile] <String>] [[-APIKey] <String>]
+ [[-wait] <Int32>] -SearchType <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-main function/cmdlet - Get information from onyphe.io web service using dedicated subfunctions by Summary API available
-send HTTP request to onyphe.io web service and convert back JSON information to a powershell custom object
+main function/cmdlet - Export Search information on onyphe.io web service using bulk APIs
+bulk APIs use input file containing ip, domain or hostname and sends back streamed json as result.
 
 ## EXAMPLES
 
 ### EXEMPLE 1
 ```
-Request all information for ip 8.8.8.8
+export summary IP information into Json file using myfile.txt as source IPs file
 ```
 
-C:\PS\> Get-OnypheSummary -SearchValue "8.8.8.8" -SummaryAPIType ip
+C:\PS\> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType ip
 
 ### EXEMPLE 2
 ```
-Request all information for perdu.com domain and set the API key
+export summary domain information into Json file using myfile.txt as source domains file
 ```
 
-C:\PS\> Get-OnypheSummary -SearchValue "perdu.com" -SummaryAPIType domain -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+C:\PS\> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType domain
 
 ### EXEMPLE 3
 ```
-Request all information for www.perdu.com hostname  and see page 2 of results
+export summary hostname information into Json file using myfileip.txt as source hostnames file
 ```
 
-C:\PS\> Get-OnypheSummary -SearchValue "www.perdu.com" -SummaryAPIType hostname -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -page "2"
+C:\PS\> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType hostname
+
+### EXEMPLE 4
+```
+export summary hostname information into object using myfileip.txt as source hostnames file
+```
+
+C:\PS\> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType hostname
 
 ## PARAMETERS
 
-### -SearchValue
-{{Fill SearchValue Description}}
+### -FilePath
+-FilePath string
+full path to file to be imported to the bulk API.
 
 ```yaml
 Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: False
+Required: True
 Position: 1
 Default value: None
-Accept pipeline input: True (ByPropertyName, ByValue)
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -APIKey
--APIKey string{APIKEY}
-set your APIKEY to be able to use Onyphe API.
+### -SaveInfoAsFile
+-SaveInfoAsFile string
+full path to file where json data will be exported.
 
 ```yaml
 Type: String
@@ -77,13 +85,12 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Page
--page string{page number}
-go directly to a specific result page (1 to 1000)
-you can set a list of page using x-y like 1-100 to read the first 100 pages
+### -APIKey
+-APIKey string{APIKEY}
+set your APIKEY to be able to use Onyphe API.
 
 ```yaml
-Type: String[]
+Type: String
 Parameter Sets: (All)
 Aliases:
 
@@ -116,7 +123,7 @@ Accept wildcard characters: False
 ```yaml
 Type: String
 Parameter Sets: (All)
-Aliases: SummaryAPIType
+Aliases: BulkAPISummary
 
 Required: True
 Position: Named
