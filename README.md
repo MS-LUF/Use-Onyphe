@@ -11,8 +11,18 @@ To request it : https://www.onyphe.io/login
 More info about available APIs :
 https://www.onyphe.io/documentation/api
 
-(c) 2018-2020 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
-## Notes version (1.2) - last public version :
+(c) 2018-2021 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
+## Notes version (1.3) - last public version :
+ - add whois simple API
+ - update bulk APIs
+ - add simple best APIs
+ - minor improvement
+ - new aliases : Export-OnypheBulkSimple, Export-OnypheBulkSummary
+ - new functions : Export-OnypheBulkInfo, Export-OnypheBulkSummaryInfo
+ - updated functions : Get-OnypheInfo
+ - update csv templates 
+
+## Notes version (1.2) :
  - add bulk APIs
  - update code to optimize file export (best memory management)
  - update object type to PSOnyphe
@@ -98,59 +108,32 @@ using a simple powershell command and an internet access :-)
 ## module content
 documentation in markdown available here : https://github.com/MS-LUF/Use-Onyphe/tree/master/docs
 ### function
-- Export-OnypheBulkInfo
-- Export-OnypheDataShot
-- Export-OnypheInfo
-- Export-OnypheInfoToFile
-- Get-OnypheAlertInfo
-- Get-OnypheCliFacets
+- Get-OnypheUserInfo 
+- Search-OnypheInfo 
 - Get-OnypheInfo
 - Get-OnypheInfoFromCSV
-- Get-OnypheSearchCategories
-- Get-OnypheSearchFilters
-- Get-OnypheSearchFunctions
-- Get-OnypheSimpleAPIName
-- Get-OnypheStatsFromObject
+- Export-OnypheInfoToFile 
+- Export-OnypheDataShot									
+- Export-OnypheBulkInfo 
+- Export-OnypheBulkSummaryInfo 
+- Export-OnypheInfo
+- Get-OnypheSummaryAPIName 
 - Get-OnypheSummary
-- Get-OnypheSummaryAPIName
-- Get-OnypheUserInfo
-- Get-ScriptDirectory
-- Import-OnypheEncryptedIKey
-- Invoke-APIBulkSummaryOnypheDomain
-- Invoke-APIBulkSummaryOnypheHostname
-- Invoke-APIBulkSummaryOnypheIP
-- Invoke-APIOnypheAddAlert
-- Invoke-APIOnypheCtl
-- Invoke-APIOnypheDataScan
-- Invoke-APIOnypheDatascanDataMD5
-- Invoke-APIOnypheDataShot
-- Invoke-APIOnypheDelAlert
-- Invoke-APIOnypheExport
-- Invoke-APIOnypheGeoloc
-- Invoke-APIOnypheInetnum
-- Invoke-APIOnypheListAlert
-- Invoke-APIOnypheOnionScan
-- Invoke-APIOnypheOnionShot
-- Invoke-APIOnyphePastries
-- Invoke-APIOnypheResolver
-- Invoke-APIOnypheResolverForward
-- Invoke-APIOnypheResolverReverse
-- Invoke-APIOnypheSearch
-- Invoke-APIOnypheSniffer
-- Invoke-APIOnypheSynScan
-- Invoke-APIOnypheThreatlist
-- Invoke-APIOnypheTopSite
-- Invoke-APIOnypheUser
-- Invoke-APIOnypheVulnscan
-- Invoke-APISummaryOnypheDomain
-- Invoke-APISummaryOnypheHostname
-- Invoke-APISummaryOnypheIP
-- Invoke-OnypheAPIV2
-- Search-OnypheInfo
-- Set-OnypheAlertInfo
+- Get-OnypheSimpleBestAPIName
+- Get-OnypheBulkCategories 
+- Get-OnypheBulkAPIType
+- Get-OnypheSearchFunctions
+- Get-OnypheSearchCategories
+- Get-OnypheSearchFilters 
 - Set-OnypheAPIKey
+- Update-OnypheFacetsFilters 
+- Get-OnypheCliFacets
+- Get-OnypheStatsFromObject 
 - Set-OnypheProxy
-- Update-OnypheFacetsFilters  
+- Import-OnypheEncryptedIKey 
+- Get-OnypheSimpleAPIName 
+- Get-OnypheAlertInfo
+- Set-OnypheAlertInfo
 
 ### alias
 - Export-Onyphe
@@ -160,3 +143,5 @@ documentation in markdown available here : https://github.com/MS-LUF/Use-Onyphe/
 - Search-Onyphe
 - Set-OnypheAlert
 - Update-OnypheLocalData
+- Export-OnypheBulkSimple
+- Export-OnypheBulkSummary

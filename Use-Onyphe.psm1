@@ -52,17 +52,24 @@
 # - add new APIv2, migrate from APIv1 to full APIv2
 # - remove temporary fix for empty array in APIv2
 # - update deserialization of psobject
-#
-# released on 08/2020
 # v1.2 : Last public release
 # - add bulk API
 # - update code to optimize file export (decrease memory to write file directly)
 # - update object type to PSOnyphe
 # - update inputobject parameter to InputOnypheObject
 # - fix various bug found 
-
 #
-#'(c) 2018-2020 lucas-cueff.com - Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).'
+# released on 11/2021
+# v1.3 : Last public release
+# - add whois simple API
+# - update bulk APIs
+# - add simple best APIs
+# - minor improvement
+# - new aliases : Export-OnypheBulkSimple, Export-OnypheBulkSummary
+# - new functions : Export-OnypheBulkInfo, Export-OnypheBulkSummaryInfo
+# - updated functions : Get-OnypheInfo
+#
+#'(c) 2018-2021 lucas-cueff.com - Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).'
 
 # dev : comment on fonction missing
 
@@ -263,7 +270,7 @@
 		$APISearchEntries = $csvcontent | where-object {$_.API -eq "Search"}
 		foreach ($entry in $APISearchEntries) {
 			$params = @{
-				SearchType = $entry.'Search-Type'
+				SearchType = $entry.'search-category'
 				Wait = 3
 			 }
 			if ($entry.'Search-Request'.contains("+")) {
@@ -291,7 +298,11 @@
 		}
 		$SimpleEntries = $csvcontent | where-object {($_.API -ne "IP") -and ($_.API -ne "Domain") -and ($_.API -ne "HostName") -and ($_.API -ne "Search")}
 		foreach ($entry in $SimpleEntries) {
-			$Script:Result += Get-OnypheInfo -SimpleAPIType $entry.API -SearchValue $entry.'API-Input' -wait 3
+			if ($entry.Best -eq "True") {
+				$Script:Result += Get-OnypheInfo -Category $entry.API -SearchValue $entry.'API-Input' -best -wait 3
+			} else {
+				$Script:Result += Get-OnypheInfo -Category $entry.API -SearchValue $entry.'API-Input' -wait 3
+			}
 		}
 		$Script:Result
 	}
@@ -514,7 +525,7 @@
 			Invoke-APIOnypheExport @params
 		}
 	}
-	Function Export-OnypheBulkInfo {
+	Function Export-OnypheBulkSummaryInfo {
 		<#
 		 .SYNOPSIS 
 		 main function/cmdlet - Export Search information on onyphe.io web service using bulk APIs
@@ -539,23 +550,27 @@
 		 -FilePath string
 		 full path to file to be imported to the bulk API.
 
-		 .PARAMETER BulkAPIType
-		 -BulkAPIType string {Get-OnypheSummaryAPIName}
+		 .PARAMETER BulkAPISummary
+		 -BulkAPISummary string {Get-OnypheSummaryAPIName}
 		 Bulk API to be used : ip, domain, hostname
 		 
 		 .OUTPUTS
 		 TypeName: System.Management.Automation.PSCustomObject
 		 	 
 		 .EXAMPLE
-		 export search for IP information into Json file using myfile.txt as source IPs file
+		 export summary IP information into Json file using myfile.txt as source IPs file
 		 C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType ip
 	 
 		 .EXAMPLE
-		 export search for domain information into Json file using myfile.txt as source domains file
+		 export summary domain information into Json file using myfile.txt as source domains file
 		 C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType domain
 	 
 		 .EXAMPLE
-		 export search for hostname information into Json file using myfileip.txt as source hostnames file
+		 export summary hostname information into Json file using myfileip.txt as source hostnames file
+		 C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType hostname
+
+		 .EXAMPLE
+		 export summary hostname information into object using myfileip.txt as source hostnames file
 		 C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType hostname
 	 #>
 		[cmdletbinding()]
@@ -563,7 +578,7 @@
 			[parameter(Mandatory=$true)]
 			[ValidateScript({test-path "$($_)"})]
 				[string]$FilePath,
-			[parameter(Mandatory=$true)]
+			[parameter(Mandatory=$false)]
 				[string]$SaveInfoAsFile,
 			[parameter(Mandatory=$false)]
 			[ValidateLength(40,40)]
@@ -585,7 +600,7 @@
 			$arrSet =  Get-OnypheSummaryAPIName
 			$ValidateSetAttribute = New-Object System.Management.Automation.ValidateSetAttribute($arrSet)
 			$AttributeCollection.Add($ValidateSetAttribute)
-			$ParameterNameAlias = New-Object System.Management.Automation.AliasAttribute -ArgumentList @("BulkAPIType")
+			$ParameterNameAlias = New-Object System.Management.Automation.AliasAttribute -ArgumentList @("BulkAPISummary")
 			$AttributeCollection.Add($ParameterNameAlias)
 			$RuntimeParameter = New-Object System.Management.Automation.RuntimeDefinedParameter($ParameterNameType, [string], $AttributeCollection)
 			$RuntimeParameterDictionary.Add($ParameterNameType, $RuntimeParameter)
@@ -595,6 +610,11 @@
 			$SearchType = $PsBoundParameters[$ParameterNameType]
 			if ($wait) {start-sleep -s $wait}
 			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+			if (!($SaveInfoAsFile)) {
+				$outputAsObject = $true
+				$SaveInfoAsFile = [System.IO.Path]::GetTempFileName()
+				remove-item -path $SaveInfoAsFile -force
+			}
 			$params = @{
 				OutFile = $SaveInfoAsFile
 				FilePath = $FilePath
@@ -602,7 +622,136 @@
 			if (test-path function:\"Invoke-APIBulkSummaryOnyphe$($Searchtype)") {
 				$responsestream = invoke-expression "Invoke-APIBulkSummaryOnyphe$($Searchtype) `@params"
 			} else {
-				throw "API $($Searchtype) not implemented yet in this version of Use-Onyphe pwsh module"
+				throw "Bulk Summary API $($Searchtype) not implemented yet in this version of Use-Onyphe pwsh module"
+			}
+			if ($outputAsObject -and (test-path $SaveInfoAsFile)) {
+				get-content $SaveInfoAsFile | convertfrom-json
+			}
+		}
+	}
+	Function Export-OnypheBulkInfo {
+		<#
+		 .SYNOPSIS 
+		 main function/cmdlet - Export Search information on onyphe.io web service using bulk simple APIs
+	 
+		 .DESCRIPTION
+		 main function/cmdlet - Export Search information on onyphe.io web service using bulk simple APIs
+		 bulk APIs use input file containing ip sends back streamed json as result.
+	 	 
+		 .PARAMETER APIKey
+		 -APIKey string{APIKEY}
+		 set your APIKEY to be able to use Onyphe API.
+	 	 
+		 .PARAMETER Wait
+		 -Wait int{second}
+		 wait for x second before sending the request to manage rate limiting restriction
+	
+		 .PARAMETER SaveInfoAsFile
+		 -SaveInfoAsFile string
+		 full path to file where json data will be exported.
+
+		 .PARAMETER FilePath
+		 -FilePath string
+		 full path to file to be imported to the bulk simple APIs.
+
+		 .PARAMETER Category
+		 -Category string {Get-OnypheBulkCategories}
+		 Bulk Simple Category to be used : ctl,datascan,datashot,geoloc,inetnum,pastries,resolver,sniffer,synscan,threatlist,topsite,vulnscan,whois
+
+		 .PARAMETER Best
+		 -Best switch
+		 Enable Best mode for Simple API
+
+		 .OUTPUTS
+		 TypeName: System.Management.Automation.PSCustomObject
+		 	 
+		 .EXAMPLE
+		 export ctl information into Json file using myfile.txt as source IPs file
+		 C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -Category ctl
+	 
+		 .EXAMPLE
+		 export datascan information into Json file using myfile.txt as source IPs file
+		 C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -Category datascan
+	 
+		 .EXAMPLE
+		 export threatlist information into Json file using myfileip.txt as source IPs file
+		 C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -Category threatlist
+
+		 .EXAMPLE
+		 export threatlist information into object file using myfileip.txt as source IPs file
+		 C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -Category threatlist
+	 #>
+		[cmdletbinding()]
+		param(
+			[parameter(Mandatory=$true)]
+			[ValidateScript({test-path "$($_)"})]
+				[string]$FilePath,
+			[parameter(Mandatory=$false)]
+				[string]$SaveInfoAsFile,
+			[parameter(Mandatory=$false)]
+				[switch]$Best,
+			[parameter(Mandatory=$false)]
+			[ValidateLength(40,40)]
+				[string]$APIKey,
+			[parameter(Mandatory=$false)]
+				[int]$wait
+		)
+		DynamicParam
+		{
+			$ParameterNameType = 'Category'
+			$RuntimeParameterDictionary = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
+			$AttributeCollection = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
+			$ParameterAttribute = New-Object System.Management.Automation.ParameterAttribute
+			$ParameterAttribute.ValueFromPipeline = $false
+			$ParameterAttribute.ValueFromPipelineByPropertyName = $false
+			$ParameterAttribute.Mandatory = $true
+			$ParameterAttribute.Position = 2
+			$AttributeCollection.Add($ParameterAttribute)
+			$arrSet =  Get-OnypheBulkCategories
+			$ValidateSetAttribute = New-Object System.Management.Automation.ValidateSetAttribute($arrSet)
+			$AttributeCollection.Add($ValidateSetAttribute)
+			$ParameterNameAlias = New-Object System.Management.Automation.AliasAttribute -ArgumentList @("BulkCategory")
+			$AttributeCollection.Add($ParameterNameAlias)
+			$RuntimeParameter = New-Object System.Management.Automation.RuntimeDefinedParameter($ParameterNameType, [string], $AttributeCollection)
+			$RuntimeParameterDictionary.Add($ParameterNameType, $RuntimeParameter)
+			return $RuntimeParameterDictionary
+	 	}
+		Process {
+			$Category = $PsBoundParameters[$ParameterNameType]
+			if ($wait) {start-sleep -s $wait}
+			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+			if (!($SaveInfoAsFile)) {
+				$outputAsObject = $true
+				$SaveInfoAsFile = [System.IO.Path]::GetTempFileName()
+				remove-item -path $SaveInfoAsFile -force
+			}
+			$params = @{
+				OutFile = $SaveInfoAsFile
+				FilePath = $FilePath
+			}
+			if ($Best.IsPresent) {
+				if ((Get-OnypheSimpleBestAPIName) -contains $Category) {
+					if (test-path function:\"Invoke-APIBulkSimpleBestOnyphe$($Category)") {
+						$responsestream = invoke-expression "Invoke-APIBulkSimpleBestOnyphe$($Category) `@params"
+					} else {
+						throw "Simple Best API $($Category) not implemented yet in this version of Use-Onyphe pwsh module"
+					}
+				} else {
+					throw "Simple Best API $($Category) not available on Onyphe"
+				}
+			} else {
+				if ((get-OnypheSimpleAPIName) -contains $Category) {
+					if (test-path function:\"Invoke-APIBulkSimpleOnyphe$($Category)") {
+						$responsestream = invoke-expression "Invoke-APIBulkSimpleOnyphe$($Category) `@params"
+					} else {
+						throw "Simple API $($Category) not implemented yet in this version of Use-Onyphe pwsh module"
+					}
+				} else {
+					throw "Simple API $($Category) not available on Onyphe"
+				}
+			}
+			if ($outputAsObject -and (test-path $SaveInfoAsFile)) {
+				get-content $SaveInfoAsFile | convertfrom-json
 			}
 		}
 	}
@@ -838,14 +987,17 @@
 	main function/cmdlet - Get information from onyphe.io web service using dedicated subfunctions by Simple API available
 	send HTTP request to onyphe.io web service and convert back JSON information to a powershell custom object
 	
-	.PARAMETER SimpleAPIType string (ctl,datascan,geoloc,inetnum,pastries,resolver,sniffer,synscan,threatlist,datashot,onionscan,onionshot,topsite,vulnscan,resolverreverse,resolverforward,datascandatamd5)
-	-SearchValue string -SimpleAPIType Inetnum -APIKey string{APIKEY}
+	.PARAMETER Category
+	-Category string (ctl,datascan,geoloc,inetnum,pastries,resolver,sniffer,synscan,threatlist,datashot,onionscan,onionshot,topsite,vulnscan,resolverreverse,resolverforward,datascandatamd5,whois)
+	
+	.PARAMETER SearchValue
+	-SearchValue string -Category Inetnum -APIKey string{APIKEY}
 	look for an ip address in onyphe database
-	-SearchValue string -SimpleAPIType Threatlist -APIKey string{APIKEY}
+	-SearchValue string -Category Threatlist -APIKey string{APIKEY}
 	look for threat info about a specific IP in onyphe database.
-	-SearchValue string -SimpleAPIType Pastries -APIKey string{APIKEY}
+	-SearchValue string -Category Pastries -APIKey string{APIKEY}
 	look for an pastbin data about a specific IP in onyphe database.
-	-SearchValue string -SimpleAPIType Synscan -APIKey string{APIKEY}
+	-SearchValue string -Category Synscan -APIKey string{APIKEY}
 	
 	.PARAMETER APIKey
 	-APIKey string{APIKEY}
@@ -859,55 +1011,61 @@
     .PARAMETER Wait
 	-Wait int{second}
 	wait for x second before sending the request to manage rate limiting restriction
+
+	.PARAMETER Best
+	-best
+	enable best mode when supported by simple API
 	
 	.OUTPUTS
 	TypeName: System.Management.Automation.PSCustomObject
 		
 	.EXAMPLE
 	Request geoloc information for ip 8.8.8.8 
-	C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Geoloc
+	C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -Category Geoloc
 	
 	.EXAMPLE
 	Request dns reverse information for ip 8.8.8.8 
-	C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType ResolverReverse -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -Category ResolverReverse -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 	
 	.EXAMPLE
 	request IIS keyword datascan information
-	C:\PS> Get-OnypheInfo -SimpleAPIType DataScan -SearchValue "IIS" -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	C:\PS> Get-OnypheInfo -Category DataScan -SearchValue "IIS" -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 	
 	.EXAMPLE
 	request datascan information for ip 8.8.8.8 
-	C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType DataScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -Category DataScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 	
 	.EXAMPLE
 	Request pastebin content information for ip 8.8.8.8 
-	C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -Category Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 	.EXAMPLE
 	Request pastebin content information for ip 8.8.8.8 and see page 2 of results
-	C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -page "2"
+	C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -Category Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -page "2"
 	
 	.EXAMPLE
 	Request dns forward information for ip 8.8.8.8 
-	C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType ResolverForward -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -Category ResolverForward -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 	
 	.EXAMPLE
 	Request threatlist information for ip 8.8.8.8 
-	C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Threatlist -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -Category Threatlist -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 	
 	.EXAMPLE
 	Request inetnum information for ip 8.8.8.8 
-	C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Inetnum -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -Category Inetnum -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 	
 	.EXAMPLE
 	Request synscan information for ip 8.8.8.8 
-	C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType SynScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"	
+	C:\PS> Get-OnypheInfo -SearchValue "8.8.8.8" -Category SynScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"	
 #>
   [cmdletbinding()]
   Param (
 	[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$false)]
 		[ValidateNotNullOrEmpty()]
 		[string]$SearchValue,
+	[parameter(Mandatory=$false)]
+		[switch]$Best,
 	[parameter(Mandatory=$false)]
 		[ValidateLength(40,40)]
 		[string]$APIKey,
@@ -931,7 +1089,7 @@
 		$arrSet =  Get-OnypheSimpleAPIName
 		$ValidateSetAttribute = New-Object System.Management.Automation.ValidateSetAttribute($arrSet)
 		$AttributeCollection.Add($ValidateSetAttribute)
-		$ParameterNameAlias = New-Object System.Management.Automation.AliasAttribute -ArgumentList @("SimpleAPIType")
+		$ParameterNameAlias = New-Object System.Management.Automation.AliasAttribute -ArgumentList @("SimpleAPIType","Category")
 		$AttributeCollection.Add($ParameterNameAlias)
 		$RuntimeParameter = New-Object System.Management.Automation.RuntimeDefinedParameter($ParameterNameType, [string], $AttributeCollection)
 		$RuntimeParameterDictionary.Add($ParameterNameType, $RuntimeParameter)
@@ -944,12 +1102,17 @@
 		}
 		if ($wait) {start-sleep -s $wait}
 		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+		if ($best.IsPresent) {
+			$APIfunctionprefix = "Invoke-APIBestOnyphe"
+		} else {
+			$APIfunctionprefix = "Invoke-APIOnyphe"
+		}
 		If ($searchtype) {
 			if ($SearchValue) {
 				$params = @{
 					input = $SearchValue
 				}
-				if (test-path function:\"Invoke-APIOnyphe$($Searchtype)") {
+				if (test-path function:\"$($APIfunctionprefix)$($Searchtype)") {
 					if ($Page) {
 						switch -regex ($page) {
 							"^((?!0)\d+)(-)((?!0)\d+)$" {
@@ -960,22 +1123,26 @@
 									} else {
 										$params.add('Page', $i.tostring())
 									}
-									invoke-expression "Invoke-APIOnyphe$($Searchtype) `@params"
+									invoke-expression "$($APIfunctionprefix)$($Searchtype) `@params"
 								}
 							}
 							"^((?!0)\d+)$" {
 								$params.add('Page', $page)
-								invoke-expression "Invoke-APIOnyphe$($Searchtype) `@params"
+								invoke-expression "$($APIfunctionprefix)$($Searchtype) `@params"
 							}
 						}
 					} else {
-						invoke-expression "Invoke-APIOnyphe$($Searchtype) `@params"
+						invoke-expression "$($APIfunctionprefix)$($Searchtype) `@params"
 					}
 				} else {
-					throw "API $($Searchtype) not implemented yet in this version of Use-Onyphe pwsh module"
+					if ($best.IsPresent) {
+						throw "Simple Best API $($Searchtype) not implemented yet in this version of Use-Onyphe pwsh module or missing in Category / Simple API"
+					} else {
+						throw "Simple API $($Searchtype) not implemented yet in this version of Use-Onyphe pwsh module"
+					}
 				}
 			} else {
-				throw "-SearchValue parameter must be used with -SimpleAPIType"
+				throw "-SearchValue parameter must be used with -Category"
 			}
 		} 
 	}
@@ -989,7 +1156,8 @@
 		  main function/cmdlet - Get information from onyphe.io web service using dedicated subfunctions by Summary API available
 		  send HTTP request to onyphe.io web service and convert back JSON information to a powershell custom object
 		  
-		  .PARAMETER SummaryAPIType string (ip,domain,hostname)
+		  .PARAMETER SummaryAPIType
+		  -SummaryAPIType string (ip,domain,hostname)
 		  -SearchValue string -SummaryAPIType ip -APIKey string{APIKEY}
 		  look for an all info available regarding an ip address in onyphe database
 		  -SearchValue string -SummaryAPIType domain -APIKey string{APIKEY}
@@ -1555,6 +1723,132 @@
 			Invoke-OnypheAPIV2 @params
 		}
     }
+	Function Invoke-APIOnypheWhois {
+  <#
+	.SYNOPSIS 
+	create several input for Invoke-OnypheAPIV2 function and then call it to get the whois info from whois API
+
+	.DESCRIPTION
+	create several input for Invoke-OnypheAPIV2 function and then call it to get the whois info from whois API
+	
+	.PARAMETER IP
+	-IP string{IP}
+	IP to be used for the geoloc API usage
+	
+	.PARAMETER APIKEY
+	-APIKey string{APIKEY}
+	Set APIKEY as global variable.
+
+	.PARAMETER Page
+	-page string{page number}
+	go directly to a specific result page (1 to 1000)
+	
+	.OUTPUTS
+	TypeName: PSOnyphe
+
+	.EXAMPLE
+	get whois info for subnet 93.184.208.0
+	C:\PS> Invoke-APIOnyphewhois -IP 93.184.208.0
+
+	.EXAMPLE
+	get whois info for subnet 93.184.208.0 and set the api key
+	C:\PS> Invoke-APIOnyphewhois -IP 93.184.208.0 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  #>
+  [cmdletbinding()]
+  Param (
+		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+		[Alias("input")]
+		[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
+			[string]$IP, 
+		[parameter(Mandatory=$false)]
+		[ValidateLength(40,40)]
+			[string]$APIKey,
+		[parameter(Mandatory=$false)]
+		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
+			[string]$Page,
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[hashtable]$FuncInput
+  )
+	Process {
+		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+		$params = @{
+			request = "v2/simple/whois/$($IP)"
+			APIInfo = "whois"
+			APIInput = @("$($IP)")
+			APIKeyrequired = $true
+		}
+		if ($FuncInput) {
+			$params.add("FuncInput", $FuncInput)
+		}
+		if ($page) {$params.add('page',$page)}
+		Write-Verbose -message "URL Info : $($params.request)"
+		Invoke-OnypheAPIV2 @params
+	}
+	}
+	Function Invoke-APIBestOnypheWhois {
+  <#
+	.SYNOPSIS 
+	create several input for Invoke-OnypheAPIV2 function and then call it to get the whois info from whois best API
+
+	.DESCRIPTION
+	create several input for Invoke-OnypheAPIV2 function and then call it to get the whois info from whois best API
+	
+	.PARAMETER IP
+	-IP string{IP}
+	IP to be used for the geoloc API usage
+	
+	.PARAMETER APIKEY
+	-APIKey string{APIKEY}
+	Set APIKEY as global variable.
+
+	.PARAMETER Page
+	-page string{page number}
+	go directly to a specific result page (1 to 1000)
+	
+	.OUTPUTS
+	TypeName: PSOnyphe
+
+	.EXAMPLE
+	get whois best info for subnet 93.184.208.0
+	C:\PS> Invoke-APIBestOnyphewhois -IP 93.184.208.0
+
+	.EXAMPLE
+	get whois best info for subnet 93.184.208.0 and set the api key
+	C:\PS> Invoke-APIBestOnyphewhois -IP 93.184.208.0 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  #>
+  [cmdletbinding()]
+  Param (
+		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+		[Alias("input")]
+		[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
+			[string]$IP, 
+		[parameter(Mandatory=$false)]
+		[ValidateLength(40,40)]
+			[string]$APIKey,
+		[parameter(Mandatory=$false)]
+		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
+			[string]$Page,
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[hashtable]$FuncInput
+  )
+	Process {
+		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+		$params = @{
+			request = "v2/simple/whois/best/$($IP)"
+			APIInfo = "whois/best"
+			APIInput = @("$($IP)")
+			APIKeyrequired = $true
+		}
+		if ($FuncInput) {
+			$params.add("FuncInput", $FuncInput)
+		}
+		if ($page) {$params.add('page',$page)}
+		Write-Verbose -message "URL Info : $($params.request)"
+		Invoke-OnypheAPIV2 @params
+	}
+	}
 	Function Invoke-APIOnypheInetnum {
   <#
 	.SYNOPSIS 
@@ -1607,6 +1901,69 @@
 		$params = @{
 			request = "v2/simple/inetnum/$($IP)"
 			APIInfo = "inetnum"
+			APIInput = @("$($IP)")
+			APIKeyrequired = $true
+		}
+		if ($FuncInput) {
+			$params.add("FuncInput", $FuncInput)
+		}
+		if ($page) {$params.add('page',$page)}
+		Write-Verbose -message "URL Info : $($params.request)"
+		Invoke-OnypheAPIV2 @params
+	}
+	}
+	Function Invoke-APIBestOnypheInetnum {
+  <#
+	.SYNOPSIS 
+	create several input for Invoke-OnypheAPIV2 function and then call it to get the inetnum info from inetnum best API
+
+	.DESCRIPTION
+	create several input for Invoke-OnypheAPIV2 function and then call it to get the inetnum info from inetnum best API
+	
+	.PARAMETER IP
+	-IP string{IP}
+	IP to be used for the geoloc API usage
+	
+	.PARAMETER APIKEY
+	-APIKey string{APIKEY}
+	Set APIKEY as global variable.
+
+	.PARAMETER Page
+	-page string{page number}
+	go directly to a specific result page (1 to 1000)
+	
+	.OUTPUTS
+	TypeName: PSOnyphe
+
+	.EXAMPLE
+	get inetnum info for subnet 93.184.208.0
+	C:\PS> Invoke-APIBestOnypheInetnum -IP 93.184.208.0
+
+	.EXAMPLE
+	get inetnum info for subnet 93.184.208.0 and set the api key
+	C:\PS> Invoke-APIBestOnypheInetnum -IP 93.184.208.0 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  #>
+  [cmdletbinding()]
+  Param (
+		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+		[Alias("input")]
+		[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
+			[string]$IP, 
+		[parameter(Mandatory=$false)]
+		[ValidateLength(40,40)]
+			[string]$APIKey,
+		[parameter(Mandatory=$false)]
+		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
+			[string]$Page,
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[hashtable]$FuncInput
+  )
+	Process {
+		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+		$params = @{
+			request = "v2/simple/inetnum/best/$($IP)"
+			APIInfo = "inetnum/best"
 			APIInput = @("$($IP)")
 			APIKeyrequired = $true
 		}
@@ -2248,8 +2605,71 @@
 		Invoke-OnypheAPIV2 @params
 	}
 	}
+	Function Invoke-APIBestOnypheThreatlist {
+  <#
+		.SYNOPSIS 
+		create several input for Invoke-OnypheAPIV2 function and then call it to get the threat info from threatlist best API
+
+		.DESCRIPTION
+		create several input for Invoke-OnypheAPIV2 function and then call it to get the threat info from threatlist best API
+		
+		.PARAMETER IP
+		-IP string{IP}
+		IP to be used for the threatlist API usage
+		
+		.PARAMETER APIKEY
+		-APIKey string{APIKEY}
+		Set APIKEY as global variable.
+
+		.PARAMETER Page
+		-page string{page number}
+		go directly to a specific result page (1 to 1000)
+			
+		.OUTPUTS
+		TypeName: PSOnyphe
+
+		.EXAMPLE
+		get all threat info for IP 	201.111.50.232
+		C:\PS> Invoke-APIBestOnypheThreatlist -IP 201.111.50.232
+
+		.EXAMPLE
+		get all threat info for IP 201.111.50.232 and set the api key
+		C:\PS> Invoke-APIBestOnypheThreatlist -IP 201.111.50.232 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  #>
+  [cmdletbinding()]
+  Param (
+		[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+		[Alias("input")]
+		[ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
+			[string]$IP, 
+		[parameter(Mandatory=$false)]
+		[ValidateLength(40,40)]
+			[string]$APIKey,
+		[parameter(Mandatory=$false)]
+		[ValidateScript({$_ -match "^((?!0)\d+)$"})]
+			[string]$Page,
+		[parameter(Mandatory=$false)]
+		[ValidateNotNullOrEmpty()]
+			[hashtable]$FuncInput
+  )
+	Process {
+		if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+		$params = @{
+			request = "v2/simple/threatlist/best/$($IP)"
+			APIInfo = "threatlist/best"
+			APIInput = @("$($IP)")
+			APIKeyrequired = $true
+		}
+		if ($page) {$params.add('page',$page)}
+		if ($FuncInput) {
+			$params.add("FuncInput", $FuncInput)
+		}
+		Write-Verbose -message "URL Info : $($params.request)"
+		Invoke-OnypheAPIV2 @params
+	}
+	}
 	Function Invoke-APIOnypheTopSite {
-		<#
+	<#
 			  .SYNOPSIS 
 			  create several input for Invoke-OnypheAPIV2 function and then call it to get the threat info from topsite API
 	  
@@ -2620,6 +3040,56 @@
 		  Invoke-OnypheAPIV2 @params
 	}
 	}
+	Function Invoke-APIBestOnypheGeoloc {
+	<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get the Geoloc info from Best Geoloc API
+		  .DESCRIPTION
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get the Geoloc info from Best Geoloc API
+		  
+		  .PARAMETER IP
+		  -IP string{IP}
+		  IP to be used for the geoloc API usage
+		  
+		  .OUTPUTS
+		  TypeName: PSOnyphe
+		  
+		  .EXAMPLE
+		  get geoloc best info for IP 8.8.8.8
+		  C:\PS> Invoke-APIBestOnypheGeoloc -IP 8.8.8.8
+	#> 
+  [cmdletbinding()]
+	Param (
+		  [parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+		  [Alias("input")]
+		  [ValidateScript({($_ -match "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])") -or ($_ -match "s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?")})]
+			  [string]$IP,
+		  [parameter(Mandatory=$false)]
+		  [ValidateLength(40,40)]
+			  [string]$APIKey,
+		  [parameter(Mandatory=$false)]
+		  [ValidateScript({$_ -match "^((?!0)\d+)$"})]
+			  [string]$Page,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+	)
+	process {
+		 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+		 $params = @{
+			  request = "v2/simple/geoloc/best/$($IP)"
+			  APIInfo = "geoloc/best"
+			  APIInput = @("$($IP)")
+			  APIKeyrequired = $true
+		  }
+		  if ($page) {$params.add('page',$page)}
+		  if ($FuncInput) {
+			$params.add("FuncInput", $FuncInput)
+		  }
+		  Write-Verbose -message "URL Info : $($params.request)"
+		  Invoke-OnypheAPIV2 @params
+	}
+	}
 	Function Invoke-APISummaryOnypheIP {
 	<#
 		  .SYNOPSIS 
@@ -2747,9 +3217,9 @@
 	Function Invoke-APISummaryOnypheDomain {
 	<#
 		  .SYNOPSIS 
-		  create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an internet domain from Geoloc Summary/domain API
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an internet domain from Summary/domain API
 		  .DESCRIPTION
-		  create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an internet domain from Geoloc Summary/domain API
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an internet domain from  Summary/domain API
 		  
 		  .PARAMETER Domain
 		  -Domain string{Domain}
@@ -2809,9 +3279,9 @@
 	Function Invoke-APIBulkSummaryOnypheIP {
 		<#
 		  .SYNOPSIS 
-		  create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of IPs based on a file input from Bulk/ip API
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of IPs based on a file input from Bulk/summary/ip API
 		  .DESCRIPTION
-		  reate several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of IPs based on a file input from Bulk/ip API
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of IPs based on a file input from Bulk/summary/ip API
 		  
 		  .PARAMETER FilePath
 		  -FilePath string{full path to an existing text file}
@@ -2826,15 +3296,15 @@
 		  Set APIKEY as global variable.
 
 		  .OUTPUTS
-		  TypeName: PSOnyphe
+		  TypeName: System.Management.Automation.PSCustomObject
 		  
 		  .EXAMPLE
 		  export all info available as JSON for all IPs contained in listip.txt
-		  C:\PS> Invoke-APIBulkSummaryOnypheIP -FilePath .\listip.txt
+		  C:\PS> Invoke-APIBulkSummaryOnypheIP -FilePath .\listip.txt -OutFile .\results.json
 
 		  .EXAMPLE
 		  export all info available as JSON for all IPs contained in listip.txt and set the API Key
-		  C:\PS> Invoke-APIBulkSummaryOnypheIP -FilePath .\listip.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+		  C:\PS> Invoke-APIBulkSummaryOnypheIP -FilePath .\listip.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\results.json
 	#>
 		[cmdletbinding()]
 		Param (
@@ -2875,9 +3345,9 @@
 	Function Invoke-APIBulkSummaryOnypheHostname {
 		<#
 		  .SYNOPSIS 
-		  create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of hostnames based on a file input from Bulk/hostname API
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of hostnames based on a file input from Bulk/summary/hostname API
 		  .DESCRIPTION
-		  reate several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of hostnames based on a file input from Bulk/hostname API
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of hostnames based on a file input from Bulk/summary/hostname API
 		  
 		  .PARAMETER FilePath
 		  -FilePath string{full path to an existing text file}
@@ -2892,15 +3362,15 @@
 		 Set APIKEY as global variable.
 
 		  .OUTPUTS
-		  TypeName: PSOnyphe
+		  TypeName: System.Management.Automation.PSCustomObject
 		  
 		  .EXAMPLE
 		  export all info available as JSON for all hosts contained in listhost.txt
-		  C:\PS> Invoke-APIBulkSummaryOnypheHostname -FilePath .\listhost.txt
+		  C:\PS> Invoke-APIBulkSummaryOnypheHostname -FilePath .\listhost.txt -OutFile .\results.json
 
 		  .EXAMPLE
 		  export all info available as JSON for all hosts contained in listhost.txt and set the API Key
-		  C:\PS> Invoke-APIBulkSummaryOnypheHostname -FilePath .\listhost.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+		  C:\PS> Invoke-APIBulkSummaryOnypheHostname -FilePath .\listhost.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\results.json
 	#>
 		[cmdletbinding()]
 		Param (
@@ -2943,7 +3413,7 @@
 		  .SYNOPSIS 
 		  create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of domains based on a file input from Bulk/domain API
 		  .DESCRIPTION
-		  reate several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of domains based on a file input from Bulk/domain API
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get the all available info for an array of domains based on a file input from Bulk/domain API
 		  
 		  .PARAMETER FilePath
 		  -FilePath string{full path to an existing text file}
@@ -2958,15 +3428,15 @@
 		 Set APIKEY as global variable.
 
 		  .OUTPUTS
-		  TypeName: PSOnyphe
+		  TypeName: System.Management.Automation.PSCustomObject
 		  
 		  .EXAMPLE
 		  export all info available as JSON for all domains contained in listdom.txt
-		  C:\PS> Invoke-APIBulkSummaryOnypheDomain -FilePath .\listdom.txt
+		  C:\PS> Invoke-APIBulkSummaryOnypheDomain -FilePath .\listdom.txt -OutFile .\results.json
 
 		  .EXAMPLE
 		  export all info available as JSON for all domains contained in listdom.txt and set the API Key
-		  C:\PS> Invoke-APIBulkSummaryOnypheDomain -FilePath .\listdom.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+		  C:\PS> Invoke-APIBulkSummaryOnypheDomain -FilePath .\listdom.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\results.json
 	#>
 		[cmdletbinding()]
 		Param (
@@ -3004,6 +3474,1146 @@
 			  Invoke-OnypheAPIV2 @params
 		}
 	}
+	
+	Function Invoke-APIBulkSimpleOnypheCTL {
+	<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get ctl info for an array of ips based on a file input from Bulk/simple/ctl API
+		  .DESCRIPTION
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get ctl info for an array of ips based on a file input from Bulk/simple/ctl API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		 -APIKey string{APIKEY}
+		 Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: System.Management.Automation.PSCustomObject
+		  
+		  .EXAMPLE
+		  export all ctl info available as JSON for all ips contained in listips.txt
+		  C:\PS> Invoke-APIBulkSimpleOnypheCTL -FilePath .\listips.txt -OutFile .\result.json
+
+		  .EXAMPLE
+		  export all ctl info available as JSON for all ips contained in listips.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSimpleOnypheCTL -FilePath .\listips.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\result.json
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({(test-path $_)})]
+				[string]$FilePath,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile,
+			  [parameter(Mandatory=$false)]
+			  [ValidateLength(40,40)]
+				  [string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+			 $params = @{
+				  request = "v2/bulk/simple/ctl/ip"
+				  APIInfo = "bulk/simple/ctl/ip"
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
+				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
+			  }
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
+			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
+			  Invoke-OnypheAPIV2 @params
+		}
+	}
+
+	Function Invoke-APIBulkSimpleOnypheDataScan {
+	<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get datascan info for an array of ips based on a file input from Bulk/simple/datascan API
+		  .DESCRIPTION
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get datascan info for an array of ips based on a file input from Bulk/simple/datascan API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		 -APIKey string{APIKEY}
+		 Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: System.Management.Automation.PSCustomObject
+		  
+		  .EXAMPLE
+		  export all datascan info available as JSON for all ips contained in listips.txt
+		  C:\PS> Invoke-APIBulkSimpleOnypheCTL -FilePath .\listips.txt -OutFile .\result.json
+
+		  .EXAMPLE
+		  export all datascan info available as JSON for all ips contained in listips.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSimpleOnypheCTL -FilePath .\listips.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\result.json
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({(test-path $_)})]
+				[string]$FilePath,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile,
+			  [parameter(Mandatory=$false)]
+			  [ValidateLength(40,40)]
+				  [string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+			 $params = @{
+				  request = "v2/bulk/simple/datascan/ip"
+				  APIInfo = "bulk/simple/datascan/ip"
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
+				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
+			  }
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
+			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
+			  Invoke-OnypheAPIV2 @params
+		}
+	}
+
+	Function Invoke-APIBulkSimpleOnypheDataShot {
+	<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get datashot info for an array of ips based on a file input from Bulk/simple/datashot API
+		  .DESCRIPTION
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get datashot info for an array of ips based on a file input from Bulk/simple/datashot API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		 -APIKey string{APIKEY}
+		 Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: System.Management.Automation.PSCustomObject
+		  
+		  .EXAMPLE
+		  export all datashot info available as JSON for all ips contained in listips.txt
+		  C:\PS> Invoke-APIBulkSimpleOnyphedatashot -FilePath .\listips.txt -OutFile .\result.json
+
+		  .EXAMPLE
+		  export all datashot info available as JSON for all ips contained in listips.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSimpleOnyphedatashot -FilePath .\listips.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\result.json
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({(test-path $_)})]
+				[string]$FilePath,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile,
+			  [parameter(Mandatory=$false)]
+			  [ValidateLength(40,40)]
+				  [string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+			 $params = @{
+				  request = "v2/bulk/simple/datashot/ip"
+				  APIInfo = "bulk/simple/datashot/ip"
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
+				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
+			  }
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
+			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
+			  Invoke-OnypheAPIV2 @params
+		}
+	}
+
+	Function Invoke-APIBulkSimpleOnypheGeoloc {
+	<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Geoloc info for an array of ips based on a file input from Bulk/simple/Geoloc API
+		  .DESCRIPTION
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Geoloc info for an array of ips based on a file input from Bulk/simple/Geoloc API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		 -APIKey string{APIKEY}
+		 Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: System.Management.Automation.PSCustomObject
+		  
+		  .EXAMPLE
+		  export all Geoloc info available as JSON for all ips contained in listips.txt
+		  C:\PS> Invoke-APIBulkSimpleOnypheGeoloc -FilePath .\listips.txt -OutFile .\result.json
+
+		  .EXAMPLE
+		  export all Geoloc info available as JSON for all ips contained in listips.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSimpleOnypheGeoloc -FilePath .\listips.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\result.json
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({(test-path $_)})]
+				[string]$FilePath,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile,
+			  [parameter(Mandatory=$false)]
+			  [ValidateLength(40,40)]
+				  [string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+			 $params = @{
+				  request = "v2/bulk/simple/geoloc/ip"
+				  APIInfo = "bulk/simple/geoloc/ip"
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
+				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
+			  }
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
+			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
+			  Invoke-OnypheAPIV2 @params
+		}
+	}
+
+	Function Invoke-APIBulkSimpleOnypheInetnum {
+	<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Inetnum info for an array of ips based on a file input from Bulk/simple/Inetnum API
+		  .DESCRIPTION
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Inetnum info for an array of ips based on a file input from Bulk/simple/Inetnum API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		 -APIKey string{APIKEY}
+		 Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: System.Management.Automation.PSCustomObject
+		  
+		  .EXAMPLE
+		  export all Inetnum info available as JSON for all ips contained in listips.txt
+		  C:\PS> Invoke-APIBulkSimpleOnypheInetnum -FilePath .\listips.txt -OutFile .\result.json
+
+		  .EXAMPLE
+		  export all Inetnum info available as JSON for all ips contained in listips.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSimpleOnypheInetnum -FilePath .\listips.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\result.json
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({(test-path $_)})]
+				[string]$FilePath,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile,
+			  [parameter(Mandatory=$false)]
+			  [ValidateLength(40,40)]
+				  [string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+			 $params = @{
+				  request = "v2/bulk/simple/inetnum/ip"
+				  APIInfo = "bulk/simple/inetnum/ip"
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
+				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
+			  }
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
+			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
+			  Invoke-OnypheAPIV2 @params
+		}
+	}
+
+	Function Invoke-APIBulkSimpleOnyphePastries {
+	<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Pastries info for an array of ips based on a file input from Bulk/simple/Pastries API
+		  .DESCRIPTION
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Pastries info for an array of ips based on a file input from Bulk/simple/Pastries API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		 -APIKey string{APIKEY}
+		 Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: System.Management.Automation.PSCustomObject
+		  
+		  .EXAMPLE
+		  export all Pastries info available as JSON for all ips contained in listips.txt
+		  C:\PS> Invoke-APIBulkSimpleOnyphePastries -FilePath .\listips.txt -OutFile .\result.json
+
+		  .EXAMPLE
+		  export all Pastries info available as JSON for all ips contained in listips.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSimpleOnyphePastries -FilePath .\listips.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\result.json
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({(test-path $_)})]
+				[string]$FilePath,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile,
+			  [parameter(Mandatory=$false)]
+			  [ValidateLength(40,40)]
+				  [string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+			 $params = @{
+				  request = "v2/bulk/simple/pastries/ip"
+				  APIInfo = "bulk/simple/pastries/ip"
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
+				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
+			  }
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
+			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
+			  Invoke-OnypheAPIV2 @params
+		}
+	}
+
+	Function Invoke-APIBulkSimpleOnypheResolver {
+	<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Resolver info for an array of ips based on a file input from Bulk/simple/Resolver API
+		  .DESCRIPTION
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Resolver info for an array of ips based on a file input from Bulk/simple/Resolver API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		 -APIKey string{APIKEY}
+		 Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: System.Management.Automation.PSCustomObject
+		  
+		  .EXAMPLE
+		  export all Resolver info available as JSON for all ips contained in listips.txt
+		  C:\PS> Invoke-APIBulkSimpleOnypheResolver -FilePath .\listips.txt -OutFile .\result.json
+
+		  .EXAMPLE
+		  export all Resolver info available as JSON for all ips contained in listips.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSimpleOnypheResolver -FilePath .\listips.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\result.json
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({(test-path $_)})]
+				[string]$FilePath,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile,
+			  [parameter(Mandatory=$false)]
+			  [ValidateLength(40,40)]
+				  [string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+			 $params = @{
+				  request = "v2/bulk/simple/resolver/ip"
+				  APIInfo = "bulk/simple/resolver/ip"
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
+				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
+			  }
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
+			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
+			  Invoke-OnypheAPIV2 @params
+		}
+	}
+
+	Function Invoke-APIBulkSimpleOnypheSniffer {
+	<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Sniffer info for an array of ips based on a file input from Bulk/simple/Sniffer API
+		  .DESCRIPTION
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Sniffer info for an array of ips based on a file input from Bulk/simple/Sniffer API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		 -APIKey string{APIKEY}
+		 Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: System.Management.Automation.PSCustomObject
+		  
+		  .EXAMPLE
+		  export all Sniffer info available as JSON for all ips contained in listips.txt
+		  C:\PS> Invoke-APIBulkSimpleOnypheSniffer -FilePath .\listips.txt -OutFile .\result.json
+
+		  .EXAMPLE
+		  export all Sniffer info available as JSON for all ips contained in listips.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSimpleOnypheSniffer -FilePath .\listips.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\result.json
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({(test-path $_)})]
+				[string]$FilePath,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile,
+			  [parameter(Mandatory=$false)]
+			  [ValidateLength(40,40)]
+				  [string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+			 $params = @{
+				  request = "v2/bulk/simple/sniffer/ip"
+				  APIInfo = "bulk/simple/sniffer/ip"
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
+				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
+			  }
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
+			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
+			  Invoke-OnypheAPIV2 @params
+		}
+	}
+
+	Function Invoke-APIBulkSimpleOnypheSynScan {
+	<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Synscan info for an array of ips based on a file input from Bulk/simple/Synscan API
+		  .DESCRIPTION
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Synscan info for an array of ips based on a file input from Bulk/simple/Synscan API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		 -APIKey string{APIKEY}
+		 Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: System.Management.Automation.PSCustomObject
+		  
+		  .EXAMPLE
+		  export all Synscan info available as JSON for all ips contained in listips.txt
+		  C:\PS> Invoke-APIBulkSimpleOnypheSynscan -FilePath .\listips.txt -OutFile .\result.json
+
+		  .EXAMPLE
+		  export all Synscan info available as JSON for all ips contained in listips.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSimpleOnypheSynscan -FilePath .\listips.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\result.json
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({(test-path $_)})]
+				[string]$FilePath,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile,
+			  [parameter(Mandatory=$false)]
+			  [ValidateLength(40,40)]
+				  [string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+			 $params = @{
+				  request = "v2/bulk/simple/synscan/ip"
+				  APIInfo = "bulk/simple/synscan/ip"
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
+				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
+			  }
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
+			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
+			  Invoke-OnypheAPIV2 @params
+		}
+	}
+
+	Function Invoke-APIBulkSimpleOnypheThreatlist {
+	<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Threatlist info for an array of ips based on a file input from Bulk/simple/Threatlist API
+		  .DESCRIPTION
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Threatlist info for an array of ips based on a file input from Bulk/simple/Threatlist API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		 -APIKey string{APIKEY}
+		 Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: System.Management.Automation.PSCustomObject
+		  
+		  .EXAMPLE
+		  export all Threatlist info available as JSON for all ips contained in listips.txt
+		  C:\PS> Invoke-APIBulkSimpleOnypheThreatlist -FilePath .\listips.txt -OutFile .\result.json
+
+		  .EXAMPLE
+		  export all Threatlist info available as JSON for all ips contained in listips.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSimpleOnypheThreatlist -FilePath .\listips.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\result.json
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({(test-path $_)})]
+				[string]$FilePath,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile,
+			  [parameter(Mandatory=$false)]
+			  [ValidateLength(40,40)]
+				  [string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+			 $params = @{
+				  request = "v2/bulk/simple/threatlist/ip"
+				  APIInfo = "bulk/simple/threatlist/ip"
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
+				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
+			  }
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
+			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
+			  Invoke-OnypheAPIV2 @params
+		}
+	}
+
+	Function Invoke-APIBulkSimpleOnypheTopSite {
+	<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Topsite info for an array of ips based on a file input from Bulk/simple/Topsite API
+		  .DESCRIPTION
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Topsite info for an array of ips based on a file input from Bulk/simple/Topsite API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		 -APIKey string{APIKEY}
+		 Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: System.Management.Automation.PSCustomObject
+		  
+		  .EXAMPLE
+		  export all Topsite info available as JSON for all ips contained in listips.txt
+		  C:\PS> Invoke-APIBulkSimpleOnypheTopsite -FilePath .\listips.txt -OutFile .\result.json
+
+		  .EXAMPLE
+		  export all Topsite info available as JSON for all ips contained in listips.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSimpleOnypheTopsite -FilePath .\listips.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\result.json
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({(test-path $_)})]
+				[string]$FilePath,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile,
+			  [parameter(Mandatory=$false)]
+			  [ValidateLength(40,40)]
+				  [string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+			 $params = @{
+				  request = "v2/bulk/simple/topsite/ip"
+				  APIInfo = "bulk/simple/topsite/ip"
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
+				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
+			  }
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
+			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
+			  Invoke-OnypheAPIV2 @params
+		}
+	}
+
+	Function Invoke-APIBulkSimpleOnypheVulnscan {
+	<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Vulnscan info for an array of ips based on a file input from Bulk/simple/Vulnscan API
+		  .DESCRIPTION
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Vulnscan info for an array of ips based on a file input from Bulk/simple/Vulnscan API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		 -APIKey string{APIKEY}
+		 Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: System.Management.Automation.PSCustomObject
+		  
+		  .EXAMPLE
+		  export all Vulnscan info available as JSON for all ips contained in listips.txt
+		  C:\PS> Invoke-APIBulkSimpleOnypheVulnscan -FilePath .\listips.txt -OutFile .\result.json
+
+		  .EXAMPLE
+		  export all Vulnscan info available as JSON for all ips contained in listips.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSimpleOnypheVulnscan -FilePath .\listips.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\result.json
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({(test-path $_)})]
+				[string]$FilePath,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile,
+			  [parameter(Mandatory=$false)]
+			  [ValidateLength(40,40)]
+				  [string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+			 $params = @{
+				  request = "v2/bulk/simple/vulnscan/ip"
+				  APIInfo = "bulk/simple/vulnscan/ip"
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
+				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
+			  }
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
+			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
+			  Invoke-OnypheAPIV2 @params
+		}
+	}
+
+	Function Invoke-APIBulkSimpleOnypheWhoIs {
+	<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Whois info for an array of ips based on a file input from Bulk/simple/Whois API
+		  .DESCRIPTION
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Whois info for an array of ips based on a file input from Bulk/simple/Whois API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		 -APIKey string{APIKEY}
+		 Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: System.Management.Automation.PSCustomObject
+		  
+		  .EXAMPLE
+		  export all Whois info available as JSON for all ips contained in listips.txt
+		  C:\PS> Invoke-APIBulkSimpleOnypheWhois -FilePath .\listips.txt -OutFile .\result.json
+
+		  .EXAMPLE
+		  export all Whois info available as JSON for all ips contained in listips.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSimpleOnypheWhois -FilePath .\listips.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\result.json
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({(test-path $_)})]
+				[string]$FilePath,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile,
+			  [parameter(Mandatory=$false)]
+			  [ValidateLength(40,40)]
+				  [string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+			 $params = @{
+				  request = "v2/bulk/simple/whois/ip"
+				  APIInfo = "bulk/simple/whois/ip"
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
+				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
+			  }
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
+			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
+			  Invoke-OnypheAPIV2 @params
+		}
+	}
+
+	Function Invoke-APIBulkSimpleBestOnypheGeoloc {
+	<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Geoloc info for an array of ips based on a file input from Bulk/simple/Geoloc/Best API
+		  .DESCRIPTION
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Geoloc info for an array of ips based on a file input from Bulk/simple/Geoloc/Best API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		 -APIKey string{APIKEY}
+		 Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: System.Management.Automation.PSCustomObject
+		  
+		  .EXAMPLE
+		  export all Geoloc best info available as JSON for all ips contained in listips.txt
+		  C:\PS> Invoke-APIBulkSimpleBestOnypheGeoloc -FilePath .\listips.txt -OutFile .\result.json
+
+		  .EXAMPLE
+		  export all Geoloc best info available as JSON for all ips contained in listips.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSimpleBestOnypheGeoloc -FilePath .\listips.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\result.json
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({(test-path $_)})]
+				[string]$FilePath,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile,
+			  [parameter(Mandatory=$false)]
+			  [ValidateLength(40,40)]
+				  [string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+			 $params = @{
+				  request = "v2/bulk/simple/geoloc/best/ip"
+				  APIInfo = "bulk/simple/geoloc/best/ip"
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
+				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
+			  }
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
+			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
+			  Invoke-OnypheAPIV2 @params
+		}
+	}
+
+	Function Invoke-APIBulkSimpleBestOnypheInetnum {
+	<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Inetnum info for an array of ips based on a file input from Bulk/simple/Inetnum/Best API
+		  .DESCRIPTION
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Inetnum info for an array of ips based on a file input from Bulk/simple/Inetnum/Best API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		 -APIKey string{APIKEY}
+		 Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: System.Management.Automation.PSCustomObject
+		  
+		  .EXAMPLE
+		  export all Inetnum best info available as JSON for all ips contained in listips.txt
+		  C:\PS> Invoke-APIBulkSimpleBestOnypheInetnum -FilePath .\listips.txt -OutFile .\result.json
+
+		  .EXAMPLE
+		  export all Inetnum best info available as JSON for all ips contained in listips.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSimpleBestOnypheInetnum -FilePath .\listips.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\result.json
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({(test-path $_)})]
+				[string]$FilePath,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile,
+			  [parameter(Mandatory=$false)]
+			  [ValidateLength(40,40)]
+				  [string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+			 $params = @{
+				  request = "v2/bulk/simple/inetnum/best/ip"
+				  APIInfo = "bulk/simple/inetnum/best/ip"
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
+				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
+			  }
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
+			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
+			  Invoke-OnypheAPIV2 @params
+		}
+	}
+
+	Function Invoke-APIBulkSimpleBestOnypheThreatlist {
+	<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Threatlist info for an array of ips based on a file input from Bulk/simple/Threatlist/Best API
+		  .DESCRIPTION
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Threatlist info for an array of ips based on a file input from Bulk/simple/Threatlist/Best API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		 -APIKey string{APIKEY}
+		 Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: System.Management.Automation.PSCustomObject
+		  
+		  .EXAMPLE
+		  export all Threatlist best info available as JSON for all ips contained in listips.txt
+		  C:\PS> Invoke-APIBulkSimpleBestOnypheThreatlist -FilePath .\listips.txt -OutFile .\result.json
+
+		  .EXAMPLE
+		  export all Threatlist best info available as JSON for all ips contained in listips.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSimpleBestOnypheThreatlist -FilePath .\listips.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\result.json
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({(test-path $_)})]
+				[string]$FilePath,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile,
+			  [parameter(Mandatory=$false)]
+			  [ValidateLength(40,40)]
+				  [string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+			 $params = @{
+				  request = "v2/bulk/simple/threatlist/best/ip"
+				  APIInfo = "bulk/simple/threatlist/best/ip"
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
+				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
+			  }
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
+			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
+			  Invoke-OnypheAPIV2 @params
+		}
+	}
+
+	Function Invoke-APIBulkSimpleBestOnypheWhois {
+	<#
+		  .SYNOPSIS 
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Whois info for an array of ips based on a file input from Bulk/simple/Whois/Best API
+		  .DESCRIPTION
+		  create several input for Invoke-OnypheAPIV2 function and then call it to get Whois info for an array of ips based on a file input from Bulk/simple/Whois/Best API
+		  
+		  .PARAMETER FilePath
+		  -FilePath string{full path to an existing text file}
+		  full path to input file to send to onyphe API
+
+		  .PARAMETER OutFile
+		  -OutFile string{full path to a new file for exporting json data}
+		  full path to output file used to write json data from Onyphe
+
+		  .PARAMETER APIKEY
+		 -APIKey string{APIKEY}
+		 Set APIKEY as global variable.
+
+		  .OUTPUTS
+		  TypeName: System.Management.Automation.PSCustomObject
+		  
+		  .EXAMPLE
+		  export all Whois best info available as JSON for all ips contained in listips.txt
+		  C:\PS> Invoke-APIBulkSimpleBestOnypheWhois -FilePath .\listips.txt -OutFile .\result.json
+
+		  .EXAMPLE
+		  export all Whois best info available as JSON for all ips contained in listips.txt and set the API Key
+		  C:\PS> Invoke-APIBulkSimpleBestOnypheWhois -FilePath .\listips.txt -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -OutFile .\result.json
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({(test-path $_)})]
+				[string]$FilePath,
+			[parameter(Mandatory=$true)]
+			[ValidateScript({!(test-path $_)})]
+				[string]$OutFile,
+			  [parameter(Mandatory=$false)]
+			  [ValidateLength(40,40)]
+				  [string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		process {
+			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null} 
+			 $params = @{
+				  request = "v2/bulk/simple/whois/best/ip"
+				  APIInfo = "bulk/simple/whois/best/ip"
+				  APIInput = @("File:$($filepath)")
+				  file = $FilePath
+				  APIKeyrequired = $true
+				  Stream = $true
+				  OutFile = $OutFile
+			  }
+			  if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			  }
+			  Write-Verbose -message "URL Info : $($params.request)"
+			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"
+			  write-verbose -message "JSON Data exported to : $($OutFile)"
+			  Invoke-OnypheAPIV2 @params
+		}
+	}
+
 	Function Invoke-OnypheAPIV2 {
 	[cmdletbinding()]
 	Param (
@@ -3603,7 +5213,7 @@
 			$XMLFilePath = join-path (Get-ScriptDirectory) "Onyphe-Data-Model.xml"
 			if (test-path $XMLFilePath) {
 				$SearchFilters = Import-Clixml -Path $XMLFilePath
-				($SearchFilters.functions | Where-Object {$_ -like "-*"}) -replace "-",""
+				$SearchFilters.functions
 			}
 	}
 	Function Get-OnypheCliFacets {
@@ -3645,9 +5255,31 @@
 	  $XMLFilePath = join-path (Get-ScriptDirectory) "Onyphe-Data-Model.xml"
 	  if (test-path $XMLFilePath) {
 			$SearchFilters = Import-Clixml -Path $XMLFilePath
-			$Apis = @($SearchFilters.apis | Where-Object {($_ -like "simple/*") -and ($_ -notlike "simple/resolver/*") -and ($_ -notlike "simple/datascan/*")}) -replace "simple/","" 
+			$Apis = @($SearchFilters.apis | Where-Object {($_ -like "simple/*") -and ($_ -notlike "simple/resolver/*") -and ($_ -notlike "simple/datascan/*") -and ($_ -notlike "simple/*/best")}) -replace "simple/","" 
 			$Apis += ($SearchFilters.apis | Where-Object {$_ -like "simple/resolver/*"}) -replace "simple/resolver/","resolver"
 			$Apis += ($SearchFilters.apis | Where-Object {$_ -like "simple/datascan/*"}) -replace "simple/datascan/","datascan"
+		  $Apis
+	  }
+	}
+	Function Get-OnypheSimpleBestAPIName {
+	<#
+	  .SYNOPSIS 
+	  Get Simple Best API available for Onyphe
+  
+	  .DESCRIPTION
+	  Get Simple Best API available for Onyphe
+	  
+	  .OUTPUTS
+	  Simple Best API as string
+	  
+	  .EXAMPLE
+	  Get API available for Onyphe
+	  C:\PS> Get-OnypheSimpleBestAPIName
+	#>
+	  $XMLFilePath = join-path (Get-ScriptDirectory) "Onyphe-Data-Model.xml"
+	  if (test-path $XMLFilePath) {
+			$SearchFilters = Import-Clixml -Path $XMLFilePath
+			$Apis = (@($SearchFilters.apis | Where-Object {($_ -like "simple/*/best")}) -replace "simple/","") -replace "/best","" 
 		  $Apis
 	  }
 	}
@@ -3671,6 +5303,50 @@
 				$SearchFilters = Import-Clixml -Path $XMLFilePath
 				$Apis = @($SearchFilters.apis | Where-Object {($_ -like "summary/*")}) -replace "summary/",""
 			  $Apis
+		  }
+	}
+	Function Get-OnypheBulkCategories {
+		<#
+		  .SYNOPSIS 
+		  Get Bulk category available for Onyphe
+	  
+		  .DESCRIPTION
+		  Get Bulk category available for Onyphe
+		  
+		  .OUTPUTS
+		  Bulk category as string
+		  
+		  .EXAMPLE
+		  Get Bulk category available for Onyphe
+		  C:\PS> Get-OnypheBulkCategories
+		#>
+		  $XMLFilePath = join-path (Get-ScriptDirectory) "Onyphe-Data-Model.xml"
+		  if (test-path $XMLFilePath) {
+				$SearchFilters = Import-Clixml -Path $XMLFilePath
+				$Apis = foreach ($entry in ($SearchFilters.apis -like "bulk/simple/*")) {($entry -split "/")[2]}
+			  	$Apis | get-unique
+		  }
+	}
+	Function Get-OnypheBulkAPIType {
+		<#
+		  .SYNOPSIS 
+		  Get Bulk api type available for Onyphe
+	  
+		  .DESCRIPTION
+		  Get Bulk api type available for Onyphe
+		  
+		  .OUTPUTS
+		  Bulk api type as string
+		  
+		  .EXAMPLE
+		  Get Bulk api type available for Onyphe
+		  C:\PS> Get-OnypheBulkAPIType
+		#>
+		  $XMLFilePath = join-path (Get-ScriptDirectory) "Onyphe-Data-Model.xml"
+		  if (test-path $XMLFilePath) {
+				$SearchFilters = Import-Clixml -Path $XMLFilePath
+				$Apis = foreach ($entry in ($SearchFilters.apis -like "bulk*")) {($entry -split "/")[1]}
+			  $Apis | get-unique
 		  }
 	}
 	Function Set-OnypheProxy {
@@ -4469,22 +6145,19 @@
 			}
 	}
 
-	New-Alias -Name Update-OnypheLocalData -value Update-OnypheFacetsFilters
+	New-Alias -Name Update-OnypheLocalData -Value Update-OnypheFacetsFilters
 	New-Alias -Name Get-Onyphe -Value Get-OnypheInfo
 	New-Alias -Name Get-OnypheFromCSV -Value Get-OnypheInfoFromCSV
 	New-Alias -Name Search-Onyphe -Value Search-OnypheInfo
 	New-Alias -Name Get-OnypheAlert -Value Get-OnypheAlertInfo
 	New-Alias -Name Set-OnypheAlert -Value Set-OnypheAlertInfo
 	New-Alias -Name Export-Onyphe -Value Export-OnypheInfo
+	New-Alias -Name Export-OnypheBulkSimple -Value Export-OnypheBulkInfo
+	New-Alias -Name Export-OnypheBulkSummary -Value Export-OnypheBulkSummaryInfo
 
 	Export-ModuleMember -Function  Get-OnypheUserInfo, Search-OnypheInfo, Get-OnypheInfo, Get-OnypheInfoFromCSV, Export-OnypheInfoToFile, Export-OnypheDataShot,
-									Invoke-APIOnypheExport, Invoke-APIOnypheGeoloc, Invoke-APIOnypheTopSite, Invoke-APIOnypheVulnscan, Invoke-APIOnypheOnionShot, Invoke-APIOnypheDataShot, Invoke-APIOnypheOnionScan, Invoke-APIOnypheCtl, Invoke-APIOnypheSniffer, Invoke-APIOnypheUser, Invoke-APIOnypheSearch, Invoke-APIOnypheDataScan, Invoke-APIOnypheDatascanDataMd5, 
-									Invoke-APIOnypheResolver, Invoke-APIOnypheResolverForward, Invoke-APIOnypheInetnum, Invoke-APIOnyphePastries, Invoke-APIOnypheResolverReverse, Invoke-APIOnypheSynScan, Invoke-APIOnypheThreatlist, Invoke-APIOnypheListAlert, 
-									Invoke-APISummaryOnypheIP, Invoke-APISummaryOnypheHostname, Invoke-APISummaryOnypheDomain,
-									Invoke-APIBulkSummaryOnypheIP, Invoke-APIBulkSummaryOnypheHostname, Invoke-APIBulkSummaryOnypheDomain, Export-OnypheBulkInfo,
-									Invoke-OnypheAPIV2, 
-									Invoke-APIOnypheAddAlert, Invoke-APIOnypheDelAlert,
-									Export-OnypheInfo,
-									Get-OnypheSummaryAPIName, Get-OnypheSummary,
-									Get-OnypheSearchFunctions, Get-OnypheSearchCategories, Get-OnypheSearchFilters, Get-ScriptDirectory, Set-OnypheAPIKey, Update-OnypheFacetsFilters, Get-OnypheCliFacets, Get-OnypheStatsFromObject, Set-OnypheProxy, Import-OnypheEncryptedIKey, Get-OnypheSimpleAPIName, Get-OnypheAlertInfo, Set-OnypheAlertInfo,
-	Export-ModuleMember -Alias Update-OnypheLocalData, Get-Onyphe, Search-Onyphe, Get-OnypheFromCSV, Get-OnypheAlert, Set-OnypheAlert, Export-Onyphe
+									Export-OnypheBulkInfo, Export-OnypheBulkSummaryInfo, Export-OnypheInfo,
+									Get-OnypheSummaryAPIName, Get-OnypheSummary, Get-OnypheSimpleBestAPIName, Get-OnypheBulkCategories, Get-OnypheBulkAPIType,
+									Get-OnypheSearchFunctions, Get-OnypheSearchCategories, Get-OnypheSearchFilters, Set-OnypheAPIKey, Update-OnypheFacetsFilters, Get-OnypheCliFacets, 
+									Get-OnypheStatsFromObject, Set-OnypheProxy, Import-OnypheEncryptedIKey, Get-OnypheSimpleAPIName, Get-OnypheAlertInfo, Set-OnypheAlertInfo
+	Export-ModuleMember -Alias Update-OnypheLocalData, Get-Onyphe, Search-Onyphe, Get-OnypheFromCSV, Get-OnypheAlert, Set-OnypheAlert, Export-Onyphe, Export-OnypheBulkSimple, Export-OnypheBulkSummary

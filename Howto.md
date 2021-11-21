@@ -3,7 +3,7 @@
 # Use-Onyphe - How-To
 
 ## ChangeLog
-This documentation has been updated to take into account **new features available with v1.2 including bulk v2 APIs**. Enjoy your Onyphe stuff with Power[Shell](Of Love)
+This documentation has been updated to take into account **new features available with v1.3 including bulk v2 APIs**. Enjoy your Onyphe stuff with Power[Shell](Of Love)
 
 ## Intro Onyphe
 Onyphe.io provides data about IP address space and publicly available information in just one place.
@@ -14,7 +14,7 @@ To request it : https://www.onyphe.io/login
 More info about available APIs :
 https://www.onyphe.io/documentation/api
 
-(c) 2018-2020 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
+(c) 2018-2021 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
 
 ## APIs v1 and v2
 Since a few weeks now, new APIs are available in "v2". Main differences between v1 and v2 APIs are :
@@ -231,21 +231,28 @@ Get-help is available on all functions, for instance, if you want to consult the
 6 main functions / cmdlets will be used :
  - Get-OnypheSummary to use all v2/summary APIs ip,domain,hostname
    - These APIs can be used to retrieve all objects linked to an IP, a domain or an hostame (all categories are sent back from summary API) 
- - Get-OnypheInfo (or Get-Onyphe) to use all v2/simple APIs ctl,datascan,geoloc,inetnum,pastries,resolver,sniffer,synscan,threatlist,datashot,onionscan,onionshot,topsite,vulnscan,resolver/reverse,resolver/forward,datascan/datamd5
+ - Get-OnypheInfo (or Get-Onyphe) to use all v2/simple APIs ctl,datascan,geoloc,inetnum,pastries,resolver,sniffer,synscan,threatlist,datashot,onionscan,onionshot,topsite,vulnscan,resolver/reverse,resolver/forward,datascan/datamd5,whois
    - These APIs are the 'standard' APIs and object category sent back are limited to API type in use (ctl category object for ctl API etc...)
+   - you can use the `Best` option to use the Best mode of simple API (currently compliant with Best answer mode : geoloc,inetnum,threatlist,whois)
  - Search-OnypheInfo (or Search-Onyphe) to make some complex and powerfull request in all Onyphe database
    - all category types can be retrieved depending on the query used for the search request
  - Get-OnypheUserInfo will be used to follow your API key / user account (user API)
  - Get-OnypheAlertInfo (or Get-OnpyheAlert) to list your alerts using v2/alert/list API
  - Set-OnypheAlertInfo (or Set-OnypheAlert) to create and delete alerts using v2/alert/add or v2/alert/del APIs
  - Export-OnypheInfo (or Export-Onyphe) to download json file from Onyphe database for a search request
- - Export-OnypheBulkInfo to download json file fron onyphe database for a summary request including multiple entries (through a txt file provided, on entry per line)
+ - Export-OnypheBulkSummaryInfo to download json file fron onyphe database for a summary request including multiple entries (through a txt file provided, on entry per line)
+ - Export-OnypheBulkInfo to download json file fron onyphe database for a simple request including multiple entries (through a txt file provided, on entry per line)
+    - All simple APIs are also available through a bulk mode using this cmdlet
  
 Find hereunder several use cases for all API examples documented on https://www.onyphe.io/documentation/api
 
 API V2/simple/geoloc : Return geolocation * information for the given IPv{4,6} address
 ```
     C:\PS> Get-OnypheInfo -Searchvalue 9.9.9.9 -Category Geoloc
+```
+API V2/simple/geoloc/best : Return best geolocation answer * information for the given IPv{4,6} address
+```
+    C:\PS> Get-OnypheInfo -Searchvalue 9.9.9.9 -Category Geoloc -Best
 ```
 API V2/user : Return information about your user account
 ```
@@ -265,66 +272,82 @@ API V2/summary/hostname : Return a summary of all information (all category) ava
 ```
 API V2/simple/inetnum : Return inetnum information
 ```
-    C:\PS> Get-OnypheInfo -searchvalue 93.184.208.1 -SimpleAPIType Inetnum
+    C:\PS> Get-OnypheInfo -searchvalue 93.184.208.1 -Category Inetnum
+```
+API V2/simple/inetnum/best : Return inetnum best answer information
+```
+    C:\PS> Get-OnypheInfo -searchvalue 93.184.208.1 -Category Inetnum -best
 ```
 API V2/simple/topsite : Return topsite information
 ```
-    C:\PS> Get-OnypheInfo -searchvalue 9.9.9.9 -SimpleAPIType topsite
+    C:\PS> Get-OnypheInfo -searchvalue 9.9.9.9 -Category topsite
 ```
 API V2/simple/vulnscan : Return vulnscan information (CVE detected / exploited on a host)
 ```
-    C:\PS> Get-OnypheInfo -searchvalue 194.177.55.67 -SimpleAPIType vulnscan
+    C:\PS> Get-OnypheInfo -searchvalue 194.177.55.67 -Category vulnscan
 ```
 API V2/simple/threatlist : Return threatlist information
 ```
-    C:\PS> Get-OnypheInfo -searchvalue 206.81.18.195 -SimpleAPIType threatlist
+    C:\PS> Get-OnypheInfo -searchvalue 206.81.18.195 -Category threatlist
+```
+API V2/simple/threatlist/best : Return threatlist best answer information
+```
+    C:\PS> Get-OnypheInfo -searchvalue 206.81.18.195 -Category threatlist -best
 ```
 API V2/simple/pastries : Return pastries information
 ```
-    C:\PS> Get-OnypheInfo -searchvalue 93.184.216.34 -SimpleAPIType pastries
+    C:\PS> Get-OnypheInfo -searchvalue 93.184.216.34 -Category pastries
 ```
 API V2/simple/synscan : Return synscan information
 ```
-    C:\PS> Get-OnypheInfo -searchvalue 107.164.81.7 -SimpleAPIType SynScan
+    C:\PS> Get-OnypheInfo -searchvalue 107.164.81.7 -Category SynScan
 ```
 API V2/simple/datascan : Return datascan information
 ```
-    C:\PS> Get-OnypheInfo -searchvalue 107.164.81.7 -SimpleAPIType DataScan
+    C:\PS> Get-OnypheInfo -searchvalue 107.164.81.7 -Category DataScan
 ```
 ```
-    C:\PS> Get-OnypheInfo -searchvalue IIS -SimpleAPIType DataScan
+    C:\PS> Get-OnypheInfo -searchvalue IIS -Category DataScan
 ```
 API V2/simple/resolver/reverse : Return resolver/dns information
 ```
-    C:\PS> Get-OnypheInfo -searchvalue 9.9.9.9 -SimpleAPIType resolver
+    C:\PS> Get-OnypheInfo -searchvalue 9.9.9.9 -Category resolver
 ```
 API V2/simple/resolver/reverse : Return reverse information
 ```
-    C:\PS> Get-OnypheInfo -searchvalue 182.59.164.193 -SimpleAPIType resolverreverse
+    C:\PS> Get-OnypheInfo -searchvalue 182.59.164.193 -Category resolverreverse
 ```
 API V2/simple/resolver/forward : Return forward information
 ```
-    C:\PS> Get-OnypheInfo -searchvalue 2.22.52.73 -SimpleAPIType resolverforward
+    C:\PS> Get-OnypheInfo -searchvalue 2.22.52.73 -Category resolverforward
 ```
 API V2/simple/sniffer : Return ip history information
 ```
-    C:\PS> Get-OnypheInfo -searchvalue 8.8.8.8 -SimpleAPIType sniffer
+    C:\PS> Get-OnypheInfo -searchvalue 8.8.8.8 -Category sniffer
 ```
 API V2/simple/onionscan : Return information about an onion url
 ```
-    C:\PS> Get-OnypheInfo -searchvalue mh7mkfvezts5j6yu.onion -SimpleAPIType onionscan
+    C:\PS> Get-OnypheInfo -searchvalue mh7mkfvezts5j6yu.onion -Category onionscan
 ```
 API V2/simple/ctl : return information about SSL/TLS certificates related to a domain or fqdn
 ```
-    C:\PS> Get-OnypheInfo -searchvalue fnac.com -SimpleAPIType ctl
+    C:\PS> Get-OnypheInfo -searchvalue fnac.com -Category ctl
 ```
 API V2/simple/datashot : return screenshot get from graphical protocol for an ip
 ```
-    C:\PS> Get-OnypheInfo -searchvalue 80.11.245.174 -SimpleAPIType datashot
+    C:\PS> Get-OnypheInfo -searchvalue 80.11.245.174 -Category datashot
 ```
 API V2/simple/datascan/datamd5 : return information on a onyphe md5 pattern / signature (SSH version...)
 ```
-    C:\PS> Get-OnypheInfo -searchvalue 7a1f20cae067b75a52bc024b83ee4667 -SimpleAPIType datascandatamd5
+    C:\PS> Get-OnypheInfo -searchvalue 7a1f20cae067b75a52bc024b83ee4667 -Category datascandatamd5
+```
+API V2/simple/whois : return whois information
+```
+    C:\PS> Get-OnypheInfo -searchvalue 9.9.9.9 -Category whois
+```
+API V2/simple/whois/best : return whois best answer information
+```
+    C:\PS> Get-OnypheInfo -searchvalue 9.9.9.9 -Category whois -best
 ```
 API V2/Search : Return datascan information
 ```
@@ -405,18 +428,28 @@ API v2/export : Export search results to file
 ```
     C:\PS> Search-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan | Export-OnypheInfo -SaveInfoAsFile .\myexport.json
 ```
-API v2/bulk/summary/ip : export summary for IPs infos in a JSON file
+API v2/bulk/summary/ip : export summary for IPs infos in a JSON file or object based on a txt input file (bulk)
 ```
-    C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType ip
+    C:\PS> Export-OnypheBulkSummaryInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType ip
+    C:\PS> Export-OnypheBulkSummaryInfo -FilePath .\myfile.txt -SearchType ip
 ```
-API v2/bulk/summary/hostname : export summary for hostnames infos in a JSON file
+API v2/bulk/summary/hostname : export summary for hostnames infos in a JSON file or object based on a txt input file (bulk)
 ```
-    C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType hostname
+    C:\PS> Export-OnypheBulkSummaryInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType hostname
+    C:\PS> Export-OnypheBulkSummaryInfo -FilePath .\myfile.txt -SearchType hostname
 ```
-API v2/bulk/summary/domain : export summary for domains infos in a JSON file
+API v2/bulk/summary/domain : export summary for domains infos in a JSON file or object based on a txt input file (bulk)
 ```
-    C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType domain
+    C:\PS> Export-OnypheBulkSummaryInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType domain
+    C:\PS> Export-OnypheBulkSummaryInfo -FilePath .\myfile.txt -SearchType domain
+```  
+All Simple APIs are available though /v2/bulk/simple, to decrease the document size / length, here is a first sample for the whois category but all other categories remain available (including using best mode)  
+API v2/bulk/simple/whois : exoprt whois infornation infos in a JSON file or object based on a txt input file (bulk)
 ```
+    C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -category whois
+    C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -category whois
+    C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -category whois -best
+```  
 ## E-mail alerting system
 Since a few weeks now, 3 new APIs (V2) are available to manage automatic e-mail alerts for your Onyphe account. It means you can automate search request at Onyphe server side and received an e-mail alerts when new events are available (especially when using timeline filter functions in your request).
 Of course this new feature requires an API Key (non free).
@@ -514,14 +547,15 @@ to do so use the function Export-OnypheInfoToFile :
     C:\PS> Export-OnypheInfoToFile -tofolder C:\temp -InputOnypheObject $AllResults
 ```
 
-## Bulk APIs, send multiple summary requests at a time and get back a Json file
-you can now use bulk summary APIs to send several requests at a time based on a txt input file containing one entry per line (no space, no coma etc...)
-3 bulk summary apis are available right now : ip, host, domain
+## Bulk APIs, send multiple summary or simple requests at a time and get back a Json file
+you can now use bulk summary / simple APIs to send several requests at a time based on a txt input file containing one entry per line (no space, no coma etc...)
+3 bulk summary apis are available : ip, host, domain
+17 bulk simple apis (including best) are available : ctl,datascan,datashot,geoloc,inetnum,pastries,resolver,sniffer,synscan,threatlist,topsite,vulnscan,whois
 the output is not an object but a json flat file.
 **Only the 10 latest results per category will be returned**
 find below an example to get summary info for ten IPs contained in myfile.txt
 ```
-    C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType ip
+    C:\PS> Export-OnypheBulkSummaryInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType ip
 ```
 
 ## Playing with Onyphe and PowerShell objects

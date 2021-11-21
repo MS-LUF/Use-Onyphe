@@ -16,20 +16,25 @@
           <S>user</S>
           <S>simple/ctl</S>
           <S>simple/datascan</S>
+          <S>simple/datascan/datamd5</S>
           <S>simple/geoloc</S>
+          <S>simple/geoloc/best</S>
           <S>simple/inetnum</S>
+          <S>simple/inetnum/best</S>
           <S>simple/pastries</S>
           <S>simple/resolver</S>
+          <S>simple/resolver/forward</S>
+          <S>simple/resolver/reverse</S>
           <S>simple/sniffer</S>
           <S>simple/synscan</S>
           <S>simple/threatlist</S>
-          <S>simple/datascan/datamd5</S>
-          <S>simple/resolver/reverse</S>
-          <S>simple/resolver/forward</S>
+          <S>simple/threatlist/best</S>
           <S>simple/datashot</S>
           <S>simple/onionscan</S>
           <S>simple/onionshot</S>
           <S>simple/topsite</S>
+          <S>simple/whois</S>
+          <S>simple/whois/best</S>
           <S>search</S>
           <S>search/ctl</S>
           <S>search/datascan</S>
@@ -53,14 +58,39 @@
           <S>summary/hostname</S>
           <S>export</S>
           <S>simple/vulnscan</S>
+          <S>bulk/simple/ctl/ip</S>
+          <S>bulk/simple/datascan/ip</S>
+          <S>bulk/simple/datashot/ip</S>
+          <S>bulk/simple/geoloc/best/ip</S>
+          <S>bulk/simple/geoloc/ip</S>
+          <S>bulk/simple/inetnum/best/ip</S>
+          <S>bulk/simple/inetnum/ip</S>
+          <S>bulk/simple/pastries/ip</S>
+          <S>bulk/simple/resolver/ip</S>
+          <S>bulk/simple/sniffer/ip</S>
+          <S>bulk/simple/synscan/ip</S>
+          <S>bulk/simple/threatlist/best/ip</S>
+          <S>bulk/simple/threatlist/ip</S>
+          <S>bulk/simple/topsite/ip</S>
+          <S>bulk/simple/vulnscan/ip</S>
+          <S>bulk/simple/whois/best/ip</S>
+          <S>bulk/simple/whois/ip</S>
+          <S>bulk/summary/domain</S>
+          <S>bulk/summary/hostname</S>
+          <S>bulk/summary/ip</S>
         </LST>
       </Obj>
       <Obj N="filters" RefId="2">
         <TNRef RefId="1" />
         <LST>
-          <S>app.browse.type</S>
-          <S>app.browse.name</S>
+          <S>abuse</S>
+          <S>alternativeip</S>
           <S>app.browse.file</S>
+          <S>app.browse.name</S>
+          <S>app.browse.type</S>
+          <S>app.database.count</S>
+          <S>app.database.name</S>
+          <S>app.database.size</S>
           <S>app.dns.versionbind</S>
           <S>app.elasticsearch.clustername</S>
           <S>app.elasticsearch.luceneversion</S>
@@ -71,6 +101,7 @@
           <S>app.extract.url</S>
           <S>app.ftp.anonymous</S>
           <S>app.http.bodymd5</S>
+          <S>app.http.bodymmh3</S>
           <S>app.http.component.product</S>
           <S>app.http.component.productvendor</S>
           <S>app.http.component.productversion</S>
@@ -80,6 +111,7 @@
           <S>app.http.description</S>
           <S>app.http.description.keyword</S>
           <S>app.http.headermd5</S>
+          <S>app.http.headermmh3</S>
           <S>app.http.header.name</S>
           <S>app.http.header.value</S>
           <S>app.http.keywords</S>
@@ -105,6 +137,7 @@
           <S>app.screenshot.format</S>
           <S>app.screenshot.image</S>
           <S>app.screenshot.imagemd5</S>
+          <S>app.screenshot.imagemmh3</S>
           <S>app.smb.nullsession</S>
           <S>app.smb.servername</S>
           <S>app.smb.share</S>
@@ -117,16 +150,20 @@
           <S>app.vnc.desktopname</S>
           <S>app.vnc.screensize</S>
           <S>app.vnc.version</S>
-          <S>abuse</S>
           <S>asn</S>
           <S>basicconstraints</S>
+          <S>bgproute</S>
           <S>botnet</S>
           <S>ca</S>
           <S>city</S>
+          <S>continent</S>
+          <S>continentname</S>
           <S>count</S>
           <S>country</S>
+          <S>countryname</S>
           <S>data</S>
           <S>datamd5</S>
+          <S>datammh3</S>
           <S>destport</S>
           <S>distinct</S>
           <S>domain</S>
@@ -141,6 +178,7 @@
           <S>information</S>
           <S>ip</S>
           <S>ipv6</S>
+          <S>isineu</S>
           <S>issuer.city</S>
           <S>issuer.commonname</S>
           <S>issuer.country</S>
@@ -170,8 +208,10 @@
           <S>publickey.algorithm</S>
           <S>publickey.exponent</S>
           <S>publickey.length</S>
+          <S>rank</S>
           <S>reason</S>
           <S>reverse</S>
+          <S>route</S>
           <S>scheme</S>
           <S>serial</S>
           <S>signature.algorithm</S>
@@ -192,6 +232,7 @@
           <S>subnet</S>
           <S>summary</S>
           <S>summarymd5</S>
+          <S>summarymmh3</S>
           <S>syntax</S>
           <S>threatlist</S>
           <S>title</S>
@@ -206,7 +247,27 @@
           <S>validity.notbefore</S>
           <S>version</S>
           <S>wildcard</S>
+          <S>geolocus.asn</S>
+          <S>geolocus.continentname</S>
+          <S>geolocus.continent</S>
+          <S>geolocus.countryname</S>
+          <S>geolocus.country</S>
+          <S>geolocus.isineu</S>
+          <S>geolocus.latitude</S>
+          <S>geolocus.location</S>
+          <S>geolocus.longitude</S>
+          <S>geolocus.netname</S>
+          <S>geolocus.organization</S>
+          <S>geolocus.source</S>
+          <S>geolocus.subnet</S>
+          <S>geolocus.timezone</S>
           <S>classification</S>
+          <S>company.country</S>
+          <S>company.fortunerank</S>
+          <S>company.globalrank</S>
+          <S>company.industry</S>
+          <S>company.name</S>
+          <S>company.sector</S>
           <S>content</S>
           <S>cpe</S>
           <S>cpecount</S>
@@ -224,15 +285,18 @@
       <Obj N="functions" RefId="3">
         <TNRef RefId="1" />
         <LST>
-          <S>-dayago</S>
-          <S>-exists</S>
-          <S>-fields</S>
-          <S>-hourago</S>
-          <S>-monthago</S>
-          <S>-notexists</S>
-          <S>-sort</S>
-          <S>-weekago</S>
-          <S>-wildcard</S>
+          <S>dayago</S>
+          <S>exists</S>
+          <S>fields</S>
+          <S>hourago</S>
+          <S>monthago</S>
+          <S>notexists</S>
+          <S>notwildcard</S>
+          <S>sort</S>
+          <S>weekago</S>
+          <S>wildcard</S>
+          <S>orwildcard</S>
+          <S>since</S>
         </LST>
       </Obj>
     </MS>
