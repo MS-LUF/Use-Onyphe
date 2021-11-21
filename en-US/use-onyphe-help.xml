@@ -6,11 +6,11 @@
       <command:verb>Export</command:verb>
       <command:noun>OnypheBulkInfo</command:noun>
       <maml:description>
-        <maml:para>main function/cmdlet - Export Search information on onyphe.io web service using bulk APIs</maml:para>
+        <maml:para>main function/cmdlet - Export Search information on onyphe.io web service using bulk simple APIs</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>main function/cmdlet - Export Search information on onyphe.io web service using bulk APIs bulk APIs use input file containing ip, domain or hostname and sends back streamed json as result.</maml:para>
+      <maml:para>main function/cmdlet - Export Search information on onyphe.io web service using bulk simple APIs bulk APIs use input file containing ip sends back streamed json as result.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -18,7 +18,7 @@
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
           <maml:name>FilePath</maml:name>
           <maml:Description>
-            <maml:para>-FilePath string full path to file to be imported to the bulk API.</maml:para>
+            <maml:para>-FilePath string full path to file to be imported to the bulk simple APIs.</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -27,7 +27,7 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
           <maml:name>SaveInfoAsFile</maml:name>
           <maml:Description>
             <maml:para>-SaveInfoAsFile string full path to file where json data will be exported.</maml:para>
@@ -63,10 +63,220 @@
           </dev:type>
           <dev:defaultValue>0</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="BulkAPIType">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>Best</maml:name>
+          <maml:Description>
+            <maml:para>-Best switch Enable Best mode for Simple API</maml:para>
+          </maml:Description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="BulkCategory">
+          <maml:name>Category</maml:name>
+          <maml:Description>
+            <maml:para>{{Fill Category Description}}</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+        <maml:name>FilePath</maml:name>
+        <maml:Description>
+          <maml:para>-FilePath string full path to file to be imported to the bulk simple APIs.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>SaveInfoAsFile</maml:name>
+        <maml:Description>
+          <maml:para>-SaveInfoAsFile string full path to file where json data will be exported.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>Best</maml:name>
+        <maml:Description>
+          <maml:para>-Best switch Enable Best mode for Simple API</maml:para>
+        </maml:Description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <maml:name>APIKey</maml:name>
+        <maml:Description>
+          <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>wait</maml:name>
+        <maml:Description>
+          <maml:para>-Wait int{second} wait for x second before sending the request to manage rate limiting restriction</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+        <dev:type>
+          <maml:name>Int32</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>0</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="BulkCategory">
+        <maml:name>Category</maml:name>
+        <maml:Description>
+          <maml:para>{{Fill Category Description}}</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>TypeName: System.Management.Automation.PSCustomObject</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>export ctl information into Json file using myfile.txt as source IPs file</dev:code>
+        <dev:remarks>
+          <maml:para>C:\PS&gt; Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -Category ctl</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXEMPLE 2 --------------------------</maml:title>
+        <dev:code>export datascan information into Json file using myfile.txt as source IPs file</dev:code>
+        <dev:remarks>
+          <maml:para>C:\PS&gt; Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -Category datascan</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXEMPLE 3 --------------------------</maml:title>
+        <dev:code>export threatlist information into Json file using myfileip.txt as source IPs file</dev:code>
+        <dev:remarks>
+          <maml:para>C:\PS&gt; Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -Category threatlist</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXEMPLE 4 --------------------------</maml:title>
+        <dev:code>export threatlist information into object file using myfileip.txt as source IPs file</dev:code>
+        <dev:remarks>
+          <maml:para>C:\PS&gt; Export-OnypheBulkInfo -FilePath .\myfile.txt -Category threatlist</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Export-OnypheBulkSummaryInfo</command:name>
+      <command:verb>Export</command:verb>
+      <command:noun>OnypheBulkSummaryInfo</command:noun>
+      <maml:description>
+        <maml:para>main function/cmdlet - Export Search information on onyphe.io web service using bulk APIs</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>main function/cmdlet - Export Search information on onyphe.io web service using bulk APIs bulk APIs use input file containing ip, domain or hostname and sends back streamed json as result.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Export-OnypheBulkSummaryInfo</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+          <maml:name>FilePath</maml:name>
+          <maml:Description>
+            <maml:para>-FilePath string full path to file to be imported to the bulk API.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>SaveInfoAsFile</maml:name>
+          <maml:Description>
+            <maml:para>-SaveInfoAsFile string full path to file where json data will be exported.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+          <maml:name>APIKey</maml:name>
+          <maml:Description>
+            <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>wait</maml:name>
+          <maml:Description>
+            <maml:para>-Wait int{second} wait for x second before sending the request to manage rate limiting restriction</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+          <dev:type>
+            <maml:name>Int32</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>0</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="BulkAPISummary">
           <maml:name>SearchType</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill SearchType Description }}</maml:para>
+            <maml:para>{{Fill SearchType Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -90,7 +300,7 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
         <maml:name>SaveInfoAsFile</maml:name>
         <maml:Description>
           <maml:para>-SaveInfoAsFile string full path to file where json data will be exported.</maml:para>
@@ -126,10 +336,10 @@
         </dev:type>
         <dev:defaultValue>0</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="BulkAPIType">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="BulkAPISummary">
         <maml:name>SearchType</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill SearchType Description }}</maml:para>
+          <maml:para>{{Fill SearchType Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -157,27 +367,31 @@
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>export search for IP information into Json file using myfile.txt as source IPs file
-C:\PS&gt; Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType ip</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>export summary IP information into Json file using myfile.txt as source IPs file</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType ip</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
-        <dev:code>export search for domain information into Json file using myfile.txt as source domains file
-C:\PS&gt; Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType domain</dev:code>
+        <maml:title>-------------------------- EXEMPLE 2 --------------------------</maml:title>
+        <dev:code>export summary domain information into Json file using myfile.txt as source domains file</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType domain</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
-        <dev:code>export search for hostname information into Json file using myfileip.txt as source hostnames file
-C:\PS&gt; Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType hostname</dev:code>
+        <maml:title>-------------------------- EXEMPLE 3 --------------------------</maml:title>
+        <dev:code>export summary hostname information into Json file using myfileip.txt as source hostnames file</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType hostname</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXEMPLE 4 --------------------------</maml:title>
+        <dev:code>export summary hostname information into object using myfileip.txt as source hostnames file</dev:code>
+        <dev:remarks>
+          <maml:para>C:\PS&gt; Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results.json -SearchType hostname</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -201,7 +415,7 @@ C:\PS&gt; Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
           <maml:name>tofolder</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill tofolder Description }}</maml:para>
+            <maml:para>{{Fill tofolder Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -213,7 +427,7 @@ C:\PS&gt; Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="2" aliases="input">
           <maml:name>InputOnypheObject</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill InputOnypheObject Description }}</maml:para>
+            <maml:para>{{Fill InputOnypheObject Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
           <dev:type>
@@ -228,7 +442,7 @@ C:\PS&gt; Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results
       <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
         <maml:name>tofolder</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill tofolder Description }}</maml:para>
+          <maml:para>{{Fill tofolder Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -240,7 +454,7 @@ C:\PS&gt; Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results
       <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="2" aliases="input">
         <maml:name>InputOnypheObject</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill InputOnypheObject Description }}</maml:para>
+          <maml:para>{{Fill InputOnypheObject Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
         <dev:type>
@@ -268,11 +482,10 @@ C:\PS&gt; Export-OnypheBulkInfo -FilePath .\myfile.txt -SaveInfoAsFile .\results
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Export all screenshots available in powershell object $temp into C:\temp folder
-C:\PS&gt; Export-OnypheDataShot -tofolder C:\temp -InputOnypheObject $temp</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>Export all screenshots available in powershell object $temp into C:\temp folder</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Export-OnypheDataShot -tofolder C:\temp -InputOnypheObject $temp</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -403,7 +616,7 @@ C:\PS&gt; Export-OnypheDataShot -tofolder C:\temp -InputOnypheObject $temp</dev:
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>FilterFunction</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill FilterFunction Description }}</maml:para>
+            <maml:para>{{Fill FilterFunction Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -415,7 +628,7 @@ C:\PS&gt; Export-OnypheDataShot -tofolder C:\temp -InputOnypheObject $temp</dev:
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>SearchFilter</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill SearchFilter Description }}</maml:para>
+            <maml:para>{{Fill SearchFilter Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -427,7 +640,7 @@ C:\PS&gt; Export-OnypheDataShot -tofolder C:\temp -InputOnypheObject $temp</dev:
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="Category">
           <maml:name>SearchType</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill SearchType Description }}</maml:para>
+            <maml:para>{{Fill SearchType Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -550,7 +763,7 @@ C:\PS&gt; Export-OnypheDataShot -tofolder C:\temp -InputOnypheObject $temp</dev:
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>FilterFunction</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill FilterFunction Description }}</maml:para>
+          <maml:para>{{Fill FilterFunction Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -562,7 +775,7 @@ C:\PS&gt; Export-OnypheDataShot -tofolder C:\temp -InputOnypheObject $temp</dev:
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>SearchFilter</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill SearchFilter Description }}</maml:para>
+          <maml:para>{{Fill SearchFilter Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -574,7 +787,7 @@ C:\PS&gt; Export-OnypheDataShot -tofolder C:\temp -InputOnypheObject $temp</dev:
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="Category">
         <maml:name>SearchType</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill SearchType Description }}</maml:para>
+          <maml:para>{{Fill SearchType Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -602,63 +815,52 @@ C:\PS&gt; Export-OnypheDataShot -tofolder C:\temp -InputOnypheObject $temp</dev:
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>AdvancedSearch with multiple criteria/filters
-Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows and export data to myexport.json
-C:\PS&gt; Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -SaveInfoAsFile .\myexport.json</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>AdvancedSearch with multiple criteria/filters</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows and export data to myexport.json C:\PS&gt; Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -SaveInfoAsFile .\myexport.json</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
-        <dev:code>simple search with one filter/criteria
-Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and export data to myexport.json
-C:\PS&gt; Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -SaveInfoAsFile .\myexport.json</dev:code>
+        <maml:title>-------------------------- EXEMPLE 2 --------------------------</maml:title>
+        <dev:code>simple search with one filter/criteria</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and export data to myexport.json C:\PS&gt; Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -SaveInfoAsFile .\myexport.json</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
-        <dev:code>AdvancedSearch with multiple criteria/filters and set the API key
-Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows and export data to myexport.json
-C:\PS&gt; Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -SaveInfoAsFile .\myexport.json</dev:code>
+        <maml:title>-------------------------- EXEMPLE 3 --------------------------</maml:title>
+        <dev:code>AdvancedSearch with multiple criteria/filters and set the API key</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows and export data to myexport.json C:\PS&gt; Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -SaveInfoAsFile .\myexport.json</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
-        <dev:code>simple search with one filter/criteria and use a server filter to retrieve only objects indexed since 2 month
-Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and export data to myexport.json
-C:\PS&gt; Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2" -SaveInfoAsFile .\myexport.json</dev:code>
+        <maml:title>-------------------------- EXEMPLE 4 --------------------------</maml:title>
+        <dev:code>simple search with one filter/criteria and use a server filter to retrieve only objects indexed since 2 month</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and export data to myexport.json C:\PS&gt; Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2" -SaveInfoAsFile .\myexport.json</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 5 --------------------------</maml:title>
-        <dev:code>filter the result and show me only the answer with os property not null for threatlist category for all Russia  and export data to myexport.json
-C:\PS&gt; Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os -SaveInfoAsFile .\myexport.json</dev:code>
+        <maml:title>-------------------------- EXEMPLE 5 --------------------------</maml:title>
+        <dev:code>filter the result and show me only the answer with os property not null for threatlist category for all Russia  and export data to myexport.json</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os -SaveInfoAsFile .\myexport.json</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 6 --------------------------</maml:title>
-        <dev:code>filter the results using multiple filters (only os property known and from all organization like *company*) for tcp port 3389 opened in russia  and export data to myexport.json
-C:\PS&gt; Export-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan -SaveInfoAsFile .\myexport.json</dev:code>
+        <maml:title>-------------------------- EXEMPLE 6 --------------------------</maml:title>
+        <dev:code>filter the results using multiple filters (only os property known and from all organization like *company*) for tcp port 3389 opened in russia  and export data to myexport.json</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Export-onyphe -AdvancedFilter @("wildcard:organization, company ","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan -SaveInfoAsFile .\myexport.json</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 7 --------------------------</maml:title>
-        <dev:code>search from onyphe using search-onyphe and pipe the object to export the content to a json file using export-onyphe
-C:\PS&gt; Search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan | Export-onyphe -SaveInfoAsFile .\myexport.json</dev:code>
+        <maml:title>-------------------------- EXEMPLE 7 --------------------------</maml:title>
+        <dev:code>search from onyphe using search-onyphe and pipe the object to export the content to a json file using export-onyphe</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Search-onyphe -AdvancedFilter @("wildcard:organization, company ","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan | Export-onyphe -SaveInfoAsFile .\myexport.json</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -773,19 +975,17 @@ C:\PS&gt; Search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exi
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Exporting onyphe results containing into $onypheresult object to flat files in folder C:\temp
-C:\PS&gt; Export-OnypheInfoToFile -tofolder C:\temp -InputOnypheObject $onypheresult</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>Exporting onyphe results containing into $onypheresult object to flat files in folder C:\temp</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Export-OnypheInfoToFile -tofolder C:\temp -InputOnypheObject $onypheresult</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
-        <dev:code>Exporting onyphe results containing into $onypheresult object to flat files in folder C:\temp using ',' as csv separator
-C:\PS&gt; Export-OnypheInfoToFile -tofolder C:\temp -InputOnypheObject $onypheresult -csvdelimiter ","</dev:code>
+        <maml:title>-------------------------- EXEMPLE 2 --------------------------</maml:title>
+        <dev:code>Exporting onyphe results containing into $onypheresult object to flat files in folder C:\temp using ',' as csv separator</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Export-OnypheInfoToFile -tofolder C:\temp -InputOnypheObject $onypheresult -csvdelimiter ","</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -947,19 +1147,17 @@ C:\PS&gt; Export-OnypheInfoToFile -tofolder C:\temp -InputOnypheObject $onyphere
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Get all existing alert using "jeanclaude.dusse@lesbronzesfontdusk.io"
-C:\PS&gt; Get-OnypheAlert -SearchValue "jeanclaude.dusse@lesbronzesfontdusk.io" -SearchOperator eq -SearchFilter email</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>Get all existing alert using "jeanclaude.dusse@lesbronzesfontdusk.io"</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheAlert -SearchValue "jeanclaude.dusse@lesbronzesfontdusk.io" -SearchOperator eq -SearchFilter email</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
-        <dev:code>Get all existing alert for your onyphe account
-C:\PS&gt; Get-OnypheAlert</dev:code>
+        <maml:title>-------------------------- EXEMPLE 2 --------------------------</maml:title>
+        <dev:code>Get all existing alert for your onyphe account</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheAlert</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -1012,6 +1210,96 @@ C:\PS&gt; Get-OnypheAlert</dev:code>
   </command:command>
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
     <command:details>
+      <command:name>Get-OnypheBulkAPIType</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>OnypheBulkAPIType</command:noun>
+      <maml:description>
+        <maml:para>Get Bulk api type available for Onyphe</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Get Bulk api type available for Onyphe</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Get-OnypheBulkAPIType</maml:name>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters />
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>Bulk api type as string</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>Get Bulk api type available for Onyphe</dev:code>
+        <dev:remarks>
+          <maml:para>C:\PS&gt; Get-OnypheBulkAPIType</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Get-OnypheBulkCategories</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>OnypheBulkCategories</command:noun>
+      <maml:description>
+        <maml:para>Get Bulk category available for Onyphe</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Get Bulk category available for Onyphe</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Get-OnypheBulkCategories</maml:name>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters />
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>Bulk category as string</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>Get Bulk category available for Onyphe</dev:code>
+        <dev:remarks>
+          <maml:para>C:\PS&gt; Get-OnypheBulkCategories</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
       <command:name>Get-OnypheCliFacets</command:name>
       <command:verb>Get</command:verb>
       <command:noun>OnypheCliFacets</command:noun>
@@ -1046,11 +1334,10 @@ C:\PS&gt; Get-OnypheAlert</dev:code>
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Get facets available for stats on local Onyphe PS Object
-C:\PS&gt; Get-OnypheCliFacets</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>Get facets available for stats on local Onyphe PS Object</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheCliFacets</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -1074,7 +1361,7 @@ C:\PS&gt; Get-OnypheCliFacets</dev:code>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
           <maml:name>SearchValue</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill SearchValue Description }}</maml:para>
+            <maml:para>-SearchValue string -Category Inetnum -APIKey string{APIKEY} look for an ip address in onyphe database -SearchValue string -Category Threatlist -APIKey string{APIKEY} look for threat info about a specific IP in onyphe database. -SearchValue string -Category Pastries -APIKey string{APIKEY} look for an pastbin data about a specific IP in onyphe database. -SearchValue string -Category Synscan -APIKey string{APIKEY}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -1119,10 +1406,21 @@ C:\PS&gt; Get-OnypheCliFacets</dev:code>
           </dev:type>
           <dev:defaultValue>0</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="SimpleAPIType">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>Best</maml:name>
+          <maml:Description>
+            <maml:para>-best enable best mode when supported by simple API</maml:para>
+          </maml:Description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="SimpleAPIType, Category">
           <maml:name>SearchType</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill SearchType Description }}</maml:para>
+            <maml:para>{{Fill SearchType Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -1137,7 +1435,7 @@ C:\PS&gt; Get-OnypheCliFacets</dev:code>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
         <maml:name>SearchValue</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill SearchValue Description }}</maml:para>
+          <maml:para>-SearchValue string -Category Inetnum -APIKey string{APIKEY} look for an ip address in onyphe database -SearchValue string -Category Threatlist -APIKey string{APIKEY} look for threat info about a specific IP in onyphe database. -SearchValue string -Category Pastries -APIKey string{APIKEY} look for an pastbin data about a specific IP in onyphe database. -SearchValue string -Category Synscan -APIKey string{APIKEY}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -1145,6 +1443,18 @@ C:\PS&gt; Get-OnypheCliFacets</dev:code>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>Best</maml:name>
+        <maml:Description>
+          <maml:para>-best enable best mode when supported by simple API</maml:para>
+        </maml:Description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
         <maml:name>APIKey</maml:name>
@@ -1182,10 +1492,10 @@ C:\PS&gt; Get-OnypheCliFacets</dev:code>
         </dev:type>
         <dev:defaultValue>0</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="SimpleAPIType">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="SimpleAPIType, Category">
         <maml:name>SearchType</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill SearchType Description }}</maml:para>
+          <maml:para>{{Fill SearchType Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -1213,83 +1523,73 @@ C:\PS&gt; Get-OnypheCliFacets</dev:code>
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Request geoloc information for ip 8.8.8.8 
-C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Geoloc</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>Request geoloc information for ip 8.8.8.8</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -Category Geoloc</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
-        <dev:code>Request dns reverse information for ip 8.8.8.8 
-C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType ResolverReverse -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 2 --------------------------</maml:title>
+        <dev:code>Request dns reverse information for ip 8.8.8.8</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -Category ResolverReverse -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
-        <dev:code>request IIS keyword datascan information
-C:\PS&gt; Get-OnypheInfo -SimpleAPIType DataScan -SearchValue "IIS" -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 3 --------------------------</maml:title>
+        <dev:code>request IIS keyword datascan information</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -Category DataScan -SearchValue "IIS" -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
-        <dev:code>request datascan information for ip 8.8.8.8 
-C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType DataScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 4 --------------------------</maml:title>
+        <dev:code>request datascan information for ip 8.8.8.8</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -Category DataScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 5 --------------------------</maml:title>
-        <dev:code>Request pastebin content information for ip 8.8.8.8 
-C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 5 --------------------------</maml:title>
+        <dev:code>Request pastebin content information for ip 8.8.8.8</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -Category Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 6 --------------------------</maml:title>
-        <dev:code>Request pastebin content information for ip 8.8.8.8 and see page 2 of results
-C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -page "2"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 6 --------------------------</maml:title>
+        <dev:code>Request pastebin content information for ip 8.8.8.8 and see page 2 of results</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -Category Pastries -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -page "2"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 7 --------------------------</maml:title>
-        <dev:code>Request dns forward information for ip 8.8.8.8 
-C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType ResolverForward -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 7 --------------------------</maml:title>
+        <dev:code>Request dns forward information for ip 8.8.8.8</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -Category ResolverForward -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 8 --------------------------</maml:title>
-        <dev:code>Request threatlist information for ip 8.8.8.8 
-C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Threatlist -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 8 --------------------------</maml:title>
+        <dev:code>Request threatlist information for ip 8.8.8.8</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -Category Threatlist -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 9 --------------------------</maml:title>
-        <dev:code>Request inetnum information for ip 8.8.8.8 
-C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType Inetnum -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 9 --------------------------</maml:title>
+        <dev:code>Request inetnum information for ip 8.8.8.8</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -Category Inetnum -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 10 --------------------------</maml:title>
-        <dev:code>Request synscan information for ip 8.8.8.8 
-C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType SynScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 10 --------------------------</maml:title>
+        <dev:code>Request synscan information for ip 8.8.8.8</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -Category SynScan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -1404,27 +1704,24 @@ C:\PS&gt; Get-OnypheInfo -SearchValue "8.8.8.8" -SimpleAPIType SynScan -apikey "
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Request info for several IP information from a csv formated file and your API key is already set as global variable
-C:\PS&gt; Get-onypheinfofromcsv -fromcsv .\input.csv</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>Request info for several IP information from a csv formated file and your API key is already set as global variable</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-onypheinfofromcsv -fromcsv .\input.csv</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
-        <dev:code>Request info for several IP information from a csv formated file and set the API key as global variable
-C:\PS&gt; Get-onypheinfofromcsv -fromcsv .\input.csv -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 2 --------------------------</maml:title>
+        <dev:code>Request info for several IP information from a csv formated file and set the API key as global variable</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-onypheinfofromcsv -fromcsv .\input.csv -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
-        <dev:code>Request info for several IP information from a csv formated file using ',' separator and set the API key as global variable
-C:\PS&gt; Get-onypheinfofromcsv -fromcsv .\input.csv -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -csvdelimiter ","</dev:code>
+        <maml:title>-------------------------- EXEMPLE 3 --------------------------</maml:title>
+        <dev:code>Request info for several IP information from a csv formated file using ',' separator and set the API key as global variable</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-onypheinfofromcsv -fromcsv .\input.csv -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -csvdelimiter ","</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -1466,11 +1763,10 @@ C:\PS&gt; Get-onypheinfofromcsv -fromcsv .\input.csv -apikey "xxxxxxxxxxxxxxxxxx
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Get category available for search APIs of Onyphe
-C:\PS&gt; Get-OnypheSearchCategories</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>Get category available for search APIs of Onyphe</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheSearchCategories</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -1512,11 +1808,10 @@ C:\PS&gt; Get-OnypheSearchCategories</dev:code>
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Get filters available for search APIs of Onyphe
-C:\PS&gt; Get-OnypheSearchFilters</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>Get filters available for search APIs of Onyphe</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheSearchFilters</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -1558,11 +1853,10 @@ C:\PS&gt; Get-OnypheSearchFilters</dev:code>
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Get category available for search APIs of Onyphe
-C:\PS&gt; Get-OnypheSearchFunctions</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>Get category available for search APIs of Onyphe</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheSearchFunctions</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -1604,11 +1898,55 @@ C:\PS&gt; Get-OnypheSearchFunctions</dev:code>
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Get API available for Onyphe
-C:\PS&gt; Get-OnypheSimpleAPIName</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>Get API available for Onyphe</dev:code>
         <dev:remarks>
+          <maml:para>C:\PS&gt; Get-OnypheSimpleAPIName</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Get-OnypheSimpleBestAPIName</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>OnypheSimpleBestAPIName</command:noun>
+      <maml:description>
+        <maml:para>Get Simple Best API available for Onyphe</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Get Simple Best API available for Onyphe</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Get-OnypheSimpleBestAPIName</maml:name>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters />
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>Simple Best API as string</maml:name>
+        </dev:type>
+        <maml:description>
           <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>Get API available for Onyphe</dev:code>
+        <dev:remarks>
+          <maml:para>C:\PS&gt; Get-OnypheSimpleBestAPIName</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -1632,7 +1970,7 @@ C:\PS&gt; Get-OnypheSimpleAPIName</dev:code>
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
           <maml:name>InputOnypheObject</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill InputOnypheObject Description }}</maml:para>
+            <maml:para>{{Fill InputOnypheObject Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
           <dev:type>
@@ -1644,7 +1982,7 @@ C:\PS&gt; Get-OnypheSimpleAPIName</dev:code>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
           <maml:name>AdvancedFacets</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill AdvancedFacets Description }}</maml:para>
+            <maml:para>{{Fill AdvancedFacets Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
           <dev:type>
@@ -1656,7 +1994,7 @@ C:\PS&gt; Get-OnypheSimpleAPIName</dev:code>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>Facets</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill Facets Description }}</maml:para>
+            <maml:para>{{Fill Facets Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -1671,7 +2009,7 @@ C:\PS&gt; Get-OnypheSimpleAPIName</dev:code>
       <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
         <maml:name>InputOnypheObject</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill InputOnypheObject Description }}</maml:para>
+          <maml:para>{{Fill InputOnypheObject Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
         <dev:type>
@@ -1683,7 +2021,7 @@ C:\PS&gt; Get-OnypheSimpleAPIName</dev:code>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
         <maml:name>AdvancedFacets</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill AdvancedFacets Description }}</maml:para>
+          <maml:para>{{Fill AdvancedFacets Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
         <dev:type>
@@ -1695,7 +2033,7 @@ C:\PS&gt; Get-OnypheSimpleAPIName</dev:code>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>Facets</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill Facets Description }}</maml:para>
+          <maml:para>{{Fill Facets Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -1714,7 +2052,7 @@ C:\PS&gt; Get-OnypheSimpleAPIName</dev:code>
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
         <dev:code>import-module use-onyphe.psm1</dev:code>
         <dev:remarks>
           <maml:para></maml:para>
@@ -1741,7 +2079,7 @@ C:\PS&gt; Get-OnypheSimpleAPIName</dev:code>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
           <maml:name>SearchValue</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill SearchValue Description }}</maml:para>
+            <maml:para>{{Fill SearchValue Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -1789,7 +2127,7 @@ C:\PS&gt; Get-OnypheSimpleAPIName</dev:code>
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="SummaryAPIType">
           <maml:name>SearchType</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill SearchType Description }}</maml:para>
+            <maml:para>{{Fill SearchType Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -1804,7 +2142,7 @@ C:\PS&gt; Get-OnypheSimpleAPIName</dev:code>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
         <maml:name>SearchValue</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill SearchValue Description }}</maml:para>
+          <maml:para>{{Fill SearchValue Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -1852,7 +2190,7 @@ C:\PS&gt; Get-OnypheSimpleAPIName</dev:code>
       <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="SummaryAPIType">
         <maml:name>SearchType</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill SearchType Description }}</maml:para>
+          <maml:para>{{Fill SearchType Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -1880,27 +2218,24 @@ C:\PS&gt; Get-OnypheSimpleAPIName</dev:code>
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Request all information for ip 8.8.8.8 
-C:\PS&gt; Get-OnypheSummary -SearchValue "8.8.8.8" -SummaryAPIType ip</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>Request all information for ip 8.8.8.8</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheSummary -SearchValue "8.8.8.8" -SummaryAPIType ip</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
-        <dev:code>Request all information for perdu.com domain and set the API key
-C:\PS&gt; Get-OnypheSummary -SearchValue "perdu.com" -SummaryAPIType domain -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 2 --------------------------</maml:title>
+        <dev:code>Request all information for perdu.com domain and set the API key</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheSummary -SearchValue "perdu.com" -SummaryAPIType domain -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
-        <dev:code>Request all information for www.perdu.com hostname  and see page 2 of results
-C:\PS&gt; Get-OnypheSummary -SearchValue "www.perdu.com" -SummaryAPIType hostname -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -page "2"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 3 --------------------------</maml:title>
+        <dev:code>Request all information for www.perdu.com hostname  and see page 2 of results</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheSummary -SearchValue "www.perdu.com" -SummaryAPIType hostname -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -page "2"</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -1942,11 +2277,10 @@ C:\PS&gt; Get-OnypheSummary -SearchValue "www.perdu.com" -SummaryAPIType hostnam
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Get API available for Onyphe
-C:\PS&gt; Get-OnypheSummaryAPIName</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>Get API available for Onyphe</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheSummaryAPIName</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -2060,19 +2394,17 @@ C:\PS&gt; Get-OnypheSummaryAPIName</dev:code>
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>get user account info for api key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx and set the api key
-C:\PS&gt; Get-OnypheUserInfo -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>get user account info for api key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx and set the api key</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheUserInfo -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
-        <dev:code>get user account info for api key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx already set as global variable
-C:\PS&gt; Get-OnypheUserInfo</dev:code>
+        <maml:title>-------------------------- EXEMPLE 2 --------------------------</maml:title>
+        <dev:code>get user account info for api key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx already set as global variable</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Get-OnypheUserInfo</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -2175,11 +2507,10 @@ C:\PS&gt; Get-OnypheUserInfo</dev:code>
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>set API Key as global variable using encrypted key hosted in local xml file previously generated with Set-OnypheAPIKey
-C:\PS&gt; Import-OnypheEncryptedIKey -MasterPassword (ConvertTo-SecureString -String "YourP@ssw0rd" -AsPlainText -Force)</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>set API Key as global variable using encrypted key hosted in local xml file previously generated with Set-OnypheAPIKey</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Import-OnypheEncryptedIKey -MasterPassword (ConvertTo-SecureString -String "YourP@ssw0rd" -AsPlainText -Force)</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -9963,7 +10294,7 @@ C:\PS&gt; Invoke-APISummaryOnypheIP -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxx
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>FilterFunction</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill FilterFunction Description }}</maml:para>
+            <maml:para>{{Fill FilterFunction Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -9975,7 +10306,7 @@ C:\PS&gt; Invoke-APISummaryOnypheIP -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxx
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>SearchFilter</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill SearchFilter Description }}</maml:para>
+            <maml:para>{{Fill SearchFilter Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -9987,7 +10318,7 @@ C:\PS&gt; Invoke-APISummaryOnypheIP -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxx
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="Category">
           <maml:name>SearchType</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill SearchType Description }}</maml:para>
+            <maml:para>{{Fill SearchType Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -10098,7 +10429,7 @@ C:\PS&gt; Invoke-APISummaryOnypheIP -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxx
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>FilterFunction</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill FilterFunction Description }}</maml:para>
+          <maml:para>{{Fill FilterFunction Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -10110,7 +10441,7 @@ C:\PS&gt; Invoke-APISummaryOnypheIP -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxx
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>SearchFilter</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill SearchFilter Description }}</maml:para>
+          <maml:para>{{Fill SearchFilter Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -10122,7 +10453,7 @@ C:\PS&gt; Invoke-APISummaryOnypheIP -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxx
       <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="Category">
         <maml:name>SearchType</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill SearchType Description }}</maml:para>
+          <maml:para>{{Fill SearchType Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -10150,64 +10481,52 @@ C:\PS&gt; Invoke-APISummaryOnypheIP -IP 8.8.8.8 -APIKey "xxxxxxxxxxxxxxxxxxxxxxx
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>AdvancedSearch with multiple criteria/filters
-Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows
-C:\PS&gt; Search-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>AdvancedSearch with multiple criteria/filters</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows C:\PS&gt; Search-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
-        <dev:code>simple search with one filter/criteria
-Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
-C:\PS&gt; Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country</dev:code>
+        <maml:title>-------------------------- EXEMPLE 2 --------------------------</maml:title>
+        <dev:code>simple search with one filter/criteria</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists C:\PS&gt; Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
-        <dev:code>AdvancedSearch with multiple criteria/filters and set the API key
-Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows
-C:\PS&gt; Search-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 3 --------------------------</maml:title>
+        <dev:code>AdvancedSearch with multiple criteria/filters and set the API key</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows C:\PS&gt; Search-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
-        <dev:code>simple search with one filter/criteria and request page 2 of the results
-Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
-C:\PS&gt; Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -page "2"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 4 --------------------------</maml:title>
+        <dev:code>simple search with one filter/criteria and request page 2 of the results</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists C:\PS&gt; Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -page "2"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 5 --------------------------</maml:title>
-        <dev:code>simple search with one filter/criteria and use a server filter to retrieve only objects indexed since 2 month
-Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
-C:\PS&gt; Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 5 --------------------------</maml:title>
+        <dev:code>simple search with one filter/criteria and use a server filter to retrieve only objects indexed since 2 month</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists C:\PS&gt; Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 6 --------------------------</maml:title>
-        <dev:code>filter the result and show me only the answer with os property not null for threatlist category for all Russia
-C:\PS&gt; Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os</dev:code>
+        <maml:title>-------------------------- EXEMPLE 6 --------------------------</maml:title>
+        <dev:code>filter the result and show me only the answer with os property not null for threatlist category for all Russia</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 7 --------------------------</maml:title>
-        <dev:code>filter the results using multiple filters (only os property known and from all organization like *company*) for tcp port 3389 opened in russia
-C:\PS&gt; search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan</dev:code>
+        <maml:title>-------------------------- EXEMPLE 7 --------------------------</maml:title>
+        <dev:code>filter the results using multiple filters (only os property known and from all organization like *company*) for tcp port 3389 opened in russia</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; search-onyphe -AdvancedFilter @("wildcard:organization, company ","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -10338,7 +10657,7 @@ C:\PS&gt; search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exi
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="named" aliases="none">
           <maml:name>InputOnypheObject</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill InputOnypheObject Description }}</maml:para>
+            <maml:para>{{Fill InputOnypheObject Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
           <dev:type>
@@ -10350,7 +10669,7 @@ C:\PS&gt; search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exi
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>FilterFunction</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill FilterFunction Description }}</maml:para>
+            <maml:para>{{Fill FilterFunction Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -10362,7 +10681,7 @@ C:\PS&gt; search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exi
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>SearchFilter</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill SearchFilter Description }}</maml:para>
+            <maml:para>{{Fill SearchFilter Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -10374,7 +10693,7 @@ C:\PS&gt; search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exi
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="Category">
           <maml:name>SearchType</maml:name>
           <maml:Description>
-            <maml:para>{{ Fill SearchType Description }}</maml:para>
+            <maml:para>{{Fill SearchType Description}}</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -10497,7 +10816,7 @@ C:\PS&gt; search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exi
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="named" aliases="none">
         <maml:name>InputOnypheObject</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill InputOnypheObject Description }}</maml:para>
+          <maml:para>{{Fill InputOnypheObject Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
         <dev:type>
@@ -10509,7 +10828,7 @@ C:\PS&gt; search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exi
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>FilterFunction</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill FilterFunction Description }}</maml:para>
+          <maml:para>{{Fill FilterFunction Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -10521,7 +10840,7 @@ C:\PS&gt; search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exi
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>SearchFilter</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill SearchFilter Description }}</maml:para>
+          <maml:para>{{Fill SearchFilter Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -10533,7 +10852,7 @@ C:\PS&gt; search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exi
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="Category">
         <maml:name>SearchType</maml:name>
         <maml:Description>
-          <maml:para>{{ Fill SearchType Description }}</maml:para>
+          <maml:para>{{Fill SearchType Description}}</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -10561,56 +10880,45 @@ C:\PS&gt; search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exi
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>New alert for AdvancedSearch with multiple criteria/filters
-Set a new alert named "windows apache" matching datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows, and sent back the alert on "jeanclaude.dusse@lesbronzesfontdusk.io"
-C:\PS&gt; Set-OnypheAlert -AdvancedSearch @("product:Apache","port:443","os:Windows") -SearchType datascan -AlertAction new -AlertName "windows apache" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>New alert for AdvancedSearch with multiple criteria/filters</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>Set a new alert named "windows apache" matching datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows, and sent back the alert on "jeanclaude.dusse@lesbronzesfontdusk.io" C:\PS&gt; Set-OnypheAlert -AdvancedSearch @("product:Apache","port:443","os:Windows") -SearchType datascan -AlertAction new -AlertName "windows apache" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
-        <dev:code>New alert for simple search with one filter/criteria
-Set a new alert named "from russia with lv" matching threatlist for all IP matching the criteria : all IP from russia tagged by threat lists, and sent back the alert on "jeanclaude.dusse@lesbronzesfontdusk.io"
-C:\PS&gt; Set-OnypheAlert -SearchValue RU -SearchType threatlist -SearchFilter country -AlertAction new -AlertName "from russia with lv" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 2 --------------------------</maml:title>
+        <dev:code>New alert for simple search with one filter/criteria</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>Set a new alert named "from russia with lv" matching threatlist for all IP matching the criteria : all IP from russia tagged by threat lists, and sent back the alert on "jeanclaude.dusse@lesbronzesfontdusk.io" C:\PS&gt; Set-OnypheAlert -SearchValue RU -SearchType threatlist -SearchFilter country -AlertAction new -AlertName "from russia with lv" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
-        <dev:code>New alert for simple search with one filter/criteria and use a server filter to retrieve only objects indexed since 2 month, 
-Set an new alert named "from russia with lv 2 m" matching threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
-C:\PS&gt; Set-OnypheAlert -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2" -AlertAction new -AlertName "from russia with lv 2 m" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 3 --------------------------</maml:title>
+        <dev:code>New alert for simple search with one filter/criteria and use a server filter to retrieve only objects indexed since 2 month,</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>Set an new alert named "from russia with lv 2 m" matching threatlist for all IP matching the criteria : all IP from russia tagged by threat lists C:\PS&gt; Set-OnypheAlert -SearchValue RU -SearchType threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2" -AlertAction new -AlertName "from russia with lv 2 m" -AlertMail "jeanclaude.dusse@lesbronzesfontdusk.io"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
-        <dev:code>Modify an existing alert named "from paris with lv" and update mail and query
-Modify an existing alert named "from paris with lv" an update it to match threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and filter the result and show me only the answer with os property not null, finally sent back the alert to new mail "robert.lespinasse@lesbronzesfontdusk.io"
-C:\PS&gt; Set-OnypheAlert -SearchValue FR -SearchType threatlist -SearchFilter country -FilterFunction exist -FilterValue os -AlertAction modify -AlertName "from paris with lv" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 4 --------------------------</maml:title>
+        <dev:code>Modify an existing alert named "from paris with lv" and update mail and query</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>Modify an existing alert named "from paris with lv" an update it to match threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and filter the result and show me only the answer with os property not null, finally sent back the alert to new mail "robert.lespinasse@lesbronzesfontdusk.io" C:\PS&gt; Set-OnypheAlert -SearchValue FR -SearchType threatlist -SearchFilter country -FilterFunction exist -FilterValue os -AlertAction modify -AlertName "from paris with lv" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 5 --------------------------</maml:title>
-        <dev:code>New alert for advanced search and filter
-Set a new alert named "RandR" matching datascan for all IP matching the criteria : all ip from RU with TCP 3389 port opened, filter the results using multiple filters (only os property known and from all organization like *company*), and finally sent back the alert to "robert.lespinasse@lesbronzesfontdusk.io"
-C:\PS&gt; Set-OnypheAlert -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 5 --------------------------</maml:title>
+        <dev:code>New alert for advanced search and filter</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>Set a new alert named "RandR" matching datascan for all IP matching the criteria : all ip from RU with TCP 3389 port opened, filter the results using multiple filters (only os property known and from all organization like company ), and finally sent back the alert to "robert.lespinasse@lesbronzesfontdusk.io" C:\PS&gt; Set-OnypheAlert -AdvancedFilter @("wildcard:organization, company ","exists:os") -AdvancedSearch @("country:RU","port:3389") -SearchType datascan -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 6 --------------------------</maml:title>
-        <dev:code>Delete an existing alert named "windows apache"
-C:\PS&gt; Set-OnypheAlert -AlertAction delete -AlertName "windows apache"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 6 --------------------------</maml:title>
+        <dev:code>Delete an existing alert named "windows apache"</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Set-OnypheAlert -AlertAction delete -AlertName "windows apache"</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -10747,27 +11055,24 @@ C:\PS&gt; Set-OnypheAlert -AlertAction delete -AlertName "windows apache"</dev:c
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Set your API key as global variable so it will be used automatically by all use-onyphe functions
-C:\PS&gt; Set-OnypheAPIKey -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>Set your API key as global variable so it will be used automatically by all use-onyphe functions</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Set-OnypheAPIKey -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
-        <dev:code>Remove your API key set as global variable
-C:\PS&gt; Set-OnypheAPIKey -remove</dev:code>
+        <maml:title>-------------------------- EXEMPLE 2 --------------------------</maml:title>
+        <dev:code>Remove your API key set as global variable</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Set-OnypheAPIKey -remove</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
-        <dev:code>Store your API key on hard drive
-C:\PS&gt; Set-OnypheAPIKey -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -MasterPassword (ConvertTo-SecureString -String "YourP@ssw0rd" -AsPlainText -Force) -EncryptKeyInLocalFile</dev:code>
+        <maml:title>-------------------------- EXEMPLE 3 --------------------------</maml:title>
+        <dev:code>Store your API key on hard drive</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Set-OnypheAPIKey -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -MasterPassword (ConvertTo-SecureString -String "YourP@ssw0rd" -AsPlainText -Force) -EncryptKeyInLocalFile</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -10927,36 +11232,31 @@ C:\PS&gt; Set-OnypheAPIKey -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -M
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Remove Internet Proxy and set a direct connection
-C:\PS&gt; Set-OnypheProxy -DirectNoProxy</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>Remove Internet Proxy and set a direct connection</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Set-OnypheProxy -DirectNoProxy</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
-        <dev:code>Set Internet Proxy and with manual authentication
-$credentials = get-credential 
-C:\PS&gt; Set-OnypheProxy -Proxy "http://myproxy:8080" -ProxyCredential $credentials</dev:code>
+        <maml:title>-------------------------- EXEMPLE 2 --------------------------</maml:title>
+        <dev:code>Set Internet Proxy and with manual authentication</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>$credentials = get-credential  C:\PS&gt; Set-OnypheProxy -Proxy "http://myproxy:8080" -ProxyCredential $credentials</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
-        <dev:code>Set Internet Proxy and with automatic authentication based on current security context
-C:\PS&gt; Set-OnypheProxy -Proxy "http://myproxy:8080" -ProxyUseDefaultCredentials</dev:code>
+        <maml:title>-------------------------- EXEMPLE 3 --------------------------</maml:title>
+        <dev:code>Set Internet Proxy and with automatic authentication based on current security context</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Set-OnypheProxy -Proxy "http://myproxy:8080" -ProxyUseDefaultCredentials</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
-        <dev:code>Set Internet Proxy and with no authentication 
-C:\PS&gt; Set-OnypheProxy -Proxy "http://myproxy:8080" -AnonymousProxy</dev:code>
+        <maml:title>-------------------------- EXEMPLE 4 --------------------------</maml:title>
+        <dev:code>Set Internet Proxy and with no authentication</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Set-OnypheProxy -Proxy "http://myproxy:8080" -AnonymousProxy</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -11046,11 +11346,10 @@ C:\PS&gt; Set-OnypheProxy -Proxy "http://myproxy:8080" -AnonymousProxy</dev:code
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Update Onyphe-Data-Model.xml local file containing a cache of available APIs, functions, filters from user API
-C:\PS&gt; Update-OnypheFacetsFilters</dev:code>
+        <maml:title>-------------------------- EXEMPLE 1 --------------------------</maml:title>
+        <dev:code>Update Onyphe-Data-Model.xml local file containing a cache of available APIs, functions, filters from user API</dev:code>
         <dev:remarks>
-          <maml:para></maml:para>
+          <maml:para>C:\PS&gt; Update-OnypheFacetsFilters</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
