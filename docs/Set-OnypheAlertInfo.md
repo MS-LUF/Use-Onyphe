@@ -15,8 +15,8 @@ main function/cmdlet - create, modify, delete an alert on onyphe.io web service 
 ```
 Set-OnypheAlertInfo [[-SearchValue] <String>] [[-FilterValue] <String[]>] [[-AdvancedSearch] <Array>]
  [-AlertAction] <String> [[-AlertMail] <String>] [-AlertName] <String> [[-APIKey] <String>] [-UseBetaFeatures]
- [[-AdvancedFilter] <Array>] [-InputOnypheObject <Array>] [-SearchType <String>] [-SearchFilter <String>]
- [-FilterFunction <String>] [<CommonParameters>]
+ [[-AdvancedFilter] <Array>] [-InputOnypheObject <Array>] [-ProgressAction <ActionPreference>] [-WhatIf]
+ [-Confirm] [-SearchType <String>] [-SearchFilter <String>] [-FilterFunction <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -234,6 +234,36 @@ Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```
 
+### -WhatIf
+Shows what would happen if the cmdlet runs. The cmdlet is not run.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: wi
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Confirm
+Prompts you for confirmation before running the cmdlet.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: cf
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -FilterFunction
 {{Fill FilterFunction Description}}
 
@@ -241,6 +271,21 @@ Accept wildcard characters: False
 Type: String
 Parameter Sets: (All)
 Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{ Fill ProgressAction Description }}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
 
 Required: False
 Position: Named
@@ -280,8 +325,7 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

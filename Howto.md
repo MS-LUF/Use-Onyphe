@@ -3,7 +3,7 @@
 # Use-Onyphe - How-To
 
 ## ChangeLog
-This documentation has been updated to take into account **new features available with v1.3 including bulk v2 APIs**. Enjoy your Onyphe stuff with Power[Shell](Of Love)
+This documentation has been updated to take into account **new features available with v2.1.0, including the Discovery API and new search-result-shaping parameters (`-Size`, `-TrackQuery`, `-Calculated`)**. Enjoy your Onyphe stuff with Power[Shell](Of Love)
 
 ## Intro Onyphe
 Onyphe.io provides data about IP address space and publicly available information in just one place.
@@ -42,8 +42,8 @@ First thing to do is your API Key. You can directly load it in a global variable
 ```
     C:\PS>Set-OnypheAPIKey -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
-Or, you can save it encrypted in a local file (%home%\Use-Onyphe\Use-Onyphe-Config.xml) and load it at each start of Powershell using your Profile Script
-**Note : previously it was stored under %appdata% but since v0.99 it is now stored under %home% for linux and Powershell Core compatibility**
+Or, you can save it encrypted in a local file (%home%\Use-Onyphe\Use-Onyphe-Config.json) and load it at each start of Powershell using your Profile Script
+**Note : previously it was stored under %appdata% but since v0.99 it is now stored under %home% for linux and Powershell Core compatibility. The config file itself was later migrated from Clixml (Use-Onyphe-Config.xml) to JSON (Use-Onyphe-Config.json); an existing .xml file is auto-migrated to .json the first time the module runs.**
 ```
     Set-OnypheAPIKey -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -MasterPassword (ConvertTo-SecureString -String "YourP@ssw0rd" -AsPlainText -Force) -EncryptKeyInLocalFile
 ```
@@ -243,6 +243,8 @@ Get-help is available on all functions, for instance, if you want to consult the
  - Export-OnypheBulkSummaryInfo to download json file fron onyphe database for a summary request including multiple entries (through a txt file provided, on entry per line)
  - Export-OnypheBulkInfo to download json file fron onyphe database for a simple request including multiple entries (through a txt file provided, on entry per line)
     - All simple APIs are also available through a bulk mode using this cmdlet
+ - Export-OnypheDiscoveryInfo (or Export-OnypheBulkDiscovery) to run a file of OQL queries (one per line) in bulk against the Discovery API and download the JSON results
+    - **requires a Griffin View subscription on Onyphe** - without one, no Discovery category will be available to you
  
 Find hereunder several use cases for all API examples documented on https://www.onyphe.io/documentation/api
 
@@ -450,6 +452,14 @@ API v2/bulk/simple/whois : exoprt whois infornation infos in a JSON file or obje
     C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -category whois
     C:\PS> Export-OnypheBulkInfo -FilePath .\myfile.txt -category whois -best
 ```  
+API v2/bulk/discovery/datascan : run a file of OQL queries (one per line) in bulk against the datascan category and get back a JSON file or object - **requires a Griffin View subscription**
+```
+    C:\PS> "protocol:rdp domain:google.com" | Set-Content .\myqueries.txt
+    C:\PS> "protocol:ssh domain:google.com" | Add-Content .\myqueries.txt
+    C:\PS> Export-OnypheDiscoveryInfo -FilePath .\myqueries.txt -SaveInfoAsFile .\results.json -Category datascan
+    C:\PS> Export-OnypheDiscoveryInfo -FilePath .\myqueries.txt -Category datascan
+```
+the resolver and vulnscan categories are also available the same way (`-Category resolver` / `-Category vulnscan`); use `Get-OnypheDiscoveryCategories` to see which Discovery categories your account currently has access to.
 ## E-mail alerting system
 Since a few weeks now, 3 new APIs (V2) are available to manage automatic e-mail alerts for your Onyphe account. It means you can automate search request at Onyphe server side and received an e-mail alerts when new events are available (especially when using timeline filter functions in your request).
 Of course this new feature requires an API Key (non free).
@@ -507,7 +517,7 @@ For instance, hereunder we request all objects created since the last 2 months
 Here are also the filters available currently : dayago, weekago, monthago, exists, wildcard, fields
 exists can be used to send back only result with a property containing a non null value. For instance, I can retrieve only the result containing a property OS set :
 ```
-    C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os
+    C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exists -FilterValue os
 ```
 wildcard can be used to search deeply a property, but this is limited to 24 hours period of time to be sure the server won't crash. For instance, to look for all organization starting with company :
 ```
@@ -520,6 +530,37 @@ you can use multiple filter functions at a time using advancedfilter property :
 a last sample using the previous request but declared as an alert named "RandR" for robert.lespinasse@lesbronzesfontdusk.io
 ```
     C:\PS> Set-OnypheAlert -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan -AlertAction new -AlertName "RandR" -AlertMail "robert.lespinasse@lesbronzesfontdusk.io"
+```
+## Excluding, OR-ing, and combining multiple wildcard/regexp conditions (OQL)
+you can exclude a filter from the results by prefixing its name with "!" (OQL NOT), directly as plain text inside -AdvancedSearch, no dedicated parameter needed. For instance, all Russia-tagged threatlist entries except those on port 80 :
+```
+    C:\PS> Search-OnypheInfo -AdvancedSearch @("category:threatlist","country:RU","!port:80") -Category threatlist
+```
+you can OR two filters together by prefixing them with "?" (OQL OR). For instance, all threatlist entries from Russia or China :
+```
+    C:\PS> Search-OnypheInfo -AdvancedSearch @("?country:RU","?country:CN") -Category threatlist
+```
+to combine several wildcard or regexp conditions together (an OR between them), repeat the function once per condition inside -AdvancedFilter - Onyphe's OQL combines multiple wildcard/regexp conditions this way, not by packing several field/pattern pairs into a single function call :
+```
+    C:\PS> Search-OnypheInfo -AdvancedFilter @("orwildcard:domain,g?ogle.com","orwildcard:domain,googl?.com") -Category resolver
+```
+## Result size, matched-filter tracking, and calculated fields
+by default a search page returns 100 results; you can request a different page size (up to 10000) with -Size :
+```
+    C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -Size 500
+```
+-TrackQuery asks Onyphe to add, to each result, which OQL filter actually matched it (useful with broader -AdvancedSearch queries) :
+```
+    C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -TrackQuery
+```
+-Calculated asks Onyphe to enrich each result with computed fields (for instance defanged/undefanged URL variants) :
+```
+    C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -Calculated
+```
+all three parameters, and -fields, can be combined together, and -TrackQuery/-Calculated are also available on Export-OnypheInfo :
+```
+    C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -Size 500 -TrackQuery -Calculated -AdvancedFilter @("fields:ip,port")
+    C:\PS> Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -TrackQuery -Calculated -SaveInfoAsFile .\myexport.json
 ```
 ## Managing rate limiting
 you can add the parameter "wait" followed by a digit to request to wait x seconds between each request to manage rate limiting feature.
@@ -551,6 +592,7 @@ to do so use the function Export-OnypheInfoToFile :
 you can now use bulk summary / simple APIs to send several requests at a time based on a txt input file containing one entry per line (no space, no coma etc...)
 3 bulk summary apis are available : ip, host, domain
 17 bulk simple apis (including best) are available : ctl,datascan,datashot,geoloc,inetnum,pastries,resolver,sniffer,synscan,threatlist,topsite,vulnscan,whois
+3 bulk discovery apis are also available (**Griffin View subscription required**) : datascan, resolver, vulnscan - see the Discovery API example above, the input file contains one OQL query per line instead of one IP/domain/hostname per line
 the output is not an object but a json flat file.
 **Only the 10 latest results per category will be returned**
 find below an example to get summary info for ten IPs contained in myfile.txt
@@ -669,7 +711,7 @@ Then, export the screenshot of the home RDP login page for more information :)
 ### Example 5
 Please Onyphe, filter the result and show me only the answer with os property not null for threatlist category for all Russia
 ```
-    C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os
+    C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exists -FilterValue os
 ```
 
 ### Example 6

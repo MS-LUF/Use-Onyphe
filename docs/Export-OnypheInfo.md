@@ -15,7 +15,8 @@ main function/cmdlet - Export Search information on onyphe.io web service using 
 ```
 Export-OnypheInfo [[-InputOnypheObject] <Array>] [[-SearchValue] <String>] [[-FilterValue] <String[]>]
  [[-AdvancedSearch] <Array>] [[-APIKey] <String>] [[-wait] <Int32>] [-UseBetaFeatures]
- [[-AdvancedFilter] <Array>] [-SaveInfoAsFile] <String> [-SearchType <String>] [-SearchFilter <String>]
+ [[-AdvancedFilter] <Array>] [-SaveInfoAsFile] <String> [-TrackQuery] [-Calculated]
+ [-ProgressAction <ActionPreference>] [-SearchType <String>] [-SearchFilter <String>]
  [-FilterFunction <String>] [<CommonParameters>]
 ```
 
@@ -25,58 +26,71 @@ send HTTP request to onyphe.io web service and convert back JSON information to 
 
 ## EXAMPLES
 
-### EXEMPLE 1
+### EXAMPLE 1
 ```
 AdvancedSearch with multiple criteria/filters
+Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows and export data to myexport.json
+C:\PS> Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -SaveInfoAsFile .\myexport.json
 ```
 
-Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows and export data to myexport.json
-C:\PS\> Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -SaveInfoAsFile .\myexport.json
-
-### EXEMPLE 2
+### EXAMPLE 2
 ```
 simple search with one filter/criteria
+Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and export data to myexport.json
+C:\PS> Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -SaveInfoAsFile .\myexport.json
 ```
 
-Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and export data to myexport.json
-C:\PS\> Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -SaveInfoAsFile .\myexport.json
-
-### EXEMPLE 3
+### EXAMPLE 3
 ```
 AdvancedSearch with multiple criteria/filters and set the API key
+Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows and export data to myexport.json
+C:\PS> Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -SaveInfoAsFile .\myexport.json
 ```
 
-Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows and export data to myexport.json
-C:\PS\> Export-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -SaveInfoAsFile .\myexport.json
-
-### EXEMPLE 4
+### EXAMPLE 4
 ```
 simple search with one filter/criteria and use a server filter to retrieve only objects indexed since 2 month
+Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and export data to myexport.json
+C:\PS> Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2" -SaveInfoAsFile .\myexport.json
 ```
 
-Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists and export data to myexport.json
-C:\PS\> Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2" -SaveInfoAsFile .\myexport.json
-
-### EXEMPLE 5
+### EXAMPLE 5
 ```
 filter the result and show me only the answer with os property not null for threatlist category for all Russia  and export data to myexport.json
+C:\PS> Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os -SaveInfoAsFile .\myexport.json
 ```
 
-C:\PS\> Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os -SaveInfoAsFile .\myexport.json
-
-### EXEMPLE 6
+### EXAMPLE 6
 ```
 filter the results using multiple filters (only os property known and from all organization like *company*) for tcp port 3389 opened in russia  and export data to myexport.json
+C:\PS> Export-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan -SaveInfoAsFile .\myexport.json
 ```
 
-C:\PS\> Export-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan -SaveInfoAsFile .\myexport.json
-
-### EXEMPLE 7
+### EXAMPLE 7
 ```
 search from onyphe using search-onyphe and pipe the object to export the content to a json file using export-onyphe
+C:\PS> Search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan | Export-onyphe -SaveInfoAsFile .\myexport.json
 ```
 
-C:\PS\> Search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan | Export-onyphe -SaveInfoAsFile .\myexport.json
+### EXAMPLE 8
+```
+exclude a filter from the results by prefixing its name with "!" (OQL NOT), and/or OR two filters together by
+prefixing them with "?" (OQL OR) - both work as plain text inside -AdvancedSearch, no dedicated parameter needed
+C:\PS> Export-OnypheInfo -AdvancedSearch @("category:threatlist","!country:RU") -category threatlist -SaveInfoAsFile .\myexport.json
+```
+
+### EXAMPLE 9
+```
+OR several wildcard/regexp conditions together by repeating the function once per condition in -AdvancedFilter
+(this is how Onyphe's OQL itself combines multiple wildcard/regexp conditions - not a single comma-packed call)
+C:\PS> Export-OnypheInfo -AdvancedFilter @("orwildcard:domain,g?ogle.com","orwildcard:domain,googl?.com") -Category resolver -SaveInfoAsFile .\myexport.json
+```
+
+### EXAMPLE 10
+```
+ask for the matched-filter/calculated-fields metadata on every exported result
+C:\PS> Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -TrackQuery -Calculated -SaveInfoAsFile .\myexport.json
+```
 
 ## PARAMETERS
 
@@ -224,8 +238,41 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -TrackQuery
+-TrackQuery switch
+ask Onyphe to return, for each result, which OQL filter matched it
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 14
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Calculated
+-Calculated switch
+ask Onyphe to enrich results with computed fields (e.g.
+defanged/undefanged URL variants)
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 15
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -FilterFunction
-{{Fill FilterFunction Description}}
+{{ Fill FilterFunction Description }}
 
 ```yaml
 Type: String
@@ -239,8 +286,23 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -ProgressAction
+{{ Fill ProgressAction Description }}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -SearchFilter
-{{Fill SearchFilter Description}}
+{{ Fill SearchFilter Description }}
 
 ```yaml
 Type: String
@@ -255,7 +317,7 @@ Accept wildcard characters: False
 ```
 
 ### -SearchType
-{{Fill SearchType Description}}
+{{ Fill SearchType Description }}
 
 ```yaml
 Type: String
@@ -270,8 +332,7 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

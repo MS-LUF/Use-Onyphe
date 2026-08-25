@@ -15,7 +15,8 @@ main function/cmdlet - Search for IP information on onyphe.io web service using 
 ```
 Search-OnypheInfo [[-SearchValue] <String>] [[-FilterValue] <String[]>] [[-AdvancedSearch] <Array>]
  [[-APIKey] <String>] [[-Page] <String[]>] [[-wait] <Int32>] [-UseBetaFeatures] [[-AdvancedFilter] <Array>]
- -SearchType <String> [-SearchFilter <String>] [-FilterFunction <String>] [<CommonParameters>]
+ [[-Size] <Int32>] [-TrackQuery] [-Calculated] [-ProgressAction <ActionPreference>] -SearchType <String>
+ [-SearchFilter <String>] [-FilterFunction <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -24,59 +25,73 @@ send HTTP request to onyphe.io web service and convert back JSON information to 
 
 ## EXAMPLES
 
-### EXEMPLE 1
+### EXAMPLE 1
 ```
 AdvancedSearch with multiple criteria/filters
+Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows
+C:\PS> Search-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan
 ```
 
-Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows
-C:\PS\> Search-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan
-
-### EXEMPLE 2
+### EXAMPLE 2
 ```
 simple search with one filter/criteria
+Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
+C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country
 ```
 
-Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
-C:\PS\> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country
-
-### EXEMPLE 3
+### EXAMPLE 3
 ```
 AdvancedSearch with multiple criteria/filters and set the API key
+Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows
+C:\PS> Search-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
-Search with datascan for all IP matching the criteria : Apache web server listening on 443 tcp port hosted on Windows
-C:\PS\> Search-OnypheInfo -AdvancedSearch @("product:Apache","port:443","os:Windows") -Category datascan -apikey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-
-### EXEMPLE 4
+### EXAMPLE 4
 ```
 simple search with one filter/criteria and request page 2 of the results
+Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
+C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -page "2"
 ```
 
-Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
-C:\PS\> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -page "2"
-
-### EXEMPLE 5
+### EXAMPLE 5
 ```
 simple search with one filter/criteria and use a server filter to retrieve only objects indexed since 2 month
+Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
+C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2"
 ```
 
-Search with threatlist for all IP matching the criteria : all IP from russia tagged by threat lists
-C:\PS\> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction monthago -FilterValue "2"
-
-### EXEMPLE 6
+### EXAMPLE 6
 ```
 filter the result and show me only the answer with os property not null for threatlist category for all Russia
+C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os
 ```
 
-C:\PS\> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -FilterFunction exist -FilterValue os
-
-### EXEMPLE 7
+### EXAMPLE 7
 ```
 filter the results using multiple filters (only os property known and from all organization like *company*) for tcp port 3389 opened in russia
+C:\PS> search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan
 ```
 
-C:\PS\> search-onyphe -AdvancedFilter @("wildcard:organization,*company*","exists:os") -AdvancedSearch @("country:RU","port:3389") -Category datascan
+### EXAMPLE 8
+```
+exclude a filter from the results by prefixing its name with "!" (OQL NOT), and/or OR two filters together by
+prefixing them with "?" (OQL OR) - both work as plain text inside -AdvancedSearch, no dedicated parameter needed
+C:\PS> Search-OnypheInfo -AdvancedSearch @("category:threatlist","!country:RU") -category threatlist
+C:\PS> Search-OnypheInfo -AdvancedSearch @("?country:RU","?country:CN") -category threatlist
+```
+
+### EXAMPLE 9
+```
+OR several wildcard/regexp conditions together by repeating the function once per condition in -AdvancedFilter
+(this is how Onyphe's OQL itself combines multiple wildcard/regexp conditions - not a single comma-packed call)
+C:\PS> Search-OnypheInfo -AdvancedFilter @("orwildcard:domain,g?ogle.com","orwildcard:domain,googl?.com") -Category resolver
+```
+
+### EXAMPLE 10
+```
+limit output fields, request a larger page size, and ask for the matched-filter/calculated-fields metadata
+C:\PS> Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -Size 500 -TrackQuery -Calculated
+```
 
 ## PARAMETERS
 
@@ -209,8 +224,57 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -Size
+-Size int{1 to 10000}
+number of results per page (server default is 100 when omitted)
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 13
+Default value: 0
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -TrackQuery
+-TrackQuery switch
+ask Onyphe to return, for each result, which OQL filter matched it
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 14
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Calculated
+-Calculated switch
+ask Onyphe to enrich results with computed fields (e.g.
+defanged/undefanged URL variants)
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 15
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -FilterFunction
-{{Fill FilterFunction Description}}
+{{ Fill FilterFunction Description }}
 
 ```yaml
 Type: String
@@ -224,8 +288,23 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -ProgressAction
+{{ Fill ProgressAction Description }}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -SearchFilter
-{{Fill SearchFilter Description}}
+{{ Fill SearchFilter Description }}
 
 ```yaml
 Type: String
@@ -240,7 +319,7 @@ Accept wildcard characters: False
 ```
 
 ### -SearchType
-{{Fill SearchType Description}}
+{{ Fill SearchType Description }}
 
 ```yaml
 Type: String
@@ -255,8 +334,7 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

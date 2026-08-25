@@ -1,0 +1,91 @@
+{
+  "version": "1.0",
+  "APIKey": {
+    "Salt": "StiFJpXYIJYMeslnh/mBZ2/dV6bXVJlwONtH/sCHh4k=",
+    "EncryptedAPIKey": "76492d1116743f0423413b16050a5345MgB8AHAARgBKAFMAZAB4ADIATAA3AGMAMQBVAG0AQwBvAE0ATgBrAEwASAB4AHcAPQA9AHwAMgA1AGYAYgAxADcAMQAzADgANgBlAGMAYwA1ADYAMQBiAGIAMAAxADQAYwBiADkAYwA4AGUANwAzAGYAMABmAGEAZABhADYANwA3AGUAOAA4ADMANgBjADIANwAwADAANgBlAGUAZAAzADEAOQBiADcAYQA2ADIANwBiADgAMQAwAGUAZAAyADYAMQBkAGEAOQA1AGEANQA3ADMAOQA0ADIAYQA3AGYANQBmADUAYwBhAGMAZAA4ADEAOABlADkAOQBmADQAMgAwADkAOABjADIANwA1AGEAMgA0ADkAMQAyADUAMAA0ADYAZAA0ADQAZAAxAGMAMABjADcAMgBkADEAMwAzADUAMgAzADkAYwAxAGMANgBmADcAYwBkAGQANgA0ADcAMQAzAGQANQBmADgAYQAzAGEAOQBkAGUANAAzAGQAZABkADMAOABhAGEAYgA4ADEANwA0ADYAOQA0AGQAZgA3ADAAYgA3AGIAMAA5ADIANQAwAGQAOQBjAGQA"
+  },
+  "Proxy": {},
+  "DataModel": {
+    "apis": [
+      "user",
+      "search",
+      "search/datascan",
+      "search/threatlist",
+      "simple/geoloc",
+      "simple/geoloc/best",
+      "simple/whois",
+      "simple/whois/best",
+      "bulk/simple/ctl/ip",
+      "bulk/summary/ip",
+      "bulk/discovery/datascan/asset",
+      "export",
+      "alert/list",
+      "alert/add",
+      "alert/del"
+    ],
+    "filters": [
+      "ip",
+      "port",
+      "protocol",
+      "domain",
+      "hostname",
+      "country",
+      "asn",
+      "subnet",
+      "organization",
+      "os",
+      "product",
+      "cve",
+      "tag",
+      "tld",
+      "app.http.title"
+    ],
+    "functions": [
+      "da",
+      "dayago",
+      "ex",
+      "exists",
+      "fi",
+      "fields",
+      "ha",
+      "hourago",
+      "ma",
+      "monthago",
+      "nex",
+      "notexists",
+      "notwildcard",
+      "nwd",
+      "oex",
+      "ore",
+      "orexists",
+      "orregexp",
+      "orwildcard",
+      "owd",
+      "si",
+      "since",
+      "so",
+      "sort",
+      "tlsexpired",
+      "wa",
+      "wd",
+      "weekago",
+      "wildcard"
+    ]
+  },
+  "Logging": {
+    "Enabled": true,
+    "MinimumLevel": "Information",
+    "Mode": "File",
+    "File": {
+      "Path": "%USERPROFILE%\\Documents\\Use-Onyphe\\Logs",
+      "FileName": "Use-Onyphe-{yyyyMMdd}.log"
+    },
+    "EventLog": {
+      "LogName": "Application",
+      "Source": "Use-Onyphe",
+      "EventIdInformation": 1000,
+      "EventIdWarning": 2000,
+      "EventIdError": 3000
+    }
+  }
+}

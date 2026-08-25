@@ -11,8 +11,40 @@ To request it : https://www.onyphe.io/login
 More info about available APIs :
 https://www.onyphe.io/documentation/api
 
-(c) 2018-2021 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
-## Notes version (1.3) - last public version :
+(c) 2018-2026 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
+
+## Notes version (2.1.1) - Search/Export OQL transport fix :
+ - fixed `Search-OnypheInfo`/`Export-OnypheInfo` (and their private `Invoke-APIOnyphe{Search,Export}` wrappers) silently dropping everything after the first `?` in a query. The OQL string used to be embedded directly in the URL *path* (`v2/search/category:X <oql>`); since `?` is the URI query-string delimiter, an OQL `?field:value` OR-prefix silently truncated the request there - the truncated remainder was still sent, as a bogus query string the server ignored, with no error. Requests are now built as `v2/search/?q=<oql>&...` / `v2/export/?q=<oql>&...`, matching Onyphe's current documented endpoint shape, with the `q` value properly percent-encoded via `EscapeDataString`.
+ - `Invoke-OnypheAPIV2` now emits a `Write-Warning` when the server returns fewer results per page than requested via `-Size` (e.g. asking for `-Size 1000` and silently getting the default page size of 10 back) instead of failing silently. The real per-account page-size ceiling is lower than the documented `1-10000` range and isn't exposed by the API, so `-Size` stays best-effort rather than guaranteed - use `-Page` to walk additional results instead of assuming a larger `-Size` was honored.
+
+## Notes version (2.1.0) - Discovery API and OQL query-language gap-closing release :
+ - added the Discovery API (**requires a Griffin View subscription on Onyphe**): `Export-OnypheDiscoveryInfo` (alias `Export-OnypheBulkDiscovery`) runs a file of OQL queries (one per line) in bulk against the `datascan`, `resolver`, or `vulnscan` category and streams back the JSON results; `Get-OnypheDiscoveryCategories` lists which Discovery categories your account has access to
+ - added `-Size`, `-TrackQuery`, and `-Calculated` to `Search-OnypheInfo`/`Invoke-APIOnypheSearch` (`-TrackQuery`/`-Calculated` also on `Export-OnypheInfo`/`Invoke-APIOnypheExport`) to control result page size and request Onyphe's matched-filter/computed-field metadata
+ - bug fixes:
+   - `Invoke-OnypheAPIV2`'s error handling only tried to extract the real Onyphe error message for HTTP status 429/400 (and a dead 200 branch); every other error status (401/403/404/500/503/...) silently discarded the actual API error and returned a generic one instead - it now always attempts to extract the real error message first
+   - fixed an `-AdvancedFilter` quoting bug where a function value containing more than one comma (e.g. a value needing quoting after a literal comma) could silently lose its quoting past the 2nd comma-separated segment
+ - added a `-TimeoutSec` parameter to `Invoke-OnypheAPIV2` (default 100s) - HTTP requests had no timeout before, so a broad/slow query (e.g. an unpaged `Export-OnypheInfo` request) could hang indefinitely
+
+## Notes version (2.0.1) - major internal refactor and security/quality release :
+ - **Breaking change**: API key encryption (`Set-OnypheAPIKey -EncryptKeyInLocalFile`) now derives its key with PBKDF2-SHA256 at 210,000 iterations instead of the previous PBKDF2-SHA1 at 1,000 iterations. An API key encrypted by an older version will fail to decrypt after upgrading — re-run `Set-OnypheAPIKey -EncryptKeyInLocalFile` to re-encrypt it.
+ - full internal refactor of the module into a `Public/`/`Private/<Layer>/` architecture (one file per cmdlet/helper); `Use-Onyphe.psm1` is now a thin loader. Same 26 public functions / 9 aliases (35 total) still exported — no change to the public command surface.
+ - migrated persisted configuration from Clixml (`Use-Onyphe-Config.xml`, `Onyphe-Data-Model.xml`) to a single JSON file (`Use-Onyphe-Config.json` under `%home%\Use-Onyphe\`); an existing `.xml` file is auto-migrated to `.json` the first time the module runs
+ - added opt-in logging via `Write-OnypheLog` (file or Windows Event Log, minimum-level filtering, redacts sensitive parameter values); every public cmdlet now logs its invocation
+ - security fixes:
+   - the API key was written in cleartext to the `-Verbose` stream when calling the Onyphe API; the `Authorization` header is now redacted before logging
+   - IP address parameters accepted values with a valid IP anywhere in the string (e.g. `"garbage8.8.8.8garbage"`) instead of requiring the whole value to be a valid IP; validation is now anchored and consolidated into one shared, tested helper instead of 19 duplicated copies
+   - the `-UseBetaFeatures` switch on Windows PowerShell 5.1 disabled TLS certificate validation for the rest of the PowerShell session instead of just the one beta-API request; it is now correctly scoped and restored afterward
+   - removed `Invoke-Expression`-based dynamic dispatch (replaced with the PowerShell call operator) in `Get-OnypheInfo`, `Get-OnypheSummary`, `Export-OnypheBulkInfo`, `Export-OnypheBulkSummaryInfo`
+ - bug fixes:
+   - fixed a crash in any cmdlet using tab-completed/validated parameters (`Get-OnypheInfo`, `Get-OnypheSummary`, `Search-OnypheInfo`, `Export-OnypheInfo`, `Export-OnypheBulkInfo`, `Export-OnypheBulkSummaryInfo`, `Set-OnypheAlertInfo`, `Get-OnypheStatsFromObject`) when used before the facets/filters cache had ever been generated (fresh install)
+   - fixed a crash when passing a single (non-range) `-Page` value to `Get-OnypheInfo`/`Get-OnypheSummary`/`Search-OnypheInfo`
+   - fixed a crash when an `-AdvancedFilter` entry had no `:` separator (search, export, and alert-creation)
+   - fixed `Set-OnypheAlertInfo -AlertAction delete -UseBetaFeatures` throwing, and `-UseBetaFeatures` not being applied to the alert lookup/delete calls (a beta alert could be deleted against production instead)
+   - fixed an internal error-handling bug that could mask the real HTTP error message on certain API error responses
+   - fixed the bulk pastries API being mislabeled internally as `"patries"`
+ - added `-WhatIf`/`-Confirm` support to `Set-OnypheAPIKey`, `Set-OnypheProxy`, `Set-OnypheAlertInfo`, and `Update-OnypheFacetsFilters`
+
+## Notes version (1.3) :
  - add whois simple API
  - update bulk APIs
  - add simple best APIs
@@ -34,23 +66,28 @@ https://www.onyphe.io/documentation/api
    - sample csv files are updated to take into account new API and new api naming convention, please check them and update your current CSV file using the new templates.
  - remove temporary fix for empty array in APIv2
  - update deserialization of psobject
+
 ## Notes version (1.00) :
  - fix rate limiting issue on paging
  - manage new API in Export-OnypheInfoToFile
+
 ## Notes version (0.99) :
  - replace $env:appdata with $home for Linux and Powershell Core compatibility
  - create new function to request APIv2 (Invoke-OnypheAPIV2) and managing api key as new header etc...
  - rename previous function to request APIv1 (Invoke-OnypheAPIV1) and fix Net.WebException management for PowerShell core
  - create new functions to deal with Onyphe Alert APIs (Invoke-APIOnypheListAlert, Invoke-APIOnypheDelAlert, Invoke-APIOnypheAddAlert)
  - create new functions for managing the Onyphe Alert (Get-OnypheAlertInfo, Set-OnypheAlertInfo)
+
 ## Notes version (0.98) :
  - fix paging regex to support more than 1000 pages
+
 ## Notes version (0.97) :
  - code improvement
  - add beta switch to use beta interface of onyphe instead of production one
  - improve paging parameters
  - add advancedfilter option to Search-onyphe to manage multiple filter functions input
  - add onionshot category to datashot export function
+
 ## Notes version (0.96) :
 - add new filtering function for search request
 - add Get-OnypheSearchFunctions function
@@ -60,19 +97,23 @@ https://www.onyphe.io/documentation/api
 - add FunctionFilter and FunctionValue parameters
 - update Get-OnypheInfoFromCSV to manage new filter function in search request
 - add new alias Get-OnypheInfoFromCSV
+
 ## Notes version (0.95) :
 - fix HTTP error on invoke-onyphe when no network is available
 - add datashot management
 - add function to export datashot to picture file
 - fix Get-OnypheInfoFromCSV
 - update Export-OnypheInfoToFile
+
 ## Notes version (0.94) :
 - manage new apis (ctl, sniffer, onionscan, md5)
 - use userinfos API to collect APIs and search filters
 - rewrite get-onyphe info function to simplify the code
 - update invoke-apionyphedatascan with only a single parameter
+
 ## Notes version (0.93)
 - add statistics function
+
 ## Notes version (0.92)
 - add tag filter
 - manage new search APIs
@@ -84,6 +125,11 @@ https://www.onyphe.io/documentation/api
 
 ## How-to
 an updated how-to is now available here : https://github.com/MS-LUF/Use-Onyphe/blob/master/Howto.md
+
+## Configuration file
+Use-Onyphe persists your API key (if you choose to encrypt it to disk), proxy settings placeholder, API/filter/function cache, and logging preferences in a single JSON file (`$home\Use-Onyphe\Use-Onyphe-Config.json`). A sample file and a full explanation of every section are available here :
+- Sample config file : [Templates/Use-Onyphe-Config.sample.json](./Templates/Use-Onyphe-Config.sample.json)
+- Full documentation : [Templates/ConfigSchema.md](./Templates/ConfigSchema.md)
 
 ## install use-onyphe from PowerShell Gallery repository
 You can easily install it from powershell gallery repository
@@ -108,40 +154,43 @@ using a simple powershell command and an internet access :-)
 ## module content
 documentation in markdown available here : https://github.com/MS-LUF/Use-Onyphe/tree/master/docs
 ### function
-- Get-OnypheUserInfo 
-- Search-OnypheInfo 
+- Export-OnypheBulkInfo
+- Export-OnypheBulkSummaryInfo
+- Export-OnypheDataShot
+- Export-OnypheDiscoveryInfo
+- Export-OnypheInfo
+- Export-OnypheInfoToFile
+- Get-OnypheAlertInfo
+- Get-OnypheBulkAPIType
+- Get-OnypheBulkCategories
+- Get-OnypheCliFacets
+- Get-OnypheDiscoveryCategories
 - Get-OnypheInfo
 - Get-OnypheInfoFromCSV
-- Export-OnypheInfoToFile 
-- Export-OnypheDataShot									
-- Export-OnypheBulkInfo 
-- Export-OnypheBulkSummaryInfo 
-- Export-OnypheInfo
-- Get-OnypheSummaryAPIName 
-- Get-OnypheSummary
-- Get-OnypheSimpleBestAPIName
-- Get-OnypheBulkCategories 
-- Get-OnypheBulkAPIType
-- Get-OnypheSearchFunctions
 - Get-OnypheSearchCategories
-- Get-OnypheSearchFilters 
-- Set-OnypheAPIKey
-- Update-OnypheFacetsFilters 
-- Get-OnypheCliFacets
-- Get-OnypheStatsFromObject 
-- Set-OnypheProxy
-- Import-OnypheEncryptedIKey 
-- Get-OnypheSimpleAPIName 
-- Get-OnypheAlertInfo
+- Get-OnypheSearchFilters
+- Get-OnypheSearchFunctions
+- Get-OnypheSimpleAPIName
+- Get-OnypheSimpleBestAPIName
+- Get-OnypheStatsFromObject
+- Get-OnypheSummary
+- Get-OnypheSummaryAPIName
+- Get-OnypheUserInfo
+- Import-OnypheEncryptedIKey
+- Search-OnypheInfo
 - Set-OnypheAlertInfo
+- Set-OnypheAPIKey
+- Set-OnypheProxy
+- Update-OnypheFacetsFilters
 
 ### alias
 - Export-Onyphe
+- Export-OnypheBulkDiscovery
+- Export-OnypheBulkSimple
+- Export-OnypheBulkSummary
 - Get-Onyphe
 - Get-OnypheAlert
 - Get-OnypheFromCSV
 - Search-Onyphe
 - Set-OnypheAlert
 - Update-OnypheLocalData
-- Export-OnypheBulkSimple
-- Export-OnypheBulkSummary

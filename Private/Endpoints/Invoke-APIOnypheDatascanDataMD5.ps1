@@ -1,0 +1,63 @@
+	Function Invoke-APIOnypheDatascanDataMD5 {
+	<#
+	.SYNOPSIS 
+	create several input for Invoke-OnypheAPIV2 function and then call it to get info from onyphe md5 signature
+
+	.DESCRIPTION
+	create several input for Invoke-OnypheAPIV2 function and then call it to get info from onyphe md5 signature
+	
+	.PARAMETER MD5
+	-MD5 string{MD5 Hash}
+	MD5 to be used for the md5 API usage
+	
+	.PARAMETER APIKEY
+	-APIKey string{APIKEY}
+	Set APIKEY as global variable.
+
+	.PARAMETER Page
+	-page string{page number}
+	go directly to a specific result page (1 to 1000)
+	
+	.OUTPUTS
+	TypeName: PSOnyphe
+
+	.EXAMPLE
+	get md5 info for 7a1f20cae067b75a52bc024b83ee4667 hash
+	C:\PS> Invoke-APIOnypheDatascanDataMd5 -MD5 7a1f20cae067b75a52bc024b83ee4667
+
+	.EXAMPLE
+	get md5 info for 7a1f20cae067b75a52bc024b83ee4667 hash and set the api key
+	C:\PS> Invoke-APIOnypheDatascanDataMd5 -MD5 7a1f20cae067b75a52bc024b83ee4667 -APIKey "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  #>
+		[cmdletbinding()]
+		Param (
+			[parameter(ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true,Mandatory=$true)]
+			[Alias("input")]
+			[ValidateScript({($_ -match "^[a-f0-9]{32}$")})]
+				[string]$MD5, 
+			[parameter(Mandatory=$false)]
+			[ValidateLength(40,40)]
+				[string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateScript({$_ -match "^((?!0)\d+)$"})]
+				[string]$Page,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		Process {
+			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+			$params = @{
+				request = "v2/simple/datascan/md5/$($MD5)"
+				APIInfo = "md5"
+				APIInput = @("$($MD5)")
+				APIKeyrequired = $true
+			}
+			if ($page) {$params.add('page',$page)}
+			if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			}
+			Write-Verbose -message "URL Info : $($params.request)"
+			Invoke-OnypheAPIV2 @params
+		}
+	}
