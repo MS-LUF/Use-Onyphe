@@ -30,6 +30,16 @@ Describe 'Export-OnypheDiscoveryInfo' -Tag 'Unit' {
 		{ Export-OnypheDiscoveryInfo -FilePath $script:InFile -Category datascan } | Should -Throw '*not available*'
 	}
 
+	It 'dispatches to a category beyond the original datascan/resolver/vulnscan set (e.g. whois)' {
+		Mock -ModuleName Use-Onyphe Get-OnypheDiscoveryCategories { @('datascan', 'resolver', 'vulnscan', 'whois') }
+		Mock -ModuleName Use-Onyphe Invoke-APIBulkDiscoveryOnypheWhois {
+			param($OutFile)
+			Set-Content -Path $OutFile -Value '{"status":"ok-whois"}'
+		}
+		$Result = Export-OnypheDiscoveryInfo -FilePath $script:InFile -Category whois
+		$Result.status | Should -Be 'ok-whois'
+	}
+
 	It 'returns the parsed object from the output file when -SaveInfoAsFile is omitted' {
 		$Result = Export-OnypheDiscoveryInfo -FilePath $script:InFile -Category datascan
 		$Result.status | Should -Be 'ok-datascan'

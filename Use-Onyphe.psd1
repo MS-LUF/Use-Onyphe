@@ -12,7 +12,7 @@
 RootModule = 'use-onyphe.psm1'
 
 # Numero de version de ce module.
-ModuleVersion = '2.1.1'
+ModuleVersion = '2.1.3'
 
 # editions PS prises en charge
 # CompatiblePSEditions = @()
@@ -107,7 +107,7 @@ PrivateData = @{
         IconUri = 'https://www.onyphe.io/img/logo-solo.png'
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'v2.1.1 : fixes Search-OnypheInfo/Export-OnypheInfo silently truncating any OQL query using the "?field" OR-prefix (the query is now sent as a q= query-string parameter instead of embedded in the URL path), and adds a warning when the server silently returns fewer results per page than requested via -Size. No breaking changes since v2.1.0. See README.md for the full list.'
+        ReleaseNotes = 'v2.1.3 : documents OQLv2 condition-group syntax (parentheses) for Search-OnypheInfo/Export-OnypheInfo, confirmed live-working on this account (requires an ASM-level or Ctiscan licence) - "(" and ")" must be passed as their own -AdvancedSearch array elements, not combined with a filter:value pair in one string, or the existing multi-word auto-quoting corrupts the query. No code change, no breaking changes since v2.1.2. See README.md for the full list.'
         # External dependent modules of this module
         # ExternalModuleDependencies = ''
 

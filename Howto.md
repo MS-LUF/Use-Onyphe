@@ -14,7 +14,7 @@ To request it : https://www.onyphe.io/login
 More info about available APIs :
 https://www.onyphe.io/documentation/api
 
-(c) 2018-2021 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
+(c) 2018-2026 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
 
 ## APIs v1 and v2
 Since a few weeks now, new APIs are available in "v2". Main differences between v1 and v2 APIs are :

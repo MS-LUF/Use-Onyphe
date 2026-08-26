@@ -111,6 +111,14 @@
 		.EXAMPLE
 		 ask for the matched-filter/calculated-fields metadata on every exported result
 		 C:\PS> Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -TrackQuery -Calculated -SaveInfoAsFile .\myexport.json
+
+		.EXAMPLE
+		 OQLv2 condition groups (requires an ASM-level or Ctiscan licence - check Get-OnypheUserInfo's oqlversion property)
+		 group conditions with parentheses to AND two independent OR-groups together; pass "(" and ")" as their own
+		 -AdvancedSearch array elements, never appended to a filter:value element with a space in the same string - the
+		 module's multi-word auto-quoting will otherwise swallow the closing paren into the previous value and produce
+		 an OQL syntax error server-side
+		 C:\PS> Export-OnypheInfo -AdvancedSearch @("(","?domain:sovcloud-core.fr","?domain:sovcloud-api.fr",")","(","?tld:fr",")") -Category resolver -SaveInfoAsFile .\myexport.json
 	 #>
 		 [cmdletbinding()]
 		 param(

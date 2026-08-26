@@ -27,7 +27,7 @@
 
 		 .PARAMETER Category
 		 -Category string {Get-OnypheDiscoveryCategories}
-		 Discovery category to be used : datascan,resolver,vulnscan
+		 Discovery category to be used : ctiscan,ctiurl,ctl,datascan,datashot,domain,geoloc,hostname,inetnum,ip,onionscan,onionshot,pastries,resolver,riskscan,sniffer,threatlist,topsite,vulnscan,whois
 
 		 .OUTPUTS
 		 TypeName: System.Management.Automation.PSCustomObject

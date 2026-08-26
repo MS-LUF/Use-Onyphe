@@ -1241,6 +1241,18 @@ C:\PS&gt; Export-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter c
           <maml:para></maml:para>
         </dev:remarks>
       </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 11 --------------------------</maml:title>
+        <dev:code>OQLv2 condition groups (requires an ASM-level or Ctiscan licence - check Get-OnypheUserInfo's oqlversion property)
+group conditions with parentheses to AND two independent OR-groups together; pass "(" and ")" as their own
+-AdvancedSearch array elements, never appended to a filter:value element with a space in the same string - the
+module's multi-word auto-quoting will otherwise swallow the closing paren into the previous value and produce
+an OQL syntax error server-side
+C:\PS&gt; Export-OnypheInfo -AdvancedSearch @("(","?domain:sovcloud-core.fr","?domain:sovcloud-api.fr",")","(","?tld:fr",")") -Category resolver -SaveInfoAsFile .\myexport.json</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
     </command:examples>
     <command:relatedLinks />
   </command:command>
@@ -3528,6 +3540,18 @@ C:\PS&gt; Search-OnypheInfo -AdvancedFilter @("orwildcard:domain,g?ogle.com","or
         <maml:title>-------------------------- EXAMPLE 10 --------------------------</maml:title>
         <dev:code>limit output fields, request a larger page size, and ask for the matched-filter/calculated-fields metadata
 C:\PS&gt; Search-OnypheInfo -SearchValue RU -Category threatlist -SearchFilter country -Size 500 -TrackQuery -Calculated</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 11 --------------------------</maml:title>
+        <dev:code>OQLv2 condition groups (requires an ASM-level or Ctiscan licence - check Get-OnypheUserInfo's oqlversion property)
+group conditions with parentheses to AND two independent OR-groups together; pass "(" and ")" as their own
+-AdvancedSearch array elements, never appended to a filter:value element with a space in the same string - the
+module's multi-word auto-quoting will otherwise swallow the closing paren into the previous value and produce
+an OQL syntax error server-side
+C:\PS&gt; Search-OnypheInfo -AdvancedSearch @("(","?domain:sovcloud-core.fr","?domain:sovcloud-api.fr",")","(","?tld:fr",")") -Category resolver</dev:code>
         <dev:remarks>
           <maml:para></maml:para>
         </dev:remarks>

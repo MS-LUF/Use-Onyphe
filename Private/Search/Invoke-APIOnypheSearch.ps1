@@ -85,6 +85,11 @@
 	  .EXAMPLE
 	  limit output fields, request a larger page size, and ask for the matched-filter/calculated-fields metadata
 	  C:\PS> Invoke-APIOnypheSearch -SearchValue RU -Category threatlist -SearchFilter country -Size 500 -TrackQuery -Calculated
+
+	  .EXAMPLE
+	  OQLv2 condition groups (requires an ASM-level or Ctiscan licence) - pass "(" and ")" as their own
+	  -AdvancedSearch array elements, never appended to a filter:value element with a space in the same string
+	  C:\PS> Invoke-APIOnypheSearch -AdvancedSearch @("(","?domain:sovcloud-core.fr","?domain:sovcloud-api.fr",")","(","?tld:fr",")") -category resolver
 	#>
 	[cmdletbinding()]
     param(

@@ -13,6 +13,13 @@ https://www.onyphe.io/documentation/api
 
 (c) 2018-2026 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
 
+## Notes version (2.1.3) - OQLv2 condition-group documentation :
+ - documented and live-verified (against a real ASM-level/Ctiscan-licensed account) that OQLv2 condition-group syntax - grouping conditions in parentheses to AND two OR-groups together, e.g. `category:resolver ( ?domain:a.com ?domain:b.com ) ( ?tld:fr )` - already works today through `Search-OnypheInfo`/`Export-OnypheInfo`'s existing `-AdvancedSearch` plain-text pass-through, same as the `!`/`?` NOT/OR prefixes documented in 2.1.0.
+ - the one real usage gotcha: pass `"("` and `")"` as their own `-AdvancedSearch` array elements, never combined with a `filter:value` pair in the same string (e.g. `"( domain:a.com )"`) - the module's existing multi-word auto-quoting will otherwise treat the space before the closing paren as part of the value and quote it in, producing a real OQL syntax error server-side (`"missing closing group after"`).
+
+## Notes version (2.1.2) - Discovery API full category coverage :
+ - `Export-OnypheDiscoveryInfo` now supports all 20 Discovery categories a Griffin View subscription can expose (`ctiscan`, `ctiurl`, `ctl`, `datascan`, `datashot`, `domain`, `geoloc`, `hostname`, `inetnum`, `ip`, `onionscan`, `onionshot`, `pastries`, `resolver`, `riskscan`, `sniffer`, `threatlist`, `topsite`, `vulnscan`, `whois`), up from 3 (`datascan`/`resolver`/`vulnscan`). 
+
 ## Notes version (2.1.1) - Search/Export OQL transport fix :
  - fixed `Search-OnypheInfo`/`Export-OnypheInfo` (and their private `Invoke-APIOnyphe{Search,Export}` wrappers) silently dropping everything after the first `?` in a query. The OQL string used to be embedded directly in the URL *path* (`v2/search/category:X <oql>`); since `?` is the URI query-string delimiter, an OQL `?field:value` OR-prefix silently truncated the request there - the truncated remainder was still sent, as a bogus query string the server ignored, with no error. Requests are now built as `v2/search/?q=<oql>&...` / `v2/export/?q=<oql>&...`, matching Onyphe's current documented endpoint shape, with the `q` value properly percent-encoded via `EscapeDataString`.
  - `Invoke-OnypheAPIV2` now emits a `Write-Warning` when the server returns fewer results per page than requested via `-Size` (e.g. asking for `-Size 1000` and silently getting the default page size of 10 back) instead of failing silently. The real per-account page-size ceiling is lower than the documented `1-10000` range and isn't exposed by the API, so `-Size` stays best-effort rather than guaranteed - use `-Page` to walk additional results instead of assuming a larger `-Size` was honored.
@@ -20,9 +27,11 @@ https://www.onyphe.io/documentation/api
 ## Notes version (2.1.0) - Discovery API and OQL query-language gap-closing release :
  - added the Discovery API (**requires a Griffin View subscription on Onyphe**): `Export-OnypheDiscoveryInfo` (alias `Export-OnypheBulkDiscovery`) runs a file of OQL queries (one per line) in bulk against the `datascan`, `resolver`, or `vulnscan` category and streams back the JSON results; `Get-OnypheDiscoveryCategories` lists which Discovery categories your account has access to
  - added `-Size`, `-TrackQuery`, and `-Calculated` to `Search-OnypheInfo`/`Invoke-APIOnypheSearch` (`-TrackQuery`/`-Calculated` also on `Export-OnypheInfo`/`Invoke-APIOnypheExport`) to control result page size and request Onyphe's matched-filter/computed-field metadata
+ - documented (with corrected examples) that OQL's `!field`/`?field` NOT/OR prefixes, and combining multiple `-wildcard`/`-regexp` conditions, already work today via plain-text entries in `-AdvancedSearch`/`-AdvancedFilter` - no new parameters were needed, the previous examples for multi-condition wildcard/regexp were just wrong about the syntax
  - bug fixes:
    - `Invoke-OnypheAPIV2`'s error handling only tried to extract the real Onyphe error message for HTTP status 429/400 (and a dead 200 branch); every other error status (401/403/404/500/503/...) silently discarded the actual API error and returned a generic one instead - it now always attempts to extract the real error message first
    - fixed an `-AdvancedFilter` quoting bug where a function value containing more than one comma (e.g. a value needing quoting after a literal comma) could silently lose its quoting past the 2nd comma-separated segment
+   - removed a dead, no-op leftover line in the datascan simple API wrapper
  - added a `-TimeoutSec` parameter to `Invoke-OnypheAPIV2` (default 100s) - HTTP requests had no timeout before, so a broad/slow query (e.g. an unpaged `Export-OnypheInfo` request) could hang indefinitely
 
 ## Notes version (2.0.1) - major internal refactor and security/quality release :
@@ -43,6 +52,8 @@ https://www.onyphe.io/documentation/api
    - fixed an internal error-handling bug that could mask the real HTTP error message on certain API error responses
    - fixed the bulk pastries API being mislabeled internally as `"patries"`
  - added `-WhatIf`/`-Confirm` support to `Set-OnypheAPIKey`, `Set-OnypheProxy`, `Set-OnypheAlertInfo`, and `Update-OnypheFacetsFilters`
+ - configuration file writes are now atomic (crash-safe), and a corrupted configuration file now produces a clear error instead of an opaque JSON-parsing exception
+ - consolidated 20 near-identical bulk file-upload internal functions into one shared implementation, reducing duplicated code and the risk of the kind of copy/paste drift that caused some of the bugs above
 
 ## Notes version (1.3) :
  - add whois simple API

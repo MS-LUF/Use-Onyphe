@@ -80,6 +80,11 @@
 		  .EXAMPLE
 		  ask for the matched-filter/calculated-fields metadata on every exported result
 		  C:\PS> Invoke-APIOnypheExport -SearchValue RU -Category threatlist -SearchFilter country -TrackQuery -Calculated -OutFile .\out.json
+
+		  .EXAMPLE
+		  OQLv2 condition groups (requires an ASM-level or Ctiscan licence) - pass "(" and ")" as their own
+		  -AdvancedSearch array elements, never appended to a filter:value element with a space in the same string
+		  C:\PS> Invoke-APIOnypheExport -AdvancedSearch @("(","?domain:sovcloud-core.fr","?domain:sovcloud-api.fr",")","(","?tld:fr",")") -category resolver -OutFile .\out.json
 		#>
 		[cmdletbinding()]
 		param(

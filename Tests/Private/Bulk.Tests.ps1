@@ -38,9 +38,26 @@ Describe 'Private/Bulk wrappers' -Tag 'Unit' {
 			@{ Function = 'Invoke-APIBulkSimpleBestOnypheInetnum'; ExpectedRequest = 'v2/bulk/simple/inetnum/best/ip'; ExpectedAPIInfo = 'bulk/simple/inetnum/best/ip' }
 			@{ Function = 'Invoke-APIBulkSimpleBestOnypheThreatlist'; ExpectedRequest = 'v2/bulk/simple/threatlist/best/ip'; ExpectedAPIInfo = 'bulk/simple/threatlist/best/ip' }
 			@{ Function = 'Invoke-APIBulkSimpleBestOnypheWhois'; ExpectedRequest = 'v2/bulk/simple/whois/best/ip'; ExpectedAPIInfo = 'bulk/simple/whois/best/ip' }
+			@{ Function = 'Invoke-APIBulkDiscoveryOnypheCtiscan'; ExpectedRequest = 'v2/bulk/discovery/ctiscan/asset'; ExpectedAPIInfo = 'bulk/discovery/ctiscan/asset' }
+			@{ Function = 'Invoke-APIBulkDiscoveryOnypheCtiurl'; ExpectedRequest = 'v2/bulk/discovery/ctiurl/asset'; ExpectedAPIInfo = 'bulk/discovery/ctiurl/asset' }
+			@{ Function = 'Invoke-APIBulkDiscoveryOnypheCtl'; ExpectedRequest = 'v2/bulk/discovery/ctl/asset'; ExpectedAPIInfo = 'bulk/discovery/ctl/asset' }
 			@{ Function = 'Invoke-APIBulkDiscoveryOnypheDatascan'; ExpectedRequest = 'v2/bulk/discovery/datascan/asset'; ExpectedAPIInfo = 'bulk/discovery/datascan/asset' }
+			@{ Function = 'Invoke-APIBulkDiscoveryOnypheDatashot'; ExpectedRequest = 'v2/bulk/discovery/datashot/asset'; ExpectedAPIInfo = 'bulk/discovery/datashot/asset' }
+			@{ Function = 'Invoke-APIBulkDiscoveryOnypheDomain'; ExpectedRequest = 'v2/bulk/discovery/domain/asset'; ExpectedAPIInfo = 'bulk/discovery/domain/asset' }
+			@{ Function = 'Invoke-APIBulkDiscoveryOnypheGeoloc'; ExpectedRequest = 'v2/bulk/discovery/geoloc/asset'; ExpectedAPIInfo = 'bulk/discovery/geoloc/asset' }
+			@{ Function = 'Invoke-APIBulkDiscoveryOnypheHostname'; ExpectedRequest = 'v2/bulk/discovery/hostname/asset'; ExpectedAPIInfo = 'bulk/discovery/hostname/asset' }
+			@{ Function = 'Invoke-APIBulkDiscoveryOnypheInetnum'; ExpectedRequest = 'v2/bulk/discovery/inetnum/asset'; ExpectedAPIInfo = 'bulk/discovery/inetnum/asset' }
+			@{ Function = 'Invoke-APIBulkDiscoveryOnypheIp'; ExpectedRequest = 'v2/bulk/discovery/ip/asset'; ExpectedAPIInfo = 'bulk/discovery/ip/asset' }
+			@{ Function = 'Invoke-APIBulkDiscoveryOnypheOnionscan'; ExpectedRequest = 'v2/bulk/discovery/onionscan/asset'; ExpectedAPIInfo = 'bulk/discovery/onionscan/asset' }
+			@{ Function = 'Invoke-APIBulkDiscoveryOnypheOnionshot'; ExpectedRequest = 'v2/bulk/discovery/onionshot/asset'; ExpectedAPIInfo = 'bulk/discovery/onionshot/asset' }
+			@{ Function = 'Invoke-APIBulkDiscoveryOnyphePastries'; ExpectedRequest = 'v2/bulk/discovery/pastries/asset'; ExpectedAPIInfo = 'bulk/discovery/pastries/asset' }
 			@{ Function = 'Invoke-APIBulkDiscoveryOnypheResolver'; ExpectedRequest = 'v2/bulk/discovery/resolver/asset'; ExpectedAPIInfo = 'bulk/discovery/resolver/asset' }
+			@{ Function = 'Invoke-APIBulkDiscoveryOnypheRiskscan'; ExpectedRequest = 'v2/bulk/discovery/riskscan/asset'; ExpectedAPIInfo = 'bulk/discovery/riskscan/asset' }
+			@{ Function = 'Invoke-APIBulkDiscoveryOnypheSniffer'; ExpectedRequest = 'v2/bulk/discovery/sniffer/asset'; ExpectedAPIInfo = 'bulk/discovery/sniffer/asset' }
+			@{ Function = 'Invoke-APIBulkDiscoveryOnypheThreatlist'; ExpectedRequest = 'v2/bulk/discovery/threatlist/asset'; ExpectedAPIInfo = 'bulk/discovery/threatlist/asset' }
+			@{ Function = 'Invoke-APIBulkDiscoveryOnypheTopsite'; ExpectedRequest = 'v2/bulk/discovery/topsite/asset'; ExpectedAPIInfo = 'bulk/discovery/topsite/asset' }
 			@{ Function = 'Invoke-APIBulkDiscoveryOnypheVulnscan'; ExpectedRequest = 'v2/bulk/discovery/vulnscan/asset'; ExpectedAPIInfo = 'bulk/discovery/vulnscan/asset' }
+			@{ Function = 'Invoke-APIBulkDiscoveryOnypheWhois'; ExpectedRequest = 'v2/bulk/discovery/whois/asset'; ExpectedAPIInfo = 'bulk/discovery/whois/asset' }
 		)
 
 		It '<Function> calls Invoke-OnypheAPIV2 with the expected request/APIInfo/file/Stream/OutFile and APIKeyrequired $true' -TestCases $cases {

@@ -55,6 +55,29 @@ Describe 'Private/Search wrappers' -Tag 'Unit' {
 				}
 			}
 
+			It 'passes OQLv2 condition-group parentheses through untouched when "(" and ")" are their own -AdvancedSearch elements' {
+				Mock Invoke-OnypheAPIV2 { [pscustomobject]@{ status = 'ok' } }
+
+				Invoke-APIOnypheSearch -SearchType 'resolver' -AdvancedSearch @('(', '?domain:a.com', '?domain:b.com', ')', '(', '?tld:fr', ')') | Out-Null
+
+				Should -Invoke Invoke-OnypheAPIV2 -Times 1 -Exactly -ParameterFilter {
+					($request -eq 'v2/search/') -and
+					($QueryValue -eq 'category:resolver ( ?domain:a.com ?domain:b.com ) ( ?tld:fr )')
+				}
+			}
+
+			It 'documents the known gotcha: an OQLv2 group and a filter:value pair combined in one -AdvancedSearch string element get corrupted by multi-word auto-quoting' {
+				Mock Invoke-OnypheAPIV2 { [pscustomobject]@{ status = 'ok' } }
+
+				# "(" and the condition must be separate array elements (see the test above) - combining them
+				# in one element like this is a real, documented footgun, not a supported usage.
+				Invoke-APIOnypheSearch -SearchType 'resolver' -AdvancedSearch @('( domain:a.com )') | Out-Null
+
+				Should -Invoke Invoke-OnypheAPIV2 -Times 1 -Exactly -ParameterFilter {
+					$QueryValue -eq 'category:resolver ( domain:"a.com )"'
+				}
+			}
+
 			It 'appends a page query parameter when -Page is supplied' {
 				Mock Invoke-OnypheAPIV2 { [pscustomobject]@{ status = 'ok' } }
 
@@ -190,6 +213,17 @@ Describe 'Private/Search wrappers' -Tag 'Unit' {
 
 				Should -Invoke Invoke-OnypheAPIV2 -Times 1 -Exactly -ParameterFilter {
 					(@($APIInput)[0]) -eq '-orwildcard:domain,g?ogle.com -orwildcard:domain,googl?.com'
+				}
+			}
+
+			It 'passes OQLv2 condition-group parentheses through untouched when "(" and ")" are their own -AdvancedSearch elements' {
+				Mock Invoke-OnypheAPIV2 { [pscustomobject]@{ status = 'ok' } }
+
+				Invoke-APIOnypheExport -SearchType 'resolver' -AdvancedSearch @('(', '?domain:a.com', '?domain:b.com', ')', '(', '?tld:fr', ')') -OutFile $script:OutFilePath | Out-Null
+
+				Should -Invoke Invoke-OnypheAPIV2 -Times 1 -Exactly -ParameterFilter {
+					($request -eq 'v2/export/') -and
+					($QueryValue -eq 'category:resolver ( ?domain:a.com ?domain:b.com ) ( ?tld:fr )')
 				}
 			}
 		}
