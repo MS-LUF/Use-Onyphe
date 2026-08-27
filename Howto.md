@@ -1,9 +1,9 @@
-![image](https://www.onyphe.io/img/logo-solo.png)
+<img src="https://www.onyphe.com/assets/img/logo/Onyphe-Logo-Official-Light-Theme.svg" alt="Onyphe" style="width:40%;">
 
 # Use-Onyphe - How-To
 
 ## ChangeLog
-This documentation has been updated to take into account **new features available with v2.1.0, including the Discovery API and new search-result-shaping parameters (`-Size`, `-TrackQuery`, `-Calculated`)**. Enjoy your Onyphe stuff with Power[Shell](Of Love)
+This documentation has been updated to take into account **new features available up to v2.2.0**: the Discovery API and new search-result-shaping parameters (`-Size`, `-TrackQuery`, `-Calculated`) from v2.1.0, the Discovery API's full 20-category coverage from v2.1.2, OQLv2 condition-group syntax from v2.1.3, and the ASD (Attack Surface Discovery) APIv1 integration from v2.2.0. Enjoy your Onyphe stuff with Power[Shell](Of Love)
 
 ## Intro Onyphe
 Onyphe.io provides data about IP address space and publicly available information in just one place.
@@ -14,7 +14,7 @@ To request it : https://www.onyphe.io/login
 More info about available APIs :
 https://www.onyphe.io/documentation/api
 
-(c) 2018-2026 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
+(c) 2018-2021 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
 
 ## APIs v1 and v2
 Since a few weeks now, new APIs are available in "v2". Main differences between v1 and v2 APIs are :
@@ -245,6 +245,8 @@ Get-help is available on all functions, for instance, if you want to consult the
     - All simple APIs are also available through a bulk mode using this cmdlet
  - Export-OnypheDiscoveryInfo (or Export-OnypheBulkDiscovery) to run a file of OQL queries (one per line) in bulk against the Discovery API and download the JSON results
     - **requires a Griffin View subscription on Onyphe** - without one, no Discovery category will be available to you
+ - Get-OnypheASDInfo to use the ASD (Attack Surface Discovery) APIv1 - domain/certificate/DNS enumeration endpoints
+    - **requires a Griffin View or Griffin View ASM Edition subscription with a non-commercial use licence** - see Get-OnypheUserInfo's `asd.stdapis` property
  
 Find hereunder several use cases for all API examples documented on https://www.onyphe.io/documentation/api
 
@@ -459,7 +461,37 @@ API v2/bulk/discovery/datascan : run a file of OQL queries (one per line) in bul
     C:\PS> Export-OnypheDiscoveryInfo -FilePath .\myqueries.txt -SaveInfoAsFile .\results.json -Category datascan
     C:\PS> Export-OnypheDiscoveryInfo -FilePath .\myqueries.txt -Category datascan
 ```
-the resolver and vulnscan categories are also available the same way (`-Category resolver` / `-Category vulnscan`); use `Get-OnypheDiscoveryCategories` to see which Discovery categories your account currently has access to.
+as of v2.1.2, all 20 Discovery categories a Griffin View subscription can expose are available the same way, not just datascan: `ctiscan`, `ctiurl`, `ctl`, `datashot`, `domain`, `geoloc`, `hostname`, `inetnum`, `ip`, `onionscan`, `onionshot`, `pastries`, `resolver`, `riskscan`, `sniffer`, `threatlist`, `topsite`, `vulnscan`, `whois` (just swap `-Category datascan` for any of these); use `Get-OnypheDiscoveryCategories` to see which Discovery categories your account currently has access to.
+
+## ASD (Attack Surface Discovery) APIs
+Since v2.2.0, `Get-OnypheASDInfo` wraps 9 of Onyphe's BETA "standard" ASD APIv1 endpoints - domain/certificate/DNS enumeration helpers, distinct from the Search/Discovery categories above. **These require a Griffin View or Griffin View ASM Edition subscription with a non-commercial use licence** - check `(Get-OnypheUserInfo).results.asd.stdapis` before use; `Get-OnypheASDAPIName` lists the implemented type names (`domaintld`, `domainwildcard`, `domaincertso`, `certsodomain`, `certsowildcard`, `dnsdomainns`, `dnsdomainmx`, `dnsdomainsoa`, `dnsdomainexist`).
+
+API v1/asd/domain/tld : discover related domains across different TLDs for a given domain
+```
+    C:\PS> Get-OnypheASDInfo -ASDAPIType domaintld -Value onyphe.io
+```
+API v1/asd/certso/domain : discover certificate subject.organization value(s) linked to a domain
+```
+    C:\PS> Get-OnypheASDInfo -ASDAPIType certsodomain -Value onyphe.io
+```
+API v1/asd/domain/certso : discover domain(s) linked to a certificate subject.organization value - note this is the one endpoint that takes an organization name rather than a domain in -Value
+```
+    C:\PS> Get-OnypheASDInfo -ASDAPIType domaincertso -Value "ONYPHE"
+```
+API v1/asd/dns/domain/exist : check whether one or more domains exist (passive DNS history / live brute-force)
+```
+    C:\PS> Get-OnypheASDInfo -ASDAPIType dnsdomainexist -Value @("onyphe.io","example.org")
+```
+API v1/asd/dns/domain/ns, /mx, /soa : live DNS lookups against a domain (same -Value shape, just swap -ASDAPIType)
+```
+    C:\PS> Get-OnypheASDInfo -ASDAPIType dnsdomainns -Value onyphe.io
+```
+you can narrow results and disable Onyphe's backend false-positive filtering with -IncludePattern/-ExcludePattern/-Untrusted (not supported by `dnsdomainexist`), and request one-JSON-object-per-line output with -AsLines :
+```
+    C:\PS> Get-OnypheASDInfo -ASDAPIType domaintld -Value onyphe.io -ExcludePattern "test" -Untrusted -AsLines
+```
+Note: the "advanced" Pivot Query ASD API (`asd.advapis`) is not implemented yet in this module, and the ASD APIs' `astask` background-task mode is not exposed - see README.md's v2.2.0 notes for why.
+
 ## E-mail alerting system
 Since a few weeks now, 3 new APIs (V2) are available to manage automatic e-mail alerts for your Onyphe account. It means you can automate search request at Onyphe server side and received an e-mail alerts when new events are available (especially when using timeline filter functions in your request).
 Of course this new feature requires an API Key (non free).
@@ -544,6 +576,15 @@ to combine several wildcard or regexp conditions together (an OR between them), 
 ```
     C:\PS> Search-OnypheInfo -AdvancedFilter @("orwildcard:domain,g?ogle.com","orwildcard:domain,googl?.com") -Category resolver
 ```
+## OQLv2 condition groups
+**Requires an ASM-level or Ctiscan licence** - check `(Get-OnypheUserInfo).results.oqlversion` (2 means it's available to you). You can group conditions in parentheses to AND two independent OR-groups together, for instance all resolver entries matching one of two domains, restricted to the .fr TLD :
+```
+    C:\PS> Search-OnypheInfo -AdvancedSearch @("(","?domain:sovcloud-core.fr","?domain:sovcloud-api.fr",")","(","?tld:fr",")") -Category resolver
+```
+**Important**: pass `"("` and `")"` as their own -AdvancedSearch array elements, never combined with a filter:value pair in the same string (e.g. `"( domain:a.com )"`). The module's own multi-word auto-quoting will otherwise treat the space before the closing paren as part of the value and quote it in, producing a real OQL syntax error server-side. This works the same way on Export-OnypheInfo :
+```
+    C:\PS> Export-OnypheInfo -AdvancedSearch @("(","?domain:sovcloud-core.fr","?domain:sovcloud-api.fr",")","(","?tld:fr",")") -Category resolver -SaveInfoAsFile .\myexport.json
+```
 ## Result size, matched-filter tracking, and calculated fields
 by default a search page returns 100 results; you can request a different page size (up to 10000) with -Size :
 ```
@@ -592,7 +633,7 @@ to do so use the function Export-OnypheInfoToFile :
 you can now use bulk summary / simple APIs to send several requests at a time based on a txt input file containing one entry per line (no space, no coma etc...)
 3 bulk summary apis are available : ip, host, domain
 17 bulk simple apis (including best) are available : ctl,datascan,datashot,geoloc,inetnum,pastries,resolver,sniffer,synscan,threatlist,topsite,vulnscan,whois
-3 bulk discovery apis are also available (**Griffin View subscription required**) : datascan, resolver, vulnscan - see the Discovery API example above, the input file contains one OQL query per line instead of one IP/domain/hostname per line
+20 bulk discovery apis are also available as of v2.1.2 (**Griffin View subscription required**) - see the Discovery API example above, the input file contains one OQL query per line instead of one IP/domain/hostname per line; use `Get-OnypheDiscoveryCategories` to see which ones your account has access to
 the output is not an object but a json flat file.
 **Only the 10 latest results per category will be returned**
 find below an example to get summary info for ten IPs contained in myfile.txt

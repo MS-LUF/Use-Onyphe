@@ -45,7 +45,10 @@
 		  	  [string]$OutFile,
 		  [parameter(Mandatory=$false)]
 		  [ValidateRange(1,[int]::MaxValue)]
-			  [int]$TimeoutSec = 100
+			  [int]$TimeoutSec = 100,
+		  [parameter(Mandatory=$false)]
+		  [ValidateNotNullOrEmpty()]
+			  [string]$APIVersion = "2"
 	)
 	Process {
 	  if ($UseBetaFeatures) {
@@ -210,7 +213,7 @@
 			  $errorvalue.PSObject.TypeNames.Insert(0,"PSOnyphe")
 			  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-API_info' -Value $APIInfo
 			  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-API_input' -Value $APIInput
-			  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-API_version' -Value "2"
+			  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-API_version' -Value $APIVersion
 			  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-key_required' -Value $APIKeyrequired
 			  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-Request_Date' -Value $DateRequest
 			  $errorvalue | add-member -MemberType NoteProperty -Name 'cli-func_input' -value $FuncInput
@@ -224,7 +227,7 @@
 				$tempobj.PSObject.TypeNames.Insert(0,"PSOnyphe")
 				$tempobj | add-member -MemberType NoteProperty -Name 'cli-API_info' -Value $APIInfo
 				$tempobj | add-member -MemberType NoteProperty -Name 'cli-API_input' -Value $APIInput
-				$tempobj | add-member -MemberType NoteProperty -Name 'cli-API_version' -Value "2"
+				$tempobj | add-member -MemberType NoteProperty -Name 'cli-API_version' -Value $APIVersion
 				$tempobj | add-member -MemberType NoteProperty -Name 'cli-key_required' -Value $APIKeyrequired
 				$tempobj | add-member -MemberType NoteProperty -Name 'cli-Request_Date' -Value $DateRequest
 				$tempobj | add-member -MemberType NoteProperty -Name 'cli-func_input' -value $FuncInput

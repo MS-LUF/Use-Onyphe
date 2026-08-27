@@ -12,7 +12,7 @@
 RootModule = 'use-onyphe.psm1'
 
 # Numero de version de ce module.
-ModuleVersion = '2.1.3'
+ModuleVersion = '2.2.0'
 
 # editions PS prises en charge
 # CompatiblePSEditions = @()
@@ -69,7 +69,7 @@ PowerShellVersion = '4.0'
 # NestedModules = @()
 
 # Fonctions a exporter a partir de ce module. Pour de meilleures performances, neutilisez pas de caracteres generiques et ne supprimez pas leentree. Utilisez un tableau vide si vous neavez aucune fonction a exporter.
-FunctionsToExport = 'Export-OnypheBulkInfo','Export-OnypheBulkSummaryInfo','Export-OnypheDataShot','Export-OnypheDiscoveryInfo','Export-OnypheInfo','Export-OnypheInfoToFile','Get-OnypheAlertInfo','Get-OnypheCliFacets','Get-OnypheDiscoveryCategories','Get-OnypheInfo','Get-OnypheInfoFromCSV','Get-OnypheSearchCategories','Get-OnypheSearchFilters','Get-OnypheSearchFunctions','Get-OnypheSimpleAPIName','Get-OnypheBulkCategories','Get-OnypheBulkAPIType','Get-OnypheStatsFromObject','Get-OnypheSummary','Get-OnypheSummaryAPIName','Get-OnypheUserInfo','Import-OnypheEncryptedIKey','Search-OnypheInfo','Set-OnypheAlertInfo','Set-OnypheAPIKey','Set-OnypheProxy','Update-OnypheFacetsFilters', 'Get-OnypheSimpleBestAPIName'
+FunctionsToExport = 'Export-OnypheBulkInfo','Export-OnypheBulkSummaryInfo','Export-OnypheDataShot','Export-OnypheDiscoveryInfo','Export-OnypheInfo','Export-OnypheInfoToFile','Get-OnypheAlertInfo','Get-OnypheASDAPIName','Get-OnypheASDInfo','Get-OnypheCliFacets','Get-OnypheDiscoveryCategories','Get-OnypheInfo','Get-OnypheInfoFromCSV','Get-OnypheSearchCategories','Get-OnypheSearchFilters','Get-OnypheSearchFunctions','Get-OnypheSimpleAPIName','Get-OnypheBulkCategories','Get-OnypheBulkAPIType','Get-OnypheStatsFromObject','Get-OnypheSummary','Get-OnypheSummaryAPIName','Get-OnypheUserInfo','Import-OnypheEncryptedIKey','Search-OnypheInfo','Set-OnypheAlertInfo','Set-OnypheAPIKey','Set-OnypheProxy','Update-OnypheFacetsFilters', 'Get-OnypheSimpleBestAPIName'
                     
 # Applets de commande a exporter a partir de ce module. Pour de meilleures performances, neutilisez pas de caracteres generiques et ne supprimez pas l entree. Utilisez un tableau vide si vous neavez aucune applet de commande e exporter.
 CmdletsToExport = @()
@@ -107,7 +107,7 @@ PrivateData = @{
         IconUri = 'https://www.onyphe.io/img/logo-solo.png'
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'v2.1.3 : documents OQLv2 condition-group syntax (parentheses) for Search-OnypheInfo/Export-OnypheInfo, confirmed live-working on this account (requires an ASM-level or Ctiscan licence) - "(" and ")" must be passed as their own -AdvancedSearch array elements, not combined with a filter:value pair in one string, or the existing multi-word auto-quoting corrupts the query. No code change, no breaking changes since v2.1.2. See README.md for the full list.'
+        ReleaseNotes = 'v2.2.0 : adds Get-OnypheASDInfo/Get-OnypheASDAPIName, wrapping the 9 licensed "standard" ASD (Attack Surface Discovery) APIv1 endpoints (domaintld, domainwildcard, domaincertso, certsodomain, certsowildcard, dnsdomainns, dnsdomainmx, dnsdomainsoa, dnsdomainexist) - BETA endpoints requiring a Griffin View/ASM Edition non-commercial licence. The advanced Pivot Query ASD API is not yet implemented (not licensed on the account used for verification, deferred until it can be live-tested). No breaking changes since v2.1.3. See README.md for the full list.'
         # External dependent modules of this module
         # ExternalModuleDependencies = ''
 

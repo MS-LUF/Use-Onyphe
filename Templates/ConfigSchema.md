@@ -1,4 +1,4 @@
-![image](https://www.onyphe.io/img/logo-solo.png)
+<img src="https://www.onyphe.com/assets/img/logo/Onyphe-Logo-Official-Light-Theme.svg" alt="Onyphe" style="width:40%;">
 
 # Use-Onyphe configuration file
 

@@ -1,4 +1,4 @@
-![image](https://www.onyphe.io/img/logo-solo.png)
+<img src="https://www.onyphe.com/assets/img/logo/Onyphe-Logo-Official-Light-Theme.svg" alt="Onyphe" style="width:40%;">
 
 # Use-Onyphe
 Simple PowerShell module to use Onyphe.io API
@@ -13,21 +13,26 @@ https://www.onyphe.io/documentation/api
 
 (c) 2018-2026 lucas-cueff.com Distributed under Artistic Licence 2.0 (https://opensource.org/licenses/artistic-license-2.0).
 
+## Notes version (2.2.0) - ASD (Attack Surface Discovery) APIv1 integration :
+ - new `Get-OnypheASDInfo -ASDAPIType <type> -Value <domain(s) or certso value(s)>` cmdlet wraps the 9 "standard" (stdapis) ASD APIv1 endpoints: `domaintld`, `domainwildcard`, `domaincertso`, `certsodomain`, `certsowildcard`, `dnsdomainns`, `dnsdomainmx`, `dnsdomainsoa`, `dnsdomainexist`. These are BETA endpoints (`POST /api/v1/asd/...`) requiring a Griffin View or Griffin View ASM Edition subscription with a non-commercial use licence - check `Get-OnypheUserInfo`'s `asd.stdapis` property before use. New `Get-OnypheASDAPIName` lists the 9 implemented type names.
+ - unlike every other API family in this module, ASD endpoints are **not** discoverable via `/v2/user`'s `apis` metadata array (confirmed empirically against a live Griffin View account - it lists zero `asd/*` entries) - the type list is hardcoded in `Get-OnypheASDAPIName` instead of derived dynamically.
+ - reuses the existing `Invoke-OnypheAPIV2` HTTP transport as-is: live-tested that the module's existing `Authorization: apikey` header (its v2 auth scheme) also authenticates successfully against these v1 endpoints, even though Onyphe's own ASD docs show `X-Api-Key` in their curl examples - no new auth scheme needed. Only change to the shared transport: `cli-API_version` is now parametrized (`-APIVersion`, defaults to `"2"`) instead of hardcoded, so ASD calls correctly report `"1"`.
+
 ## Notes version (2.1.3) - OQLv2 condition-group documentation :
- - documented and live-verified (against a real ASM-level/Ctiscan-licensed account) that OQLv2 condition-group syntax - grouping conditions in parentheses to AND two OR-groups together, e.g. `category:resolver ( ?domain:a.com ?domain:b.com ) ( ?tld:fr )` - already works today through `Search-OnypheInfo`/`Export-OnypheInfo`'s existing `-AdvancedSearch` plain-text pass-through, same as the `!`/`?` NOT/OR prefixes documented in 2.1.0.
- - the one real usage gotcha: pass `"("` and `")"` as their own `-AdvancedSearch` array elements, never combined with a `filter:value` pair in the same string (e.g. `"( domain:a.com )"`) - the module's existing multi-word auto-quoting will otherwise treat the space before the closing paren as part of the value and quote it in, producing a real OQL syntax error server-side (`"missing closing group after"`).
+ - documented and live-verified (against a real ASM-level/Ctiscan-licensed account) that OQLv2 condition-group syntax - grouping conditions in parentheses to AND two OR-groups together, e.g. `category:resolver ( ?domain:a.com ?domain:b.com ) ( ?tld:fr )` - already works today through `Search-OnypheInfo`/`Export-OnypheInfo`'s existing `-AdvancedSearch` plain-text pass-through, same as the `!`/`?` NOT/OR prefixes documented in 2.1.0. 
 
 ## Notes version (2.1.2) - Discovery API full category coverage :
- - `Export-OnypheDiscoveryInfo` now supports all 20 Discovery categories a Griffin View subscription can expose (`ctiscan`, `ctiurl`, `ctl`, `datascan`, `datashot`, `domain`, `geoloc`, `hostname`, `inetnum`, `ip`, `onionscan`, `onionshot`, `pastries`, `resolver`, `riskscan`, `sniffer`, `threatlist`, `topsite`, `vulnscan`, `whois`), up from 3 (`datascan`/`resolver`/`vulnscan`). 
+ - `Export-OnypheDiscoveryInfo` now supports all 20 Discovery categories a Griffin View subscription can expose (`ctiscan`, `ctiurl`, `ctl`, `datascan`, `datashot`, `domain`, `geoloc`, `hostname`, `inetnum`, `ip`, `onionscan`, `onionshot`, `pastries`, `resolver`, `riskscan`, `sniffer`, `threatlist`, `topsite`, `vulnscan`, `whois`), up from 3 (`datascan`/`resolver`/`vulnscan`). `Get-OnypheDiscoveryCategories` already derived its list dynamically from the account's `/v2/user` metadata, so it correctly advertised all 20 categories as valid `-Category` values - but 17 of them had no `Invoke-APIBulkDiscoveryOnyphe<Category>` wrapper behind them and threw `"Discovery API X not implemented yet in this version of Use-Onyphe pwsh module"` when selected. Found and fixed via live testing against a real Griffin View key (the mocked-only test suite couldn't have caught this, since it stubs `Get-OnypheDiscoveryCategories`'s return value).
 
 ## Notes version (2.1.1) - Search/Export OQL transport fix :
- - fixed `Search-OnypheInfo`/`Export-OnypheInfo` (and their private `Invoke-APIOnyphe{Search,Export}` wrappers) silently dropping everything after the first `?` in a query. The OQL string used to be embedded directly in the URL *path* (`v2/search/category:X <oql>`); since `?` is the URI query-string delimiter, an OQL `?field:value` OR-prefix silently truncated the request there - the truncated remainder was still sent, as a bogus query string the server ignored, with no error. Requests are now built as `v2/search/?q=<oql>&...` / `v2/export/?q=<oql>&...`, matching Onyphe's current documented endpoint shape, with the `q` value properly percent-encoded via `EscapeDataString`.
+ - fixed `Search-OnypheInfo`/`Export-OnypheInfo` (and their private `Invoke-APIOnyphe{Search,Export}` wrappers) silently dropping everything after the first `?` in a query. The OQL string used to be embedded directly in the URL *path* (`v2/search/category:X <oql>`); since `?` is the URI query-string delimiter, an OQL `?field:value` OR-prefix silently truncated the request there - the truncated remainder was still sent, as a bogus query string the server ignored, with no error. Requests are now built as `v2/search/?q=<oql>&...` / `v2/export/?q=<oql>&...`, matching Onyphe's current documented endpoint shape, with the `q` value properly percent-encoded via `EscapeDataString`. Live-verified: a 4-domain OR query (`?domain:a ?domain:b ?domain:c ?domain:d`) that previously returned only the first domain's results now returns the correct union across all four.
+   - found while fixing this (not a code change, just documented since it looks like a bug otherwise): OR only unions correctly when *every* alternative for a field is `?`-prefixed (`?domain:a ?domain:b`) - mixing one bare `domain:a` with `?domain:b` doesn't union them, it's read as `domain:a AND (domain:a OR domain:b)`, i.e. just `domain:a`.
  - `Invoke-OnypheAPIV2` now emits a `Write-Warning` when the server returns fewer results per page than requested via `-Size` (e.g. asking for `-Size 1000` and silently getting the default page size of 10 back) instead of failing silently. The real per-account page-size ceiling is lower than the documented `1-10000` range and isn't exposed by the API, so `-Size` stays best-effort rather than guaranteed - use `-Page` to walk additional results instead of assuming a larger `-Size` was honored.
 
 ## Notes version (2.1.0) - Discovery API and OQL query-language gap-closing release :
  - added the Discovery API (**requires a Griffin View subscription on Onyphe**): `Export-OnypheDiscoveryInfo` (alias `Export-OnypheBulkDiscovery`) runs a file of OQL queries (one per line) in bulk against the `datascan`, `resolver`, or `vulnscan` category and streams back the JSON results; `Get-OnypheDiscoveryCategories` lists which Discovery categories your account has access to
  - added `-Size`, `-TrackQuery`, and `-Calculated` to `Search-OnypheInfo`/`Invoke-APIOnypheSearch` (`-TrackQuery`/`-Calculated` also on `Export-OnypheInfo`/`Invoke-APIOnypheExport`) to control result page size and request Onyphe's matched-filter/computed-field metadata
- - documented (with corrected examples) that OQL's `!field`/`?field` NOT/OR prefixes, and combining multiple `-wildcard`/`-regexp` conditions, already work today via plain-text entries in `-AdvancedSearch`/`-AdvancedFilter` - no new parameters were needed, the previous examples for multi-condition wildcard/regexp were just wrong about the syntax
+ - documented (with corrected examples) that OQL's `!field`/`?field` NOT/OR prefixes, and combining multiple `-wildcard`/`-regexp` conditions, already work today via plain-text entries in `-AdvancedSearch`/`-AdvancedFilter` - no new parameters were needed, the previous examples for multi-condition wildcard/regexp were just wrong about the syntax (Onyphe repeats the function once per condition rather than packing multiple field/pattern pairs into one call)
  - bug fixes:
    - `Invoke-OnypheAPIV2`'s error handling only tried to extract the real Onyphe error message for HTTP status 429/400 (and a dead 200 branch); every other error status (401/403/404/500/503/...) silently discarded the actual API error and returned a generic one instead - it now always attempts to extract the real error message first
    - fixed an `-AdvancedFilter` quoting bug where a function value containing more than one comma (e.g. a value needing quoting after a literal comma) could silently lose its quoting past the 2nd comma-separated segment
@@ -39,6 +44,7 @@ https://www.onyphe.io/documentation/api
  - full internal refactor of the module into a `Public/`/`Private/<Layer>/` architecture (one file per cmdlet/helper); `Use-Onyphe.psm1` is now a thin loader. Same 26 public functions / 9 aliases (35 total) still exported — no change to the public command surface.
  - migrated persisted configuration from Clixml (`Use-Onyphe-Config.xml`, `Onyphe-Data-Model.xml`) to a single JSON file (`Use-Onyphe-Config.json` under `%home%\Use-Onyphe\`); an existing `.xml` file is auto-migrated to `.json` the first time the module runs
  - added opt-in logging via `Write-OnypheLog` (file or Windows Event Log, minimum-level filtering, redacts sensitive parameter values); every public cmdlet now logs its invocation
+ - added a full Pester unit-test suite: 238 tests covering every internal layer and every public cmdlet
  - security fixes:
    - the API key was written in cleartext to the `-Verbose` stream when calling the Onyphe API; the `Authorization` header is now redacted before logging
    - IP address parameters accepted values with a valid IP anywhere in the string (e.g. `"garbage8.8.8.8garbage"`) instead of requiring the whole value to be a valid IP; validation is now anchored and consolidated into one shared, tested helper instead of 19 duplicated copies
@@ -172,6 +178,8 @@ documentation in markdown available here : https://github.com/MS-LUF/Use-Onyphe/
 - Export-OnypheInfo
 - Export-OnypheInfoToFile
 - Get-OnypheAlertInfo
+- Get-OnypheASDAPIName
+- Get-OnypheASDInfo
 - Get-OnypheBulkAPIType
 - Get-OnypheBulkCategories
 - Get-OnypheCliFacets
