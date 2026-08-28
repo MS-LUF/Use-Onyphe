@@ -66,4 +66,18 @@ Describe 'Export-OnypheDiscoveryInfo' -Tag 'Unit' {
 		$missingPath = Join-Path $TestDrive 'does-not-exist.txt'
 		{ Export-OnypheDiscoveryInfo -FilePath $missingPath -Category datascan } | Should -Throw
 	}
+
+	It 'passes -Size through to the Invoke-APIBulkDiscoveryOnyphe<Category> function (Onyphe defaults to 100 results/query-line without it)' {
+		Export-OnypheDiscoveryInfo -FilePath $script:InFile -Category datascan -Size 10000 | Out-Null
+		Should -Invoke -ModuleName Use-Onyphe Invoke-APIBulkDiscoveryOnypheDatascan -Times 1 -Exactly -ParameterFilter {
+			$Size -eq 10000
+		}
+	}
+
+	It 'does not pass a Size value when -Size is not supplied' {
+		Export-OnypheDiscoveryInfo -FilePath $script:InFile -Category datascan | Out-Null
+		Should -Invoke -ModuleName Use-Onyphe Invoke-APIBulkDiscoveryOnypheDatascan -Times 1 -Exactly -ParameterFilter {
+			-not $Size
+		}
+	}
 }

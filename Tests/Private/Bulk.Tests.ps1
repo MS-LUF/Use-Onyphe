@@ -113,6 +113,26 @@ Describe 'Private/Bulk wrappers' -Tag 'Unit' {
 			{ Invoke-APIBulkSummaryOnypheIP -FilePath $script:InFile -OutFile $existingOutFile } | Should -Throw
 		}
 
+		It 'Invoke-APIBulkDiscoveryOnypheRiskscan passes -Size through to Invoke-OnypheAPIV2 as size (default is Onyphe''s silent 100/query-line cap, not this module)' {
+			Mock Invoke-OnypheAPIV2 { [pscustomobject]@{ status = 'ok' } }
+
+			Invoke-APIBulkDiscoveryOnypheRiskscan -FilePath $script:InFile -OutFile $script:OutFilePath -Size 10000 | Out-Null
+
+			Should -Invoke Invoke-OnypheAPIV2 -Times 1 -Exactly -ParameterFilter {
+				$size -eq 10000
+			}
+		}
+
+		It 'Invoke-APIBulkDiscoveryOnypheRiskscan does not add a size key to the API call when -Size is not supplied' {
+			Mock Invoke-OnypheAPIV2 { [pscustomobject]@{ status = 'ok' } }
+
+			Invoke-APIBulkDiscoveryOnypheRiskscan -FilePath $script:InFile -OutFile $script:OutFilePath | Out-Null
+
+			Should -Invoke Invoke-OnypheAPIV2 -Times 1 -Exactly -ParameterFilter {
+				-not $size
+			}
+		}
+
 		Context 'Invoke-OnypheBulkFileUpload' {
 			It 'builds request/APIInfo as v2/bulk/<Endpoint> and bulk/<Endpoint>' {
 				Mock Invoke-OnypheAPIV2 { [pscustomobject]@{ status = 'ok' } }
@@ -137,6 +157,26 @@ Describe 'Private/Bulk wrappers' -Tag 'Unit' {
 
 				Should -Invoke Invoke-OnypheAPIV2 -Times 1 -Exactly -ParameterFilter {
 					-not $FuncInput
+				}
+			}
+
+			It 'passes -Size through to Invoke-OnypheAPIV2 as size' {
+				Mock Invoke-OnypheAPIV2 { [pscustomobject]@{ status = 'ok' } }
+
+				Invoke-OnypheBulkFileUpload -Endpoint 'discovery/riskscan/asset' -FilePath $script:InFile -OutFile $script:OutFilePath -Size 5000 | Out-Null
+
+				Should -Invoke Invoke-OnypheAPIV2 -Times 1 -Exactly -ParameterFilter {
+					$size -eq 5000
+				}
+			}
+
+			It 'does not add a size key to the API call when -Size is not supplied' {
+				Mock Invoke-OnypheAPIV2 { [pscustomobject]@{ status = 'ok' } }
+
+				Invoke-OnypheBulkFileUpload -Endpoint 'discovery/riskscan/asset' -FilePath $script:InFile -OutFile $script:OutFilePath | Out-Null
+
+				Should -Invoke Invoke-OnypheAPIV2 -Times 1 -Exactly -ParameterFilter {
+					-not $size
 				}
 			}
 		}

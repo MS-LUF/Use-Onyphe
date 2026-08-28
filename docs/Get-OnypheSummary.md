@@ -81,6 +81,11 @@ Accept wildcard characters: False
 -page string{page number}
 go directly to a specific result page (1 to 1000)
 you can set a list of page using x-y like 1-100 to read the first 100 pages
+NOTE: this API does not actually paginate - live-confirmed (2026-08-28) that any
+-page value returns the same first page of results, with no error or warning
+(the server always reports page:1 back, regardless of what page was requested).
+Use Search-OnypheInfo/Export-OnypheInfo instead if you need more results than a
+single page returns for this category.
 
 ```yaml
 Type: String[]

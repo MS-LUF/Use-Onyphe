@@ -12,7 +12,7 @@
 RootModule = 'use-onyphe.psm1'
 
 # Numero de version de ce module.
-ModuleVersion = '2.2.0'
+ModuleVersion = '2.2.2'
 
 # editions PS prises en charge
 # CompatiblePSEditions = @()
@@ -107,7 +107,7 @@ PrivateData = @{
         IconUri = 'https://www.onyphe.io/img/logo-solo.png'
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'v2.2.0 : adds Get-OnypheASDInfo/Get-OnypheASDAPIName, wrapping the 9 licensed "standard" ASD (Attack Surface Discovery) APIv1 endpoints (domaintld, domainwildcard, domaincertso, certsodomain, certsowildcard, dnsdomainns, dnsdomainmx, dnsdomainsoa, dnsdomainexist) - BETA endpoints requiring a Griffin View/ASM Edition non-commercial licence. The advanced Pivot Query ASD API is not yet implemented (not licensed on the account used for verification, deferred until it can be live-tested). No breaking changes since v2.1.3. See README.md for the full list.'
+        ReleaseNotes = 'v2.2.2 : documentation-only release - live-confirmed (8.8.8.8, 1.1.1.1) that the Summary API (v2/summary/<type>/<value>, wrapped by Get-OnypheSummary) does not paginate either, same as the Simple API caveat documented in v2.2.1: any -Page value returns the same first page of results, with no error or warning, and the server always reports page:1 back regardless of what was requested. No code/behavior change - Get-OnypheSummary.ps1 and the three Invoke-APISummaryOnyphe<IP,Domain,Hostname> private wrappers'' -Page doc blocks, Howto.md, docs/Get-OnypheSummary.md and en-US/use-onyphe-help.xml now carry a NOTE pointing to Search-OnypheInfo/Export-OnypheInfo for anyone who needs more than one page of results. v2.2.1 : fixes Export-OnypheDiscoveryInfo (and every Invoke-APIBulkDiscoveryOnyphe<Category> private wrapper) silently capping each OQL query line in the Discovery API at 100 results, even when far more results actually match - Onyphe truncates without any error/warning unless a size query-string parameter is supplied. Adds an optional -Size <1-10000> parameter, opt-in, default behavior unchanged (still 100 when omitted) to avoid a breaking change. Live-verified: the same query returned 100 results by default and 2791 with -Size 10000, matching the account holder''s own count from the Onyphe website (2789, small drift from new data indexed between checks). No breaking changes since v2.2.0. v2.2.0 : adds Get-OnypheASDInfo/Get-OnypheASDAPIName, wrapping the 9 licensed "standard" ASD (Attack Surface Discovery) APIv1 endpoints (domaintld, domainwildcard, domaincertso, certsodomain, certsowildcard, dnsdomainns, dnsdomainmx, dnsdomainsoa, dnsdomainexist) - BETA endpoints requiring a Griffin View/ASM Edition non-commercial licence. The advanced Pivot Query ASD API is not yet implemented (not licensed on the account used for verification, deferred until it can be live-tested). See README.md for the full list.'
         # External dependent modules of this module
         # ExternalModuleDependencies = ''
 

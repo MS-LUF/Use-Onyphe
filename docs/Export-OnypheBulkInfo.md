@@ -20,6 +20,10 @@ Export-OnypheBulkInfo [-FilePath] <String> [[-SaveInfoAsFile] <String>] [-Best] 
 ## DESCRIPTION
 main function/cmdlet - Export Search information on onyphe.io web service using bulk simple APIs
 bulk APIs use input file containing ip sends back streamed json as result.
+NOTE: the Simple API this cmdlet wraps does not paginate - each entry in -FilePath is
+capped at 100 results with no error or warning, and no parameter here can raise that.
+Use Export-OnypheInfo instead if a category needs more than 100 results per entry - it
+uses the Search/Export API, which supports real pagination and -Size up to 10000.
 
 ## EXAMPLES
 

@@ -18,6 +18,10 @@
 		 -APIKey string{APIKEY}
 		 Set APIKEY as global variable.
 
+		  .PARAMETER Size
+		 -Size int{1-10000}
+		 number of results Onyphe should return for this query (per query line) - Onyphe defaults to 100 per query line when omitted, silently, with no error or warning.
+
 		  .OUTPUTS
 		  TypeName: System.Management.Automation.PSCustomObject
 
@@ -43,7 +47,10 @@
 				  [string]$APIKey,
 			[parameter(Mandatory=$false)]
 			[ValidateNotNullOrEmpty()]
-				[hashtable]$FuncInput
+				[hashtable]$FuncInput,
+		[parameter(Mandatory=$false)]
+		[ValidateRange(1,10000)]
+			[int]$Size
 		)
 		process {
 			$params = @{
@@ -53,6 +60,7 @@
 			}
 			if ($APIKey) { $params.APIKey = $APIKey }
 			if ($FuncInput) { $params.FuncInput = $FuncInput }
+			if ($Size) { $params.Size = $Size }
 			Invoke-OnypheBulkFileUpload @params
 		}
 	}

@@ -14,7 +14,8 @@ main function/cmdlet - Export bulk OQL search results from onyphe.io web service
 
 ```
 Export-OnypheDiscoveryInfo [-FilePath] <String> [[-SaveInfoAsFile] <String>] [[-APIKey] <String>]
- [[-wait] <Int32>] [-ProgressAction <ActionPreference>] -Category <String> [<CommonParameters>]
+ [[-wait] <Int32>] [[-Size] <Int32>] [-ProgressAction <ActionPreference>] -Category <String>
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -35,6 +36,12 @@ C:\PS> Export-OnypheDiscoveryInfo -FilePath .\myqueries.txt -SaveInfoAsFile .\re
 ```
 export resolver discovery information into object using myqueries.txt as source OQL queries file
 C:\PS> Export-OnypheDiscoveryInfo -FilePath .\myqueries.txt -Category resolver
+```
+
+### EXAMPLE 3
+```
+export up to 10000 riskscan results per query line instead of Onyphe's silent 100-result default
+C:\PS> Export-OnypheDiscoveryInfo -FilePath .\myqueries.txt -Category riskscan -Size 10000
 ```
 
 ## PARAMETERS
@@ -99,6 +106,24 @@ Aliases:
 
 Required: False
 Position: 4
+Default value: 0
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Size
+-Size int{1-10000}
+number of results Onyphe should return for each OQL query line in -FilePath - Onyphe
+defaults to 100 per query line when this is omitted, silently, with no error or warning
+that the result set was truncated.
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 5
 Default value: 0
 Accept pipeline input: False
 Accept wildcard characters: False

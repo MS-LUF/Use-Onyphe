@@ -3,7 +3,7 @@
 # Use-Onyphe - How-To
 
 ## ChangeLog
-This documentation has been updated to take into account **new features available up to v2.2.0**: the Discovery API and new search-result-shaping parameters (`-Size`, `-TrackQuery`, `-Calculated`) from v2.1.0, the Discovery API's full 20-category coverage from v2.1.2, OQLv2 condition-group syntax from v2.1.3, and the ASD (Attack Surface Discovery) APIv1 integration from v2.2.0. Enjoy your Onyphe stuff with Power[Shell](Of Love)
+This documentation has been updated to take into account **new features available up to v2.2.2**: the Discovery API and new search-result-shaping parameters (`-Size`, `-TrackQuery`, `-Calculated`) from v2.1.0, the Discovery API's full 20-category coverage from v2.1.2, OQLv2 condition-group syntax from v2.1.3, the ASD (Attack Surface Discovery) APIv1 integration from v2.2.0, a `-Size` parameter on `Export-OnypheDiscoveryInfo` (fixing a silent 100-result-per-query-line cap on the Discovery API) from v2.2.1, and a documentation-only caveat added in v2.2.2 noting that the Summary API (`Get-OnypheSummary`) does not paginate either, same as the Simple API. Enjoy your Onyphe stuff with Power[Shell](Of Love)
 
 ## Intro Onyphe
 Onyphe.io provides data about IP address space and publicly available information in just one place.
@@ -231,9 +231,11 @@ Get-help is available on all functions, for instance, if you want to consult the
 6 main functions / cmdlets will be used :
  - Get-OnypheSummary to use all v2/summary APIs ip,domain,hostname
    - These APIs can be used to retrieve all objects linked to an IP, a domain or an hostame (all categories are sent back from summary API) 
+   - **the Summary API does not actually paginate either, even though `-Page` is accepted as a parameter** - live-confirmed (2026-08-28): any `-Page` value returns the exact same first page of results, with no error or warning; the response's own `page` property stays `1` regardless of what you request, and an unexposed `size` query parameter has no effect either when tried directly against the API. `total` in the response is still accurate, you just can't retrieve past the first page through this API. Same limitation and same workaround as the Simple API caveat below - use `Search-OnypheInfo`/`Export-OnypheInfo` instead if you need more than one page's worth of results for a category.
  - Get-OnypheInfo (or Get-Onyphe) to use all v2/simple APIs ctl,datascan,geoloc,inetnum,pastries,resolver,sniffer,synscan,threatlist,datashot,onionscan,onionshot,topsite,vulnscan,resolver/reverse,resolver/forward,datascan/datamd5,whois
    - These APIs are the 'standard' APIs and object category sent back are limited to API type in use (ctl category object for ctl API etc...)
    - you can use the `Best` option to use the Best mode of simple API (currently compliant with Best answer mode : geoloc,inetnum,threatlist,whois)
+   - **the Simple API does not actually paginate, even though `-Page` is accepted as a parameter** - live-confirmed (2026-08-28): asking for `-Page 2` returns the exact same first 100 results as no page at all, with no error and no warning; the response's own `page` property stays `1` regardless of what you request. `total` in the response is still accurate (it tells you how many records really exist), you just can't retrieve past the first 100 of them through this API. This applies to the bulk form too (`Export-OnypheBulkInfo`/`Invoke-APIBulkSimpleOnyphe<Category>`) - a `size` query parameter has no effect there either. If you need more than the first 100 results for a category, use `Search-OnypheInfo`/`Export-OnypheInfo` instead (see "Paging and Results" and "Result size..." below) - real pagination and a real `-Size` up to 10000 both work there, and `Export-OnypheInfo` covers every Simple-API category plus more.
  - Search-OnypheInfo (or Search-Onyphe) to make some complex and powerfull request in all Onyphe database
    - all category types can be retrieved depending on the query used for the search request
  - Get-OnypheUserInfo will be used to follow your API key / user account (user API)
@@ -243,6 +245,7 @@ Get-help is available on all functions, for instance, if you want to consult the
  - Export-OnypheBulkSummaryInfo to download json file fron onyphe database for a summary request including multiple entries (through a txt file provided, on entry per line)
  - Export-OnypheBulkInfo to download json file fron onyphe database for a simple request including multiple entries (through a txt file provided, on entry per line)
     - All simple APIs are also available through a bulk mode using this cmdlet
+    - capped at 100 results per entry, same as `Get-OnypheInfo` - see the caveat under that bullet above
  - Export-OnypheDiscoveryInfo (or Export-OnypheBulkDiscovery) to run a file of OQL queries (one per line) in bulk against the Discovery API and download the JSON results
     - **requires a Griffin View subscription on Onyphe** - without one, no Discovery category will be available to you
  - Get-OnypheASDInfo to use the ASD (Attack Surface Discovery) APIv1 - domain/certificate/DNS enumeration endpoints
@@ -462,6 +465,12 @@ API v2/bulk/discovery/datascan : run a file of OQL queries (one per line) in bul
     C:\PS> Export-OnypheDiscoveryInfo -FilePath .\myqueries.txt -Category datascan
 ```
 as of v2.1.2, all 20 Discovery categories a Griffin View subscription can expose are available the same way, not just datascan: `ctiscan`, `ctiurl`, `ctl`, `datashot`, `domain`, `geoloc`, `hostname`, `inetnum`, `ip`, `onionscan`, `onionshot`, `pastries`, `resolver`, `riskscan`, `sniffer`, `threatlist`, `topsite`, `vulnscan`, `whois` (just swap `-Category datascan` for any of these); use `Get-OnypheDiscoveryCategories` to see which Discovery categories your account currently has access to.
+
+**Onyphe silently caps each OQL query line in the Discovery API at 100 results if you don't ask for more** - no error, no warning, no truncation flag in the response, it just stops at 100 even when far more actually match. Use `-Size` (up to 10000) to raise that ceiling per query line:
+```
+    C:\PS> Export-OnypheDiscoveryInfo -FilePath .\myqueries.txt -Category riskscan -Size 10000
+```
+`page` has no effect on this endpoint at all (confirmed: `?page=1` and `?page=2` return the exact same 100 records) - `-Size` is the only lever. Some categories (e.g. `riskscan`) are Discovery-only with no Search/Export API equivalent, so this is the only way to get a complete result set for them - `Export-OnypheInfo`/the Search API will reject a Discovery-only category outright.
 
 ## ASD (Attack Surface Discovery) APIs
 Since v2.2.0, `Get-OnypheASDInfo` wraps 9 of Onyphe's BETA "standard" ASD APIv1 endpoints - domain/certificate/DNS enumeration helpers, distinct from the Search/Discovery categories above. **These require a Griffin View or Griffin View ASM Edition subscription with a non-commercial use licence** - check `(Get-OnypheUserInfo).results.asd.stdapis` before use; `Get-OnypheASDAPIName` lists the implemented type names (`domaintld`, `domainwildcard`, `domaincertso`, `certsodomain`, `certsowildcard`, `dnsdomainns`, `dnsdomainmx`, `dnsdomainsoa`, `dnsdomainexist`).

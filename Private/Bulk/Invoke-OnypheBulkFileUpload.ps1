@@ -35,6 +35,12 @@
 		  original bound parameters of the calling wrapper, threaded through to the
 		  result object's cli-func_input property
 
+		  .PARAMETER Size
+		  -Size int{1-10000}
+		  number of results Onyphe should return for this query (per query line) -
+		  Onyphe defaults to 100 per query line when omitted, silently, with no error
+		  or warning.
+
 		  .OUTPUTS
 		  TypeName: System.Management.Automation.PSCustomObject
 
@@ -58,7 +64,10 @@
 				  [string]$APIKey,
 			[parameter(Mandatory=$false)]
 			[ValidateNotNullOrEmpty()]
-				[hashtable]$FuncInput
+				[hashtable]$FuncInput,
+			[parameter(Mandatory=$false)]
+			[ValidateRange(1,10000)]
+				[int]$Size
 		)
 		process {
 			 if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -73,6 +82,9 @@
 			  }
 			  if ($FuncInput) {
 				$params.add("FuncInput", $FuncInput)
+			  }
+			  if ($Size) {
+				$params.add("size", $Size)
 			  }
 			  Write-Verbose -message "URL Info : $($params.request)"
 			  write-verbose -message "File uploaded to Onyphe API : $($FilePath)"

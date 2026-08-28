@@ -29,6 +29,12 @@
 		 -Category string {Get-OnypheDiscoveryCategories}
 		 Discovery category to be used : ctiscan,ctiurl,ctl,datascan,datashot,domain,geoloc,hostname,inetnum,ip,onionscan,onionshot,pastries,resolver,riskscan,sniffer,threatlist,topsite,vulnscan,whois
 
+		 .PARAMETER Size
+		 -Size int{1-10000}
+		 number of results Onyphe should return for each OQL query line in -FilePath - Onyphe
+		 defaults to 100 per query line when this is omitted, silently, with no error or warning
+		 that the result set was truncated.
+
 		 .OUTPUTS
 		 TypeName: System.Management.Automation.PSCustomObject
 
@@ -39,6 +45,10 @@
 		 .EXAMPLE
 		 export resolver discovery information into object using myqueries.txt as source OQL queries file
 		 C:\PS> Export-OnypheDiscoveryInfo -FilePath .\myqueries.txt -Category resolver
+
+		 .EXAMPLE
+		 export up to 10000 riskscan results per query line instead of Onyphe's silent 100-result default
+		 C:\PS> Export-OnypheDiscoveryInfo -FilePath .\myqueries.txt -Category riskscan -Size 10000
 		 #>
 		[cmdletbinding()]
 		param(
@@ -51,7 +61,10 @@
 			[ValidateLength(40,40)]
 				[string]$APIKey,
 			[parameter(Mandatory=$false)]
-				[int]$wait
+				[int]$wait,
+			[parameter(Mandatory=$false)]
+			[ValidateRange(1,10000)]
+				[int]$Size
 		)
 		DynamicParam
 		{
@@ -90,6 +103,7 @@
 				OutFile = $SaveInfoAsFile
 				FilePath = $FilePath
 			}
+			if ($Size) { $params.Size = $Size }
 			if ((Get-OnypheDiscoveryCategories) -contains $Category) {
 				$FunctionName = "Invoke-APIBulkDiscoveryOnyphe$($Category)"
 				if (Get-Command -Name $FunctionName -CommandType Function -ErrorAction SilentlyContinue) {

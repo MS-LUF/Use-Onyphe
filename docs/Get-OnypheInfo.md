@@ -152,6 +152,10 @@ Accept wildcard characters: False
 -page string{page number}
 go directly to a specific result page (1 to 1000)
 you can set a list of page using x-y like 1-100 to read the first 100 pages
+NOTE: the Simple API this cmdlet wraps does not actually paginate - live-confirmed
+(2026-08-28) that any -Page value returns the same first 100 results, with no error
+or warning. Use Search-OnypheInfo/Export-OnypheInfo instead if you need more than the
+first 100 results for a category - real pagination and -Size (up to 10000) both work there.
 
 ```yaml
 Type: String[]

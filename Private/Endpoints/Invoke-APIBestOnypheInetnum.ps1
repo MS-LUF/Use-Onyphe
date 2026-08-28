@@ -17,6 +17,10 @@
 	.PARAMETER Page
 	-page string{page number}
 	go directly to a specific result page (1 to 1000)
+	NOTE: this API does not actually paginate - live-confirmed (2026-08-28) that any
+	-page value returns the same first 100 results, with no error or warning. Use
+	Search-OnypheInfo/Export-OnypheInfo instead if you need more than the first 100
+	results for this category.
 	
 	.OUTPUTS
 	TypeName: PSOnyphe
