@@ -1,0 +1,5 @@
+# Locally-generated/user-instance config and cache files.
+note.txt
+
+# Local package management.
+/Release/
