@@ -54,6 +54,12 @@
 		  -OutFile string{full path to a new file for exporting json data}
 		  full path to output file used to write json data from Onyphe
 
+		  .PARAMETER Post
+		  -Post switch
+		  send the OQL query as a POST request body (form-urlencoded, field "query") instead of a GET
+		  query-string parameter - avoids hitting a URL-length limit on very long OQL strings (many
+		  OR-terms/exclusions). trackquery/calculated still go in the query string either way.
+
 		  .OUTPUTS
 		   TypeName: PSOnyphe
 
@@ -85,6 +91,10 @@
 		  OQLv2 condition groups (requires an ASM-level or Ctiscan licence) - pass "(" and ")" as their own
 		  -AdvancedSearch array elements, never appended to a filter:value element with a space in the same string
 		  C:\PS> Invoke-APIOnypheExport -AdvancedSearch @("(","?domain:sovcloud-core.fr","?domain:sovcloud-api.fr",")","(","?tld:fr",")") -category resolver -OutFile .\out.json
+
+		  .EXAMPLE
+		  send a very long OQL query (many OR-terms) as a POST body instead of a GET query string, to avoid a URL-length limit
+		  C:\PS> Invoke-APIOnypheExport -AdvancedSearch @("?domain:a.com","?domain:b.com","?domain:c.com") -category resolver -OutFile .\out.json -Post
 		#>
 		[cmdletbinding()]
 		param(
@@ -126,7 +136,9 @@
 				[hashtable]$FuncInput,
 			[parameter(Mandatory=$true)]
 			[ValidateScript({!(test-path $_)})]
-				[string]$OutFile
+				[string]$OutFile,
+			[parameter(Mandatory=$false)]
+				[switch]$Post
 		)
 		Process {		
 			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
@@ -193,6 +205,9 @@
 			}
 			if ($UseBetaFeatures) {
 				$params.add('UseBetaFeatures', $true)
+			}
+			if ($Post) {
+				$params.add('Method', 'POST')
 			}
 			Write-Verbose -message "URL Info : $($params.request)?q=$($params.QueryValue)"
 			Invoke-OnypheAPIV2 @params

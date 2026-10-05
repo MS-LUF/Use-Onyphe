@@ -5,12 +5,16 @@ BeforeDiscovery {
 Describe 'Get-OnypheASDInfo' -Tag 'Unit' {
 	BeforeEach {
 		Mock -ModuleName Use-Onyphe Read-OnypheConfigFile { [PSCustomObject]@{} }
-		Mock -ModuleName Use-Onyphe Get-OnypheASDAPIName { @('domaintld', 'domaincertso', 'dnsdomainexist', 'bogus') }
+		Mock -ModuleName Use-Onyphe Get-OnypheASDAPIName { @('domaintld', 'domaincertso', 'dnsdomainexist', 'dnsdomainnsexist', 'domainexist', 'ipcertso', 'bootstrapcertsowildcard', 'bogus') }
 		Mock -ModuleName Use-Onyphe Set-OnypheAPIKey { }
 		Mock -ModuleName Use-Onyphe Start-Sleep { }
 		Mock -ModuleName Use-Onyphe Invoke-APIOnypheASDDomainTld { [PSCustomObject]@{ error = 0 } }
 		Mock -ModuleName Use-Onyphe Invoke-APIOnypheASDDomainCertso { [PSCustomObject]@{ error = 0 } }
 		Mock -ModuleName Use-Onyphe Invoke-APIOnypheASDDnsDomainExist { [PSCustomObject]@{ error = 0 } }
+		Mock -ModuleName Use-Onyphe Invoke-APIOnypheASDDnsDomainNsExist { [PSCustomObject]@{ error = 0 } }
+		Mock -ModuleName Use-Onyphe Invoke-APIOnypheASDDomainExist { [PSCustomObject]@{ error = 0 } }
+		Mock -ModuleName Use-Onyphe Invoke-APIOnypheASDIpCertso { [PSCustomObject]@{ error = 0 } }
+		Mock -ModuleName Use-Onyphe Invoke-APIOnypheASDBootstrapCertsoWildcard { [PSCustomObject]@{ error = 0 } }
 	}
 
 	It 'dispatches to Invoke-APIOnypheASDDomainTld with -Value mapped to -Domain for most ASDAPIType values' {
@@ -34,6 +38,20 @@ Describe 'Get-OnypheASDInfo' -Tag 'Unit' {
 		}
 	}
 
+	It 'dispatches to Invoke-APIOnypheASDIpCertso with -Value mapped to -Certso for ASDAPIType ipcertso' {
+		Get-OnypheASDInfo -ASDAPIType ipcertso -Value 'Example Organization' | Out-Null
+		Should -Invoke -ModuleName Use-Onyphe Invoke-APIOnypheASDIpCertso -Times 1 -Exactly -ParameterFilter {
+			($Certso -join ',') -eq 'Example Organization'
+		}
+	}
+
+	It 'dispatches to Invoke-APIOnypheASDBootstrapCertsoWildcard with -Value mapped to -Certso for ASDAPIType bootstrapcertsowildcard' {
+		Get-OnypheASDInfo -ASDAPIType bootstrapcertsowildcard -Value 'Example Organization' | Out-Null
+		Should -Invoke -ModuleName Use-Onyphe Invoke-APIOnypheASDBootstrapCertsoWildcard -Times 1 -Exactly -ParameterFilter {
+			($Certso -join ',') -eq 'Example Organization'
+		}
+	}
+
 	It 'passes -IncludePattern/-ExcludePattern/-Untrusted through for a stdapis type that supports them' {
 		Get-OnypheASDInfo -ASDAPIType domaintld -Value 'example.com' -IncludePattern 'foo' -ExcludePattern 'bar' -Untrusted | Out-Null
 		Should -Invoke -ModuleName Use-Onyphe Invoke-APIOnypheASDDomainTld -Times 1 -Exactly -ParameterFilter {
@@ -44,6 +62,20 @@ Describe 'Get-OnypheASDInfo' -Tag 'Unit' {
 	It 'silently drops -IncludePattern/-ExcludePattern/-Untrusted for ASDAPIType dnsdomainexist (unsupported by that endpoint)' {
 		Get-OnypheASDInfo -ASDAPIType dnsdomainexist -Value 'example.com' -IncludePattern 'foo' -Untrusted | Out-Null
 		Should -Invoke -ModuleName Use-Onyphe Invoke-APIOnypheASDDnsDomainExist -Times 1 -Exactly -ParameterFilter {
+			(-not $IncludePattern) -and (-not $Untrusted)
+		}
+	}
+
+	It 'silently drops -IncludePattern/-ExcludePattern/-Untrusted for ASDAPIType dnsdomainnsexist (unsupported by that endpoint)' {
+		Get-OnypheASDInfo -ASDAPIType dnsdomainnsexist -Value 'example.com' -IncludePattern 'foo' -Untrusted | Out-Null
+		Should -Invoke -ModuleName Use-Onyphe Invoke-APIOnypheASDDnsDomainNsExist -Times 1 -Exactly -ParameterFilter {
+			(-not $IncludePattern) -and (-not $Untrusted)
+		}
+	}
+
+	It 'silently drops -IncludePattern/-ExcludePattern/-Untrusted for ASDAPIType domainexist (unsupported by that endpoint)' {
+		Get-OnypheASDInfo -ASDAPIType domainexist -Value 'example.com' -IncludePattern 'foo' -Untrusted | Out-Null
+		Should -Invoke -ModuleName Use-Onyphe Invoke-APIOnypheASDDomainExist -Times 1 -Exactly -ParameterFilter {
 			(-not $IncludePattern) -and (-not $Untrusted)
 		}
 	}

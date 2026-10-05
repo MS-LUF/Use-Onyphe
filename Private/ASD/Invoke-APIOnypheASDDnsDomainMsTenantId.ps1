@@ -1,0 +1,100 @@
+	Function Invoke-APIOnypheASDDnsDomainMsTenantId {
+	<#
+	  .SYNOPSIS
+	  create input for Invoke-OnypheAPIV2 function and then call it to query the ASD Dns Domain MsTenantId APIv1
+
+	  .DESCRIPTION
+	  create input for Invoke-OnypheAPIV2 function and then call it to query the ASD Dns Domain MsTenantId
+	  APIv1 - given one or more domains, resolves their Microsoft 365 tenant ID (a live DNS lookup, see
+	  Onyphe's own WARNING that this endpoint executes DNS requests) and returns every **other** domain
+	  sharing that same tenant, not the tenant ID value itself. Live-tested 2026-09-19: "microsoft.com"
+	  returned 107 sibling domains genuinely owned by Microsoft (xbox.com, linkedin.com, github.com, skype.com,
+	  azure.com, ...) - a domain-to-domain pivot via shared M365 tenant membership, useful for organizational
+	  footprint discovery. "onyphe.io" returned exactly 1 result (itself) - on Microsoft 365 but with no
+	  sibling domains found in Onyphe's data. "sovcloud-core.fr"/"sovcloud-api.fr"/"neocase-sov.fr" all
+	  returned error 1006 "search failed: no result found" - none of this project's own tracked domains are
+	  themselves Microsoft 365 tenant domains, so this endpoint does not apply to (or help enumerate) that
+	  domain family despite the superficial "Bleu/Microsoft" naming connection. Plain bare "domain"-array
+	  request body, same shape as Invoke-APIOnypheASDDomainTld. BETA endpoint, requires a Griffin View or
+	  Griffin View ASM Edition subscription with a non-commercial use licence (see Get-OnypheUserInfo's
+	  asd.stdapis property).
+
+	  .PARAMETER Domain
+	  -Domain string[]
+	  one or more domains to query
+
+	  .PARAMETER IncludePattern
+	  -IncludePattern string[]
+	  patterns to grep and keep matching results
+
+	  .PARAMETER ExcludePattern
+	  -ExcludePattern string[]
+	  patterns to grep and exclude from results
+
+	  .PARAMETER Untrusted
+	  -Untrusted switch
+	  disable Onyphe's backend false-positive filtering (server default is enabled/trusted)
+
+	  .PARAMETER AsLines
+	  -AsLines switch
+	  render results as one JSON object per line instead of with context (server default is with context)
+
+	  .PARAMETER APIKEY
+	  -APIKey string{APIKEY}
+	  Set APIKEY as global variable
+
+	  .PARAMETER FuncInput
+	  -FuncInput hashtable
+	  original bound parameters of the calling wrapper, threaded through to the result object's cli-func_input property
+
+	  .OUTPUTS
+	  TypeName: PSOnyphe
+
+	  .EXAMPLE
+	  C:\PS> Invoke-APIOnypheASDDnsDomainMsTenantId -Domain example.com
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(Mandatory=$true)]
+			[ValidateNotNullOrEmpty()]
+				[string[]]$Domain,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[string[]]$IncludePattern,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[string[]]$ExcludePattern,
+			[parameter(Mandatory=$false)]
+				[switch]$Untrusted,
+			[parameter(Mandatory=$false)]
+				[switch]$AsLines,
+			[parameter(Mandatory=$false)]
+			[ValidateLength(40,40)]
+				[string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		Process {
+			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+			$Body = [ordered]@{ domain = $Domain }
+			if ($IncludePattern) { $Body.includep = $IncludePattern }
+			if ($ExcludePattern) { $Body.excludep = $ExcludePattern }
+			if ($Untrusted) { $Body.trusted = $false }
+			if ($AsLines) { $Body.aslines = $true }
+			$params = @{
+				request = "v1/asd/dns/domain/mstenantid"
+				APIInfo = "asd/dns/domain/mstenantid"
+				APIInput = @($Domain)
+				APIKeyrequired = $true
+				APIVersion = "1"
+				Data = $Body | ConvertTo-Json
+			}
+			if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			}
+			Write-Verbose -message "URL Info : $($params.request)"
+			Write-Verbose -message "POST JSON Data : $($Body | ConvertTo-Json)"
+			Invoke-OnypheAPIV2 @params
+		}
+	}

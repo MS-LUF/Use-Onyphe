@@ -62,7 +62,14 @@
 		 .PARAMETER SaveInfoAsFile
 		 -SaveInfoAsFile string
 		 full path to file where json data will be exported.
-		 
+
+		 .PARAMETER Post
+		 -Post switch
+		 send the OQL query as a POST request body (form-urlencoded, field "query") instead of a GET
+		 query-string parameter - avoids hitting a URL-length limit on very long OQL strings (many
+		 OR-terms/exclusions, e.g. a large -AdvancedSearch domain list). trackquery/calculated still
+		 go in the query string either way.
+
 		 .OUTPUTS
 		 TypeName: System.Management.Automation.PSCustomObject
 		 	 
@@ -119,6 +126,10 @@
 		 module's multi-word auto-quoting will otherwise swallow the closing paren into the previous value and produce
 		 an OQL syntax error server-side
 		 C:\PS> Export-OnypheInfo -AdvancedSearch @("(","?domain:sovcloud-core.fr","?domain:sovcloud-api.fr",")","(","?tld:fr",")") -Category resolver -SaveInfoAsFile .\myexport.json
+
+		.EXAMPLE
+		 send a very long OQL query (many OR-terms) as a POST body instead of a GET query string, to avoid a URL-length limit
+		 C:\PS> Export-OnypheInfo -AdvancedSearch @("?domain:a.com","?domain:b.com","?domain:c.com") -Category resolver -SaveInfoAsFile .\myexport.json -Post
 	 #>
 		 [cmdletbinding()]
 		 param(
@@ -149,7 +160,9 @@
 			 [parameter(Mandatory=$false,Position=13)]
 				 [switch]$TrackQuery,
 			 [parameter(Mandatory=$false,Position=14)]
-				 [switch]$Calculated
+				 [switch]$Calculated,
+			 [parameter(Mandatory=$false,Position=15)]
+				 [switch]$Post
 		 )
 		 DynamicParam
 		 {
@@ -247,6 +260,9 @@
 				}
 				if ($Calculated) {
 					$params.add('Calculated', $true)
+				}
+				if ($Post) {
+					$params.add('Post', $true)
 				}
 				$params.add('FuncInput', $PsBoundParameters)
 			} else {

@@ -205,6 +205,72 @@ Describe 'Invoke-OnypheAPIV2' -Tag 'Unit' {
 			}
 		}
 
+		It 'sends a DELETE request when -Method DELETE is supplied' {
+			Mock Invoke-WebRequest {
+				[pscustomobject]@{
+					Content = '{"status":"ok"}'
+					Headers = @{}
+				}
+			}
+
+			Invoke-OnypheAPIV2 -request 'asd/task/kill/abc' -APIInfo 'asd/task/kill' -APIInput 'abc' -APIKeyrequired $false -Method DELETE | Out-Null
+
+			Should -Invoke Invoke-WebRequest -Times 1 -Exactly -ParameterFilter {
+				$Method -eq 'Delete'
+			}
+		}
+
+		It 'sends -QueryValue as a form-urlencoded POST body field "query" instead of a q= query-string parameter when -Method POST is supplied' {
+			Mock Invoke-WebRequest {
+				[pscustomobject]@{
+					Content = '{"status":"ok"}'
+					Headers = @{}
+				}
+			}
+
+			Invoke-OnypheAPIV2 -request 'v2/search/' -APIInfo 'search' -APIInput 'q' -APIKeyrequired $false -QueryValue 'category:resolver domain:a.com' -Method POST | Out-Null
+
+			Should -Invoke Invoke-WebRequest -Times 1 -Exactly -ParameterFilter {
+				($URI -eq 'https://www.onyphe.io/api/v2/search/') -and
+				($Method -eq 'Post') -and
+				($Body -eq 'query=category%3Aresolver%20domain%3Aa.com') -and
+				($ContentType -eq 'application/x-www-form-urlencoded')
+			}
+		}
+
+		It 'keeps page/size/trackquery/calculated in the query string alongside a POST body -QueryValue' {
+			Mock Invoke-WebRequest {
+				[pscustomobject]@{
+					Content = '{"status":"ok"}'
+					Headers = @{}
+				}
+			}
+
+			Invoke-OnypheAPIV2 -request 'v2/search/' -APIInfo 'search' -APIInput 'q' -APIKeyrequired $false -QueryValue 'category:resolver domain:a.com' -Method POST -page '2' -size 50 | Out-Null
+
+			Should -Invoke Invoke-WebRequest -Times 1 -Exactly -ParameterFilter {
+				($URI -eq 'https://www.onyphe.io/api/v2/search/?page=2&size=50') -and
+				($Body -eq 'query=category%3Aresolver%20domain%3Aa.com')
+			}
+		}
+
+		It 'still puts -QueryValue in the q= query string (not the POST body) when -Method is POST but -data is also supplied' {
+			Mock Invoke-WebRequest {
+				[pscustomobject]@{
+					Content = '{"status":"ok"}'
+					Headers = @{}
+				}
+			}
+
+			Invoke-OnypheAPIV2 -request 'v1/asd/domain/tld' -APIInfo 'asd' -APIInput 'q' -APIKeyrequired $false -QueryValue 'category:resolver domain:a.com' -Method POST -data '{"domain":["a.com"]}' | Out-Null
+
+			Should -Invoke Invoke-WebRequest -Times 1 -Exactly -ParameterFilter {
+				($URI -eq 'https://www.onyphe.io/api/v1/asd/domain/tld?q=category%3Aresolver%20domain%3Aa.com') -and
+				($Body -eq '{"domain":["a.com"]}') -and
+				($ContentType -eq 'application/json')
+			}
+		}
+
 		It 'merges $global:OnypheProxyParams into the Invoke-WebRequest call when set' {
 			$global:OnypheProxyParams = @{ Proxy = 'http://myproxy:3128'; ProxyUseDefaultCredentials = $true }
 			Mock Invoke-WebRequest {

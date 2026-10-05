@@ -48,5 +48,5 @@ foreach ($PublicFunctionFile in (Get-ChildItem -Path (Join-Path -Path $script:Mo
 									Get-OnypheSummaryAPIName, Get-OnypheSummary, Get-OnypheSimpleBestAPIName, Get-OnypheBulkCategories, Get-OnypheBulkAPIType, Get-OnypheDiscoveryCategories,
 									Get-OnypheSearchFunctions, Get-OnypheSearchCategories, Get-OnypheSearchFilters, Set-OnypheAPIKey, Update-OnypheFacetsFilters, Get-OnypheCliFacets,
 									Get-OnypheStatsFromObject, Set-OnypheProxy, Import-OnypheEncryptedIKey, Get-OnypheSimpleAPIName, Get-OnypheAlertInfo, Set-OnypheAlertInfo,
-									Get-OnypheASDInfo, Get-OnypheASDAPIName
+									Get-OnypheASDInfo, Get-OnypheASDAPIName, Get-OnypheASDTask, Get-OnypheASDTaskList, Wait-OnypheASDTask, Stop-OnypheASDTask, Invoke-OnyphePivot
 	Export-ModuleMember -Alias Update-OnypheLocalData, Get-Onyphe, Search-Onyphe, Get-OnypheFromCSV, Get-OnypheAlert, Set-OnypheAlert, Export-Onyphe, Export-OnypheBulkSimple, Export-OnypheBulkSummary, Export-OnypheBulkDiscovery

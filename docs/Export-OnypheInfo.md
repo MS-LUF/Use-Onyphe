@@ -15,7 +15,7 @@ main function/cmdlet - Export Search information on onyphe.io web service using 
 ```
 Export-OnypheInfo [[-InputOnypheObject] <Array>] [[-SearchValue] <String>] [[-FilterValue] <String[]>]
  [[-AdvancedSearch] <Array>] [[-APIKey] <String>] [[-wait] <Int32>] [-UseBetaFeatures]
- [[-AdvancedFilter] <Array>] [-SaveInfoAsFile] <String> [-TrackQuery] [-Calculated]
+ [[-AdvancedFilter] <Array>] [-SaveInfoAsFile] <String> [-TrackQuery] [-Calculated] [-Post]
  [-ProgressAction <ActionPreference>] [-SearchType <String>] [-SearchFilter <String>]
  [-FilterFunction <String>] [<CommonParameters>]
 ```
@@ -100,6 +100,12 @@ group conditions with parentheses to AND two independent OR-groups together; pas
 module's multi-word auto-quoting will otherwise swallow the closing paren into the previous value and produce
 an OQL syntax error server-side
 C:\PS> Export-OnypheInfo -AdvancedSearch @("(","?domain:sovcloud-core.fr","?domain:sovcloud-api.fr",")","(","?tld:fr",")") -Category resolver -SaveInfoAsFile .\myexport.json
+```
+
+### EXAMPLE 12
+```
+send a very long OQL query (many OR-terms) as a POST body instead of a GET query string, to avoid a URL-length limit
+C:\PS> Export-OnypheInfo -AdvancedSearch @("?domain:a.com","?domain:b.com","?domain:c.com") -Category resolver -SaveInfoAsFile .\myexport.json -Post
 ```
 
 ## PARAMETERS
@@ -276,6 +282,27 @@ Aliases:
 
 Required: False
 Position: 15
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Post
+-Post switch
+send the OQL query as a POST request body (form-urlencoded, field "query") instead of a GET
+query-string parameter - avoids hitting a URL-length limit on very long OQL strings (many
+OR-terms/exclusions, e.g.
+a large -AdvancedSearch domain list).
+trackquery/calculated still
+go in the query string either way.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 16
 Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False

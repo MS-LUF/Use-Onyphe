@@ -11,7 +11,7 @@
 		  [ValidateNotNullOrEmpty()]
 			  [string]$file,
 		  [parameter(Mandatory=$false)]
-		  [Validateset("GET","POST")]
+		  [Validateset("GET","POST","DELETE")]
 			  [string]$Method = "GET",
 		  [parameter(Mandatory=$true)]
 		  [ValidateNotNullOrEmpty()]
@@ -67,8 +67,9 @@
 		  $CertCallbackOverridden = $false
 		  $OriginalCertCallback = $null
 		  $fullonypheurl = "$($onypheurl)$($request)"
+		  $isPostQuery = ($Method -eq "POST") -and $QueryValue -and (-not $data) -and (-not $file)
 		  $queryStringParams = @()
-		  if ($QueryValue) { $queryStringParams += "q=$([System.Uri]::EscapeDataString($QueryValue))" }
+		  if ($QueryValue -and -not $isPostQuery) { $queryStringParams += "q=$([System.Uri]::EscapeDataString($QueryValue))" }
 		  if ($page) { $queryStringParams += "page=$($page)" }
 		  if ($size) { $queryStringParams += "size=$($size)" }
 		  if ($TrackQuery) { $queryStringParams += "trackquery=true" }
@@ -136,6 +137,11 @@
 				  $params.add('SkipCertificateCheck', $true)
 			  }
 		  }
+		  if ($isPostQuery) {
+			  $params.add('Method','Post')
+			  $params.add('Body', "query=$([System.Uri]::EscapeDataString($QueryValue))")
+			  $params.add('ContentType', 'application/x-www-form-urlencoded')
+		  }
 		  if ($data) {
 			  $params.add('Method','Post')
 			  $params.add('Body', $data)
@@ -148,6 +154,9 @@
 		  }
 		  if (($Method -eq "POST") -and !$params.Method) {
 			  $params.add('Method','Post')
+		  }
+		  if (($Method -eq "DELETE") -and !$params.Method) {
+			  $params.add('Method','Delete')
 		  }
 		  if ($APIKeyrequired) {
 			  $params.add('Headers', @{'Authorization' = 'apikey {0}' -f $global:OnypheAPIKey})

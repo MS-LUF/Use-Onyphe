@@ -878,6 +878,17 @@ C:\PS&gt; Export-OnypheDiscoveryInfo -FilePath .\myqueries.txt -Category risksca
           </dev:type>
           <dev:defaultValue>False</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="16" aliases="none">
+          <maml:name>Post</maml:name>
+          <maml:description>
+            <maml:para>-Post switch send the OQL query as a POST request body (form-urlencoded, field "query") instead of a GET query-string parameter - avoids hitting a URL-length limit on very long OQL strings (many OR-terms/exclusions, e.g. a large -AdvancedSearch domain list). trackquery/calculated still go in the query string either way.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
           <maml:name>SearchValue</maml:name>
           <maml:description>
@@ -1121,6 +1132,18 @@ C:\PS&gt; Export-OnypheDiscoveryInfo -FilePath .\myqueries.txt -Category risksca
         </dev:type>
         <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="16" aliases="none">
+        <maml:name>Post</maml:name>
+        <maml:description>
+          <maml:para>-Post switch send the OQL query as a POST request body (form-urlencoded, field "query") instead of a GET query-string parameter - avoids hitting a URL-length limit on very long OQL strings (many OR-terms/exclusions, e.g. a large -AdvancedSearch domain list). trackquery/calculated still go in the query string either way.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>FilterFunction</maml:name>
         <maml:description>
@@ -1281,6 +1304,14 @@ group conditions with parentheses to AND two independent OR-groups together; pas
 module's multi-word auto-quoting will otherwise swallow the closing paren into the previous value and produce
 an OQL syntax error server-side
 C:\PS&gt; Export-OnypheInfo -AdvancedSearch @("(","?domain:sovcloud-core.fr","?domain:sovcloud-api.fr",")","(","?tld:fr",")") -Category resolver -SaveInfoAsFile .\myexport.json</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 12 --------------------------</maml:title>
+        <dev:code>send a very long OQL query (many OR-terms) as a POST body instead of a GET query string, to avoid a URL-length limit
+C:\PS&gt; Export-OnypheInfo -AdvancedSearch @("?domain:a.com","?domain:b.com","?domain:c.com") -Category resolver -SaveInfoAsFile .\myexport.json -Post</dev:code>
         <dev:remarks>
           <maml:para></maml:para>
         </dev:remarks>
@@ -1643,7 +1674,7 @@ C:\PS&gt; Export-OnypheInfo -AdvancedSearch @("(","?domain:sovcloud-core.fr","?d
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Get ASD API type available for Onyphe. Unlike Get-OnypheDiscoveryCategories/Get-OnypheSimpleAPIName, this list cannot be derived from /v2/user's "apis" metadata - the ASD APIs (v1, BETA) do not appear in that array (confirmed against a live Griffin View account), so the 9 currently-implemented standard ASD API (stdapis) type names are hardcoded here instead. Whether they are actually usable on a given account still depends on that account's asd.stdapis licence flag (see Get-OnypheUserInfo) - this function always returns the full list regardless of licensing, the API call itself will fail server-side if unlicensed.</maml:para>
+      <maml:para>Get ASD API type available for Onyphe. Unlike Get-OnypheDiscoveryCategories/Get-OnypheSimpleAPIName, this list cannot be derived from /v2/user's "apis" metadata - the ASD APIs (v1, BETA) do not appear in that array (confirmed against a live Griffin View account), so the 21 currently-implemented standard ASD API (stdapis) type names are hardcoded here instead. Whether they are actually usable on a given account still depends on that account's asd.stdapis licence flag (see Get-OnypheUserInfo) - this function always returns the full list regardless of licensing, the API call itself will fail server-side if unlicensed. Note "subnetinventory" is implemented but not yet confirmed to return real data on any tested account (every domain tried returned "no result found") - see Invoke-APIOnypheASDSubnetInventory's comment-based help. "orginventory" returning HTTP error 1011 for a large domain is not a failure - see Get-OnypheASDTask/ Wait-OnypheASDTask to retrieve the result via ASD's task/background-task mode. "domainexist" can hit the same HTTP error 1011 for domains with a large enough footprint (unlike its dnsdomainexist/dnsdomainnsexist siblings), and returns HTTP error 1006 rather than an "exist":"false" record for a genuinely non-existent domain - see Invoke-APIOnypheASDDomainExist's comment-based help. "bootstrapcertsowildcard" can also hit HTTP error 1011 for a large certso organization value; live-tested "Bleu SAS" via astask/ Wait-OnypheASDTask and found the eventual result was still 0 results, so error 1011's size estimate does not guarantee a large final result set - see Invoke-APIOnypheASDBootstrapCertsoWildcard's comment-based help.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -1689,7 +1720,7 @@ C:\PS&gt; Get-OnypheASDAPIName</dev:code>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>main function/cmdlet - Get information from onyphe.io web service using dedicated subfunctions by ASD API type available. The ASD APIs are BETA endpoints requiring a Griffin View or Griffin View ASM Edition subscription with a non-commercial use licence - see Get-OnypheUserInfo's asd.stdapis property to check whether they are licensed on your account. Only the 9 currently-licensable "standard" ASD APIs (stdapis) are implemented; the "advanced" Pivot Query API (advapis) is not yet implemented in this module.</maml:para>
+      <maml:para>main function/cmdlet - Get information from onyphe.io web service using dedicated subfunctions by ASD API type available. The ASD APIs are BETA endpoints requiring a Griffin View or Griffin View ASM Edition subscription with a non-commercial use licence - see Get-OnypheUserInfo's asd.stdapis property to check whether they are licensed on your account. Only 21 of the ~21-22 "standard" ASD APIs (stdapis) documented by the official onyphe/cli are implemented so far; the "advanced" Pivot Query API (advapis) and the remaining stdapis inventory/existence-check endpoints are not yet implemented in this module. ASD task management (for results too large to return synchronously) is implemented separately - see Get-OnypheASDTask/Get-OnypheASDTaskList/Wait-OnypheASDTask/Stop-OnypheASDTask.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -1697,7 +1728,7 @@ C:\PS&gt; Get-OnypheASDAPIName</dev:code>
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
           <maml:name>Value</maml:name>
           <maml:description>
-            <maml:para>-Value string[] one or more values to query. For every ASDAPIType except domaincertso this is one or more domains; for domaincertso this is one or more certificate subject.organization values.</maml:para>
+            <maml:para>-Value string[] one or more values to query. For domaincertso, ipcertso and bootstrapcertsowildcard this is one or more certificate subject.organization values; for subnetinventory/ipinventory/orginventory/vhostinventory/ scoreinventory, the domain(s) are wrapped server-side into an inventory rollup rather than queried individually; for every other ASDAPIType this is one or more domains.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
           <dev:type>
@@ -1709,7 +1740,7 @@ C:\PS&gt; Get-OnypheASDAPIName</dev:code>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
           <maml:name>IncludePattern</maml:name>
           <maml:description>
-            <maml:para>-IncludePattern string[] patterns to grep and keep matching results (not supported by ASDAPIType dnsdomainexist)</maml:para>
+            <maml:para>-IncludePattern string[] patterns to grep and keep matching results (not supported by ASDAPIType dnsdomainexist, dnsdomainnsexist, domainexist)</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
           <dev:type>
@@ -1721,7 +1752,7 @@ C:\PS&gt; Get-OnypheASDAPIName</dev:code>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
           <maml:name>ExcludePattern</maml:name>
           <maml:description>
-            <maml:para>-ExcludePattern string[] patterns to grep and exclude from results (not supported by ASDAPIType dnsdomainexist)</maml:para>
+            <maml:para>-ExcludePattern string[] patterns to grep and exclude from results (not supported by ASDAPIType dnsdomainexist, dnsdomainnsexist, domainexist)</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
           <dev:type>
@@ -1757,7 +1788,7 @@ C:\PS&gt; Get-OnypheASDAPIName</dev:code>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>Untrusted</maml:name>
           <maml:description>
-            <maml:para>-Untrusted switch disable Onyphe's backend false-positive filtering, server default is enabled/trusted (not supported by ASDAPIType dnsdomainexist)</maml:para>
+            <maml:para>-Untrusted switch disable Onyphe's backend false-positive filtering, server default is enabled/trusted (not supported by ASDAPIType dnsdomainexist, dnsdomainnsexist, domainexist)</maml:para>
           </maml:description>
           <dev:type>
             <maml:name>SwitchParameter</maml:name>
@@ -1806,7 +1837,7 @@ C:\PS&gt; Get-OnypheASDAPIName</dev:code>
       <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
         <maml:name>Value</maml:name>
         <maml:description>
-          <maml:para>-Value string[] one or more values to query. For every ASDAPIType except domaincertso this is one or more domains; for domaincertso this is one or more certificate subject.organization values.</maml:para>
+          <maml:para>-Value string[] one or more values to query. For domaincertso, ipcertso and bootstrapcertsowildcard this is one or more certificate subject.organization values; for subnetinventory/ipinventory/orginventory/vhostinventory/ scoreinventory, the domain(s) are wrapped server-side into an inventory rollup rather than queried individually; for every other ASDAPIType this is one or more domains.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
         <dev:type>
@@ -1818,7 +1849,7 @@ C:\PS&gt; Get-OnypheASDAPIName</dev:code>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
         <maml:name>IncludePattern</maml:name>
         <maml:description>
-          <maml:para>-IncludePattern string[] patterns to grep and keep matching results (not supported by ASDAPIType dnsdomainexist)</maml:para>
+          <maml:para>-IncludePattern string[] patterns to grep and keep matching results (not supported by ASDAPIType dnsdomainexist, dnsdomainnsexist, domainexist)</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
         <dev:type>
@@ -1830,7 +1861,7 @@ C:\PS&gt; Get-OnypheASDAPIName</dev:code>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
         <maml:name>ExcludePattern</maml:name>
         <maml:description>
-          <maml:para>-ExcludePattern string[] patterns to grep and exclude from results (not supported by ASDAPIType dnsdomainexist)</maml:para>
+          <maml:para>-ExcludePattern string[] patterns to grep and exclude from results (not supported by ASDAPIType dnsdomainexist, dnsdomainnsexist, domainexist)</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
         <dev:type>
@@ -1842,7 +1873,7 @@ C:\PS&gt; Get-OnypheASDAPIName</dev:code>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>Untrusted</maml:name>
         <maml:description>
-          <maml:para>-Untrusted switch disable Onyphe's backend false-positive filtering, server default is enabled/trusted (not supported by ASDAPIType dnsdomainexist)</maml:para>
+          <maml:para>-Untrusted switch disable Onyphe's backend false-positive filtering, server default is enabled/trusted (not supported by ASDAPIType dnsdomainexist, dnsdomainnsexist, domainexist)</maml:para>
         </maml:description>
         <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
         <dev:type>
@@ -1957,6 +1988,364 @@ C:\PS&gt; Get-OnypheASDInfo -ASDAPIType domaincertso -Value "Example Organizatio
         <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
         <dev:code>check whether one or more domains exist (passive DNS history / live brute-force)
 C:\PS&gt; Get-OnypheASDInfo -ASDAPIType dnsdomainexist -Value @("example.com","example.org")</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 5 --------------------------</maml:title>
+        <dev:code>discover the subnet(s) belonging to one or more domains, as an attack-surface inventory rollup
+C:\PS&gt; Get-OnypheASDInfo -ASDAPIType subnetinventory -Value example.com</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 6 --------------------------</maml:title>
+        <dev:code>discover the IP address(es) belonging to one or more domains, as an attack-surface inventory rollup
+C:\PS&gt; Get-OnypheASDInfo -ASDAPIType ipinventory -Value example.com</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 7 --------------------------</maml:title>
+        <dev:code>discover the organization(s) associated with one or more domains, as an attack-surface inventory rollup
+C:\PS&gt; Get-OnypheASDInfo -ASDAPIType orginventory -Value example.com</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 8 --------------------------</maml:title>
+        <dev:code>discover the IP address(es) belonging to a certificate subject.organization value
+C:\PS&gt; Get-OnypheASDInfo -ASDAPIType ipcertso -Value "Example Organization"</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 9 --------------------------</maml:title>
+        <dev:code>discover the IP address(es) belonging to one or more domains
+C:\PS&gt; Get-OnypheASDInfo -ASDAPIType ipdomain -Value example.com</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 10 --------------------------</maml:title>
+        <dev:code>discover the virtual host(s)/forward DNS hostname(s) belonging to one or more domains
+C:\PS&gt; Get-OnypheASDInfo -ASDAPIType vhostinventory -Value example.com</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 11 --------------------------</maml:title>
+        <dev:code>discover risk-flagged findings for one or more domains, as an attack-surface inventory rollup
+C:\PS&gt; Get-OnypheASDInfo -ASDAPIType scoreinventory -Value example.com</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 12 --------------------------</maml:title>
+        <dev:code>discover other domain(s) sharing the same Microsoft 365 tenant as one or more domains (a live DNS lookup)
+C:\PS&gt; Get-OnypheASDInfo -ASDAPIType dnsdomainmstenantid -Value example.com</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 13 --------------------------</maml:title>
+        <dev:code>check whether one or more domains have an existing NS record (a live DNS lookup)
+C:\PS&gt; Get-OnypheASDInfo -ASDAPIType dnsdomainnsexist -Value @("example.com","example.org")</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 14 --------------------------</maml:title>
+        <dev:code>check whether one or more domains exist - can return HTTP error 1011 "too many results, you should create a task" for domains with a large enough footprint, see Get-OnypheASDTask/Wait-OnypheASDTask
+C:\PS&gt; Get-OnypheASDInfo -ASDAPIType domainexist -Value @("example.com","example.org")</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 15 --------------------------</maml:title>
+        <dev:code>discover subdomain(s)/hostname(s) for one or more domains from web crawl data
+C:\PS&gt; Get-OnypheASDInfo -ASDAPIType websubdomaindomain -Value example.com</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 16 --------------------------</maml:title>
+        <dev:code>seed a wildcard-domain search from a certificate subject.organization value - can return HTTP error 1011 "too many results, you should create a task" for a large organization, see Get-OnypheASDTask/Wait-OnypheASDTask
+C:\PS&gt; Get-OnypheASDInfo -ASDAPIType bootstrapcertsowildcard -Value "Example Organization"</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Get-OnypheASDTask</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>OnypheASDTask</command:noun>
+      <maml:description>
+        <maml:para>main function/cmdlet - retrieve the final result of an ASD task on onyphe.io web service</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>main function/cmdlet - retrieve the final result of an ASD task on onyphe.io web service using the ASD Task Id APIv1 (v1/asd/task/id/&lt;id&gt;). Any ASD *inventory endpoint (Get-OnypheASDInfo -ASDAPIType orginventory/subnetinventory/ipinventory) can return HTTP error 1011 "too many results, you should create a task" for a large domain instead of its usual results - re-run the same ASD call adding an "astask":"true" field to get a .taskid back instead, then use that task ID here (or with Wait-OnypheASDTask, which polls until the task finishes and calls this automatically). Returns error 1009 ("task not finished, no output file") if the task hasn't finished yet. These are BETA endpoints requiring a Griffin View or Griffin View ASM Edition subscription with a non-commercial use licence - see Get-OnypheUserInfo's asd.stdapis property to check whether they are licensed on your account.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Get-OnypheASDTask</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+          <maml:name>TaskId</maml:name>
+          <maml:description>
+            <maml:para>-TaskId string the task ID to retrieve results for</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>APIKey</maml:name>
+          <maml:description>
+            <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+          <maml:name>wait</maml:name>
+          <maml:description>
+            <maml:para>-Wait int{second} wait for x second before sending the request to manage rate limiting restriction</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+          <dev:type>
+            <maml:name>Int32</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>0</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="proga">
+          <maml:name>ProgressAction</maml:name>
+          <maml:description>
+            <maml:para>{{ Fill ProgressAction Description }}</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">ActionPreference</command:parameterValue>
+          <dev:type>
+            <maml:name>ActionPreference</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <maml:name>TaskId</maml:name>
+        <maml:description>
+          <maml:para>-TaskId string the task ID to retrieve results for</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>APIKey</maml:name>
+        <maml:description>
+          <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <maml:name>wait</maml:name>
+        <maml:description>
+          <maml:para>-Wait int{second} wait for x second before sending the request to manage rate limiting restriction</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+        <dev:type>
+          <maml:name>Int32</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>0</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="proga">
+        <maml:name>ProgressAction</maml:name>
+        <maml:description>
+          <maml:para>{{ Fill ProgressAction Description }}</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">ActionPreference</command:parameterValue>
+        <dev:type>
+          <maml:name>ActionPreference</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>TypeName: PSOnyphe</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>retrieve the final result of a finished ASD task
+C:\PS&gt; Get-OnypheASDTask -TaskId "22f9efca-994f-4f26-af1b-8a4db99e4fa7"</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Get-OnypheASDTaskList</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>OnypheASDTaskList</command:noun>
+      <maml:description>
+        <maml:para>main function/cmdlet - list all ASD tasks for the account on onyphe.io web service</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>main function/cmdlet - list all ASD tasks for the account on onyphe.io web service using the ASD Task List APIv1 (v1/asd/task/list) - currently running or already finished. Each entry is {"taskid": "&lt;guid&gt;", "running": "true"|"false"}. Returns error 1007 ("task not found: empty list") when there are no tasks at all - not a failure, just an empty list. Live-tested 2026-09-18: this account allows only one task at a time - a second call to an ASD *inventory endpoint with astask:true while one is already tracked here fails with error 1008 "creating task failed: a task is already running", even after the tracked task has finished, until it is explicitly cleared with Stop-OnypheASDTask. These are BETA endpoints requiring a Griffin View or Griffin View ASM Edition subscription with a non-commercial use licence - see Get-OnypheUserInfo's asd.stdapis property to check whether they are licensed on your account.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Get-OnypheASDTaskList</maml:name>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+          <maml:name>APIKey</maml:name>
+          <maml:description>
+            <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>wait</maml:name>
+          <maml:description>
+            <maml:para>-Wait int{second} wait for x second before sending the request to manage rate limiting restriction</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+          <dev:type>
+            <maml:name>Int32</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>0</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="proga">
+          <maml:name>ProgressAction</maml:name>
+          <maml:description>
+            <maml:para>{{ Fill ProgressAction Description }}</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">ActionPreference</command:parameterValue>
+          <dev:type>
+            <maml:name>ActionPreference</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+        <maml:name>APIKey</maml:name>
+        <maml:description>
+          <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>wait</maml:name>
+        <maml:description>
+          <maml:para>-Wait int{second} wait for x second before sending the request to manage rate limiting restriction</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+        <dev:type>
+          <maml:name>Int32</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>0</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="proga">
+        <maml:name>ProgressAction</maml:name>
+        <maml:description>
+          <maml:para>{{ Fill ProgressAction Description }}</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">ActionPreference</command:parameterValue>
+        <dev:type>
+          <maml:name>ActionPreference</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>TypeName: PSOnyphe</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>list all ASD tasks for the account
+C:\PS&gt; Get-OnypheASDTaskList</dev:code>
         <dev:remarks>
           <maml:para></maml:para>
         </dev:remarks>
@@ -3428,6 +3817,347 @@ C:\PS&gt; Get-OnypheDiscoveryCategories</dev:code>
   </command:command>
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
     <command:details>
+      <command:name>Invoke-OnyphePivot</command:name>
+      <command:verb>Invoke</command:verb>
+      <command:noun>OnyphePivot</command:noun>
+      <maml:description>
+        <maml:para>main function/cmdlet - pivot from a prior Onyphe result set to a follow-up search, per distinct value of a field</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>main function/cmdlet - takes a prior Onyphe result set (e.g. from Search-OnypheInfo/Get-OnypheInfo), extracts every distinct value of -PivotField from it, and fires one follow-up Search-OnypheInfo call per distinct value using -PivotFilter as the target OQL filter name. Captures the "auto-pivot" idea from the official onyphe/cli's opp companion tool (Andlookup/Orlookup/Pivots/Whois processors, which issue new Onyphe API calls off a field pulled from a prior result set) without porting the rest of that tool's 24 purely client-side formatting/filtering processors - those are already covered natively and idiomatically by PowerShell's own object pipeline (Where-Object/Group-Object/ Sort-Object -Unique/etc.).</maml:para>
+      <maml:para>One API call is made per distinct pivot value (not a single OR-combined query) - this mirrors the manual multi-step technique this project's own OSINT sessions have already used by hand (e.g. Results/CertAndDNS/sovcloud_domains_analysis.md's organization-to-domain and subnet-to-domain enumeration passes), and keeps clear provenance (which pivot value produced which hits) at the cost of one API call/credit per distinct value. Each returned result object is tagged with two extra NoteProperty fields, 'cli-pivot_source_field' and 'cli-pivot_source_value', recording which -PivotField value produced it.</maml:para>
+      <maml:para>Only the first page of results is retrieved per pivot value (no -Page support) - use -Size to widen that first page if needed.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Invoke-OnyphePivot</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByValue)" position="2" aliases="none">
+          <maml:name>InputObject</maml:name>
+          <maml:description>
+            <maml:para>-InputObject PSOnyphe object[] a prior Onyphe result set (e.g. piped in from Search-OnypheInfo/Get-OnypheInfo) to pivot from</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
+          <dev:type>
+            <maml:name>Array</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+          <maml:name>PivotField</maml:name>
+          <maml:description>
+            <maml:para>-PivotField string dotted property path to read off each -InputObject item (e.g. "subject.organization", "geolocus.organization") - the source of the distinct values to pivot on. If the resolved property value is itself an array (e.g. a SAN list), every element is treated as its own distinct value.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>APIKey</maml:name>
+          <maml:description>
+            <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>Size</maml:name>
+          <maml:description>
+            <maml:para>-Size int{1 to 10000} number of results per page (server default is 100 when omitted), applied to every follow-up query</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+          <dev:type>
+            <maml:name>Int32</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>0</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>TrackQuery</maml:name>
+          <maml:description>
+            <maml:para>-TrackQuery switch ask Onyphe to return, for each result, which OQL filter matched it (applied to every follow-up query)</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>Calculated</maml:name>
+          <maml:description>
+            <maml:para>-Calculated switch ask Onyphe to enrich results with computed fields (applied to every follow-up query)</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>UseBetaFeatures</maml:name>
+          <maml:description>
+            <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>Post</maml:name>
+          <maml:description>
+            <maml:para>-Post switch send each follow-up query's OQL as a POST request body instead of a GET query-string parameter (see Search-OnypheInfo's -Post)</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>Wait</maml:name>
+          <maml:description>
+            <maml:para>-Wait int{second} wait for x second before sending each follow-up query, to manage rate limiting across the (potentially many) API calls this cmdlet can fire - one per distinct pivot value</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+          <dev:type>
+            <maml:name>Int32</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>0</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>PivotCategory</maml:name>
+          <maml:description>
+            <maml:para>{{ Fill PivotCategory Description }}</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>PivotFilter</maml:name>
+          <maml:description>
+            <maml:para>{{ Fill PivotFilter Description }}</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="proga">
+          <maml:name>ProgressAction</maml:name>
+          <maml:description>
+            <maml:para>{{ Fill ProgressAction Description }}</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">ActionPreference</command:parameterValue>
+          <dev:type>
+            <maml:name>ActionPreference</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByValue)" position="2" aliases="none">
+        <maml:name>InputObject</maml:name>
+        <maml:description>
+          <maml:para>-InputObject PSOnyphe object[] a prior Onyphe result set (e.g. piped in from Search-OnypheInfo/Get-OnypheInfo) to pivot from</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
+        <dev:type>
+          <maml:name>Array</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <maml:name>PivotField</maml:name>
+        <maml:description>
+          <maml:para>-PivotField string dotted property path to read off each -InputObject item (e.g. "subject.organization", "geolocus.organization") - the source of the distinct values to pivot on. If the resolved property value is itself an array (e.g. a SAN list), every element is treated as its own distinct value.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>APIKey</maml:name>
+        <maml:description>
+          <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>Size</maml:name>
+        <maml:description>
+          <maml:para>-Size int{1 to 10000} number of results per page (server default is 100 when omitted), applied to every follow-up query</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+        <dev:type>
+          <maml:name>Int32</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>0</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>TrackQuery</maml:name>
+        <maml:description>
+          <maml:para>-TrackQuery switch ask Onyphe to return, for each result, which OQL filter matched it (applied to every follow-up query)</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>Calculated</maml:name>
+        <maml:description>
+          <maml:para>-Calculated switch ask Onyphe to enrich results with computed fields (applied to every follow-up query)</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>UseBetaFeatures</maml:name>
+        <maml:description>
+          <maml:para>-UseBetaFeatures switch use test.onyphe.io to use new beat features of Onyphe</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>Post</maml:name>
+        <maml:description>
+          <maml:para>-Post switch send each follow-up query's OQL as a POST request body instead of a GET query-string parameter (see Search-OnypheInfo's -Post)</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>Wait</maml:name>
+        <maml:description>
+          <maml:para>-Wait int{second} wait for x second before sending each follow-up query, to manage rate limiting across the (potentially many) API calls this cmdlet can fire - one per distinct pivot value</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+        <dev:type>
+          <maml:name>Int32</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>0</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>PivotCategory</maml:name>
+        <maml:description>
+          <maml:para>{{ Fill PivotCategory Description }}</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>PivotFilter</maml:name>
+        <maml:description>
+          <maml:para>{{ Fill PivotFilter Description }}</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="proga">
+        <maml:name>ProgressAction</maml:name>
+        <maml:description>
+          <maml:para>{{ Fill ProgressAction Description }}</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">ActionPreference</command:parameterValue>
+        <dev:type>
+          <maml:name>ActionPreference</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>TypeName: PSOnyphe</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>pivot from a ctl result set to every other certificate sharing the same subject.organization value(s), using -PivotField and -PivotFilter as the same field name here (both live on the ctl category)
+C:\PS&gt; Search-OnypheInfo -AdvancedSearch @("domain:example.com") -Category ctl | Invoke-OnyphePivot -PivotField "subject.organization" -PivotCategory ctl -PivotFilter "subject.organization"</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
+        <dev:code>pivot from a resolver result set to every other hostname hosted on the same organization, waiting 2s between each follow-up call
+C:\PS&gt; Search-OnypheInfo -AdvancedSearch @("domain:example.com") -Category resolver | Invoke-OnyphePivot -PivotField organization -PivotCategory resolver -PivotFilter organization -Wait 2</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
       <command:name>Search-OnypheInfo</command:name>
       <command:verb>Search</command:verb>
       <command:noun>OnypheInfo</command:noun>
@@ -3503,6 +4233,17 @@ C:\PS&gt; Get-OnypheDiscoveryCategories</dev:code>
           <maml:name>Calculated</maml:name>
           <maml:description>
             <maml:para>-Calculated switch ask Onyphe to enrich results with computed fields (e.g. defanged/undefanged URL variants)</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="16" aliases="none">
+          <maml:name>Post</maml:name>
+          <maml:description>
+            <maml:para>-Post switch send the OQL query as a POST request body (form-urlencoded, field "query") instead of a GET query-string parameter - avoids hitting a URL-length limit on very long OQL strings (many OR-terms/exclusions, e.g. a large -AdvancedSearch domain list). page/size/trackquery/calculated still go in the query string either way.</maml:para>
           </maml:description>
           <dev:type>
             <maml:name>SwitchParameter</maml:name>
@@ -3753,6 +4494,18 @@ C:\PS&gt; Get-OnypheDiscoveryCategories</dev:code>
         </dev:type>
         <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="16" aliases="none">
+        <maml:name>Post</maml:name>
+        <maml:description>
+          <maml:para>-Post switch send the OQL query as a POST request body (form-urlencoded, field "query") instead of a GET query-string parameter - avoids hitting a URL-length limit on very long OQL strings (many OR-terms/exclusions, e.g. a large -AdvancedSearch domain list). page/size/trackquery/calculated still go in the query string either way.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>FilterFunction</maml:name>
         <maml:description>
@@ -3915,6 +4668,14 @@ group conditions with parentheses to AND two independent OR-groups together; pas
 module's multi-word auto-quoting will otherwise swallow the closing paren into the previous value and produce
 an OQL syntax error server-side
 C:\PS&gt; Search-OnypheInfo -AdvancedSearch @("(","?domain:sovcloud-core.fr","?domain:sovcloud-api.fr",")","(","?tld:fr",")") -Category resolver</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 12 --------------------------</maml:title>
+        <dev:code>send a very long OQL query (many OR-terms) as a POST body instead of a GET query string, to avoid a URL-length limit
+C:\PS&gt; Search-OnypheInfo -AdvancedSearch @("?domain:a.com","?domain:b.com","?domain:c.com") -Category resolver -Post</dev:code>
         <dev:remarks>
           <maml:para></maml:para>
         </dev:remarks>
@@ -4864,6 +5625,203 @@ C:\PS&gt; Search-OnypheInfo -AdvancedSearch @("(","?domain:sovcloud-core.fr","?d
   </command:command>
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
     <command:details>
+      <command:name>Stop-OnypheASDTask</command:name>
+      <command:verb>Stop</command:verb>
+      <command:noun>OnypheASDTask</command:noun>
+      <maml:description>
+        <maml:para>main function/cmdlet - kill/clear an ASD task on onyphe.io web service</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>main function/cmdlet - kill/clear an ASD task on onyphe.io web service using the ASD Task Kill APIv1 (v1/asd/task/kill/&lt;id&gt;, an HTTP DELETE request) - works on both a still-running task (terminates it) and an already-finished one (clears it from Get-OnypheASDTaskList, which is necessary on this account before a new ASD *inventory call with astask:true can be made - see Get-OnypheASDTaskList's comment-based help). These are BETA endpoints requiring a Griffin View or Griffin View ASM Edition subscription with a non-commercial use licence - see Get-OnypheUserInfo's asd.stdapis property to check whether they are licensed on your account.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Stop-OnypheASDTask</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+          <maml:name>TaskId</maml:name>
+          <maml:description>
+            <maml:para>-TaskId string the task ID to kill/clear</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>APIKey</maml:name>
+          <maml:description>
+            <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+          <maml:name>wait</maml:name>
+          <maml:description>
+            <maml:para>-Wait int{second} wait for x second before sending the request to manage rate limiting restriction</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+          <dev:type>
+            <maml:name>Int32</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>0</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="wi">
+          <maml:name>WhatIf</maml:name>
+          <maml:description>
+            <maml:para>Shows what would happen if the cmdlet runs. The cmdlet is not run.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="cf">
+          <maml:name>Confirm</maml:name>
+          <maml:description>
+            <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="proga">
+          <maml:name>ProgressAction</maml:name>
+          <maml:description>
+            <maml:para>{{ Fill ProgressAction Description }}</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">ActionPreference</command:parameterValue>
+          <dev:type>
+            <maml:name>ActionPreference</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <maml:name>TaskId</maml:name>
+        <maml:description>
+          <maml:para>-TaskId string the task ID to kill/clear</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>APIKey</maml:name>
+        <maml:description>
+          <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <maml:name>wait</maml:name>
+        <maml:description>
+          <maml:para>-Wait int{second} wait for x second before sending the request to manage rate limiting restriction</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+        <dev:type>
+          <maml:name>Int32</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>0</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="wi">
+        <maml:name>WhatIf</maml:name>
+        <maml:description>
+          <maml:para>Shows what would happen if the cmdlet runs. The cmdlet is not run.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="cf">
+        <maml:name>Confirm</maml:name>
+        <maml:description>
+          <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="proga">
+        <maml:name>ProgressAction</maml:name>
+        <maml:description>
+          <maml:para>{{ Fill ProgressAction Description }}</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">ActionPreference</command:parameterValue>
+        <dev:type>
+          <maml:name>ActionPreference</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>TypeName: PSOnyphe</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>kill/clear an ASD task, prompting for confirmation first
+C:\PS&gt; Stop-OnypheASDTask -TaskId "22f9efca-994f-4f26-af1b-8a4db99e4fa7"</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
+        <dev:code>kill/clear an ASD task without prompting
+C:\PS&gt; Stop-OnypheASDTask -TaskId "22f9efca-994f-4f26-af1b-8a4db99e4fa7" -Confirm:$false</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
       <command:name>Update-OnypheFacetsFilters</command:name>
       <command:verb>Update</command:verb>
       <command:noun>OnypheFacetsFilters</command:noun>
@@ -5020,6 +5978,181 @@ C:\PS&gt; Search-OnypheInfo -AdvancedSearch @("(","?domain:sovcloud-core.fr","?d
         <dev:code>Update the local Use-Onyphe-Config.json configuration file's cache of available APIs, functions, filters from user API</dev:code>
         <dev:remarks>
           <maml:para>C:\PS&gt; Update-OnypheFacetsFilters</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Wait-OnypheASDTask</command:name>
+      <command:verb>Wait</command:verb>
+      <command:noun>OnypheASDTask</command:noun>
+      <maml:description>
+        <maml:para>main function/cmdlet - wait for an ASD task on onyphe.io web service to finish, then return its result</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>main function/cmdlet - wait for an ASD task on onyphe.io web service to finish, then return its result. Repeatedly checks Get-OnypheASDTaskList's per-task "running" flag (the only reliable completion signal found live-testing 2026-09-18 - the ASD Task Poll APIv1's own output is a rolling numeric progress-tick array that does not visibly change shape on completion, so it's surfaced here only as -Verbose progress information, not used to detect completion) every -PollIntervalSec seconds, up to -TimeoutSec seconds total, then calls Get-OnypheASDTask to fetch and return the finished task's actual result. If the task ID is no longer present in Get-OnypheASDTaskList at all (already cleared, or never existed), attempts Get-OnypheASDTask once anyway as a fallback so the caller still sees whatever error the server reports, rather than this cmdlet silently returning nothing. On timeout, returns the last-seen task-list entry with a warning instead of the (still unfinished) result. These are BETA endpoints requiring a Griffin View or Griffin View ASM Edition subscription with a non-commercial use licence - see Get-OnypheUserInfo's asd.stdapis property to check whether they are licensed on your account.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Wait-OnypheASDTask</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+          <maml:name>TaskId</maml:name>
+          <maml:description>
+            <maml:para>-TaskId string the task ID to wait for</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>PollIntervalSec</maml:name>
+          <maml:description>
+            <maml:para>-PollIntervalSec int seconds to wait between each check (default 5)</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+          <dev:type>
+            <maml:name>Int32</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>5</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+          <maml:name>TimeoutSec</maml:name>
+          <maml:description>
+            <maml:para>-TimeoutSec int maximum total seconds to wait before giving up (default 300)</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+          <dev:type>
+            <maml:name>Int32</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>300</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>APIKey</maml:name>
+          <maml:description>
+            <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="proga">
+          <maml:name>ProgressAction</maml:name>
+          <maml:description>
+            <maml:para>{{ Fill ProgressAction Description }}</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">ActionPreference</command:parameterValue>
+          <dev:type>
+            <maml:name>ActionPreference</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <maml:name>TaskId</maml:name>
+        <maml:description>
+          <maml:para>-TaskId string the task ID to wait for</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>PollIntervalSec</maml:name>
+        <maml:description>
+          <maml:para>-PollIntervalSec int seconds to wait between each check (default 5)</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+        <dev:type>
+          <maml:name>Int32</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>5</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <maml:name>TimeoutSec</maml:name>
+        <maml:description>
+          <maml:para>-TimeoutSec int maximum total seconds to wait before giving up (default 300)</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+        <dev:type>
+          <maml:name>Int32</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>300</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>APIKey</maml:name>
+        <maml:description>
+          <maml:para>-APIKey string{APIKEY} set your APIKEY to be able to use Onyphe API.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="proga">
+        <maml:name>ProgressAction</maml:name>
+        <maml:description>
+          <maml:para>{{ Fill ProgressAction Description }}</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">ActionPreference</command:parameterValue>
+        <dev:type>
+          <maml:name>ActionPreference</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>TypeName: PSOnyphe</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>wait for an ASD task to finish (default polling every 5s, up to 300s), then return its result
+C:\PS&gt; Wait-OnypheASDTask -TaskId "22f9efca-994f-4f26-af1b-8a4db99e4fa7"</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
+        <dev:code>wait for a long-running task, checking every 10 seconds for up to 10 minutes
+C:\PS&gt; Wait-OnypheASDTask -TaskId "22f9efca-994f-4f26-af1b-8a4db99e4fa7" -PollIntervalSec 10 -TimeoutSec 600</dev:code>
+        <dev:remarks>
+          <maml:para></maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>

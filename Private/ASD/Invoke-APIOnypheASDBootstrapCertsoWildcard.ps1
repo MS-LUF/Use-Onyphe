@@ -1,0 +1,104 @@
+	Function Invoke-APIOnypheASDBootstrapCertsoWildcard {
+	<#
+	  .SYNOPSIS
+	  create input for Invoke-OnypheAPIV2 function and then call it to query the ASD Bootstrap Certso Wildcard APIv1
+
+	  .DESCRIPTION
+	  create input for Invoke-OnypheAPIV2 function and then call it to query the ASD Bootstrap Certso Wildcard
+	  APIv1 - seeds a wildcard-domain search from a certificate subject.organization value, discovering
+	  wildcard domain pattern(s) (e.g. *.example.com) linked to it. BETA endpoint, requires a Griffin View or
+	  Griffin View ASM Edition subscription with a non-commercial use licence (see Get-OnypheUserInfo's
+	  asd.stdapis property). Uses the "certso"-keyed request body, same shape as
+	  Invoke-APIOnypheASDDomainCertso/Invoke-APIOnypheASDIpCertso, NOT the "domain"-keyed body its "wildcard"
+	  name might suggest - confirmed live: sending a "domain" key instead returns HTTP error 1002 "certso:
+	  parameter error: certso not given".
+
+	  Live-tested 2026-09-19: "ONYPHE" returned HTTP error 1006 "search failed: no result found"; "DigiCert
+	  Inc" returned a clean "success" with 0 results; "Bleu SAS" returned HTTP error 1011 "too many results,
+	  you should create a task" - same astask/Wait-OnypheASDTask background-task mode as
+	  Invoke-APIOnypheASDOrgInventory/Invoke-APIOnypheASDDomainExist. Confirmed end-to-end: resending with
+	  "astask":"true" and polling via Wait-OnypheASDTask eventually returned a clean "success" with 0 results
+	  too - i.e. the error 1011 size estimate that triggers task mode does not guarantee the final result set
+	  is actually large once computed, worth remembering for any other endpoint that hits this error.
+	  -AsTask/task-result-retrieval is intentionally not exposed by this wrapper, same reasoning as
+	  Invoke-APIOnypheASDOrgInventory.
+
+	  .PARAMETER Certso
+	  -Certso string[]
+	  one or more certificate subject.organization values to query
+
+	  .PARAMETER IncludePattern
+	  -IncludePattern string[]
+	  patterns to grep and keep matching results
+
+	  .PARAMETER ExcludePattern
+	  -ExcludePattern string[]
+	  patterns to grep and exclude from results
+
+	  .PARAMETER Untrusted
+	  -Untrusted switch
+	  disable Onyphe's backend false-positive filtering (server default is enabled/trusted)
+
+	  .PARAMETER AsLines
+	  -AsLines switch
+	  render results as one JSON object per line instead of with context (server default is with context)
+
+	  .PARAMETER APIKEY
+	  -APIKey string{APIKEY}
+	  Set APIKEY as global variable
+
+	  .PARAMETER FuncInput
+	  -FuncInput hashtable
+	  original bound parameters of the calling wrapper, threaded through to the result object's cli-func_input property
+
+	  .OUTPUTS
+	  TypeName: PSOnyphe
+
+	  .EXAMPLE
+	  C:\PS> Invoke-APIOnypheASDBootstrapCertsoWildcard -Certso "Example Organization"
+	#>
+		[cmdletbinding()]
+		Param (
+			[parameter(Mandatory=$true)]
+			[ValidateNotNullOrEmpty()]
+				[string[]]$Certso,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[string[]]$IncludePattern,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[string[]]$ExcludePattern,
+			[parameter(Mandatory=$false)]
+				[switch]$Untrusted,
+			[parameter(Mandatory=$false)]
+				[switch]$AsLines,
+			[parameter(Mandatory=$false)]
+			[ValidateLength(40,40)]
+				[string]$APIKey,
+			[parameter(Mandatory=$false)]
+			[ValidateNotNullOrEmpty()]
+				[hashtable]$FuncInput
+		)
+		Process {
+			if ($APIKey) {Set-OnypheAPIKey -APIKey $APIKey | out-null}
+			$Body = [ordered]@{ certso = $Certso }
+			if ($IncludePattern) { $Body.includep = $IncludePattern }
+			if ($ExcludePattern) { $Body.excludep = $ExcludePattern }
+			if ($Untrusted) { $Body.trusted = $false }
+			if ($AsLines) { $Body.aslines = $true }
+			$params = @{
+				request = "v1/asd/bootstrap/certso/wildcard"
+				APIInfo = "asd/bootstrap/certso/wildcard"
+				APIInput = @($Certso)
+				APIKeyrequired = $true
+				APIVersion = "1"
+				Data = $Body | ConvertTo-Json
+			}
+			if ($FuncInput) {
+				$params.add("FuncInput", $FuncInput)
+			}
+			Write-Verbose -message "URL Info : $($params.request)"
+			Write-Verbose -message "POST JSON Data : $($Body | ConvertTo-Json)"
+			Invoke-OnypheAPIV2 @params
+		}
+	}

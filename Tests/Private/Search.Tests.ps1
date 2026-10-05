@@ -164,6 +164,16 @@ Describe 'Private/Search wrappers' -Tag 'Unit' {
 					(@($APIInput)[0]) -eq '-wildcard:organization,"foo,bar baz"'
 				}
 			}
+
+				It 'passes -Method POST through to Invoke-OnypheAPIV2 when -Post is supplied' {
+					Mock Invoke-OnypheAPIV2 { [pscustomobject]@{ status = 'ok' } }
+
+					Invoke-APIOnypheSearch -SearchType 'resolver' -AdvancedSearch @('?domain:a.com', '?domain:b.com') -Post | Out-Null
+
+					Should -Invoke Invoke-OnypheAPIV2 -Times 1 -Exactly -ParameterFilter {
+						($Method -eq 'POST') -and ($QueryValue -eq 'category:resolver ?domain:a.com ?domain:b.com')
+					}
+				}
 		}
 
 		Context 'Invoke-APIOnypheExport' {
@@ -224,6 +234,16 @@ Describe 'Private/Search wrappers' -Tag 'Unit' {
 				Should -Invoke Invoke-OnypheAPIV2 -Times 1 -Exactly -ParameterFilter {
 					($request -eq 'v2/export/') -and
 					($QueryValue -eq 'category:resolver ( ?domain:a.com ?domain:b.com ) ( ?tld:fr )')
+				}
+			}
+
+			It 'passes -Method POST through to Invoke-OnypheAPIV2 when -Post is supplied' {
+				Mock Invoke-OnypheAPIV2 { [pscustomobject]@{ status = 'ok' } }
+
+				Invoke-APIOnypheExport -SearchType 'resolver' -AdvancedSearch @('?domain:a.com', '?domain:b.com') -OutFile $script:OutFilePath -Post | Out-Null
+
+				Should -Invoke Invoke-OnypheAPIV2 -Times 1 -Exactly -ParameterFilter {
+					($Method -eq 'POST') -and ($QueryValue -eq 'category:resolver ?domain:a.com ?domain:b.com')
 				}
 			}
 		}

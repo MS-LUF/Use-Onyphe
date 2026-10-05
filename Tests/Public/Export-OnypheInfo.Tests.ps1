@@ -68,4 +68,11 @@ Describe 'Export-OnypheInfo' -Tag 'Unit' {
 			($TrackQuery -eq $true) -and ($Calculated -eq $true)
 		}
 	}
+
+	It 'passes -Post through to Invoke-APIOnypheExport' {
+		Export-OnypheInfo -SearchValue 'RU' -Category threatlist -SearchFilter country -Post -SaveInfoAsFile 'out.json' | Out-Null
+		Should -Invoke -ModuleName Use-Onyphe Invoke-APIOnypheExport -Times 1 -Exactly -ParameterFilter {
+			$Post -eq $true
+		}
+	}
 }

@@ -248,8 +248,9 @@ Get-help is available on all functions, for instance, if you want to consult the
     - capped at 100 results per entry, same as `Get-OnypheInfo` - see the caveat under that bullet above
  - Export-OnypheDiscoveryInfo (or Export-OnypheBulkDiscovery) to run a file of OQL queries (one per line) in bulk against the Discovery API and download the JSON results
     - **requires a Griffin View subscription on Onyphe** - without one, no Discovery category will be available to you
- - Get-OnypheASDInfo to use the ASD (Attack Surface Discovery) APIv1 - domain/certificate/DNS enumeration endpoints
+ - Get-OnypheASDInfo to use the ASD (Attack Surface Discovery) APIv1 - domain/certificate/DNS enumeration and inventory-rollup endpoints
     - **requires a Griffin View or Griffin View ASM Edition subscription with a non-commercial use licence** - see Get-OnypheUserInfo's `asd.stdapis` property
+ - Get-OnypheASDTask / Get-OnypheASDTaskList / Wait-OnypheASDTask / Stop-OnypheASDTask to manage ASD background tasks - needed when an ASD `*inventory` endpoint's result is too large to return synchronously (see the "ASD task management" section below)
  
 Find hereunder several use cases for all API examples documented on https://www.onyphe.io/documentation/api
 
@@ -473,7 +474,7 @@ as of v2.1.2, all 20 Discovery categories a Griffin View subscription can expose
 `page` has no effect on this endpoint at all (confirmed: `?page=1` and `?page=2` return the exact same 100 records) - `-Size` is the only lever. Some categories (e.g. `riskscan`) are Discovery-only with no Search/Export API equivalent, so this is the only way to get a complete result set for them - `Export-OnypheInfo`/the Search API will reject a Discovery-only category outright.
 
 ## ASD (Attack Surface Discovery) APIs
-Since v2.2.0, `Get-OnypheASDInfo` wraps 9 of Onyphe's BETA "standard" ASD APIv1 endpoints - domain/certificate/DNS enumeration helpers, distinct from the Search/Discovery categories above. **These require a Griffin View or Griffin View ASM Edition subscription with a non-commercial use licence** - check `(Get-OnypheUserInfo).results.asd.stdapis` before use; `Get-OnypheASDAPIName` lists the implemented type names (`domaintld`, `domainwildcard`, `domaincertso`, `certsodomain`, `certsowildcard`, `dnsdomainns`, `dnsdomainmx`, `dnsdomainsoa`, `dnsdomainexist`).
+Since v2.2.0 (extended in v2.2.4/v2.2.5/v2.2.6/v2.3.0/v2.3.1/v2.3.2/v2.3.3/v2.3.4/v2.3.5/v2.3.6/v2.3.7/v2.3.8/v2.3.9), `Get-OnypheASDInfo` wraps the "standard" ASD APIv1 endpoints - domain/certificate/DNS enumeration and inventory-rollup helpers, distinct from the Search/Discovery categories above. **These require a Griffin View or Griffin View ASM Edition subscription with a non-commercial use licence** - check `(Get-OnypheUserInfo).results.asd.stdapis` before use; `Get-OnypheASDAPIName` lists the implemented type names (`domaintld`, `domainwildcard`, `domaincertso`, `certsodomain`, `certsowildcard`, `dnsdomainns`, `dnsdomainmx`, `dnsdomainsoa`, `dnsdomainexist`, `subnetinventory`, `ipinventory`, `orginventory`, `ipcertso`, `ipdomain`, `vhostinventory`, `scoreinventory`, `dnsdomainmstenantid`, `dnsdomainnsexist`, `domainexist`, `websubdomaindomain`, `bootstrapcertsowildcard`).
 
 API v1/asd/domain/tld : discover related domains across different TLDs for a given domain
 ```
@@ -491,15 +492,79 @@ API v1/asd/dns/domain/exist : check whether one or more domains exist (passive D
 ```
     C:\PS> Get-OnypheASDInfo -ASDAPIType dnsdomainexist -Value @("onyphe.io","example.org")
 ```
+API v1/asd/domain/exist : also checks whether one or more domains exist, but does noticeably heavier work server-side than dnsdomainexist/dnsdomainnsexist - a small domain returns a clean `exist:"true"`/`"false"` synchronously, but a domain with a large enough footprint (`sovcloud-core.fr`, `sovcloud-api.fr`, `microsoft.com` all hit this in testing) returns `error 1011 "too many results, you should create a task"` instead, needing the same `astask`/`Wait-OnypheASDTask` background-task mode as `orginventory` (see the "ASD task management" section below) - confirmed working end-to-end. Also unlike its two siblings, a genuinely non-existent domain returns `error 1006 "search failed: no result found"` rather than a clean `exist:"false"` record.
+```
+    C:\PS> Get-OnypheASDInfo -ASDAPIType domainexist -Value @("onyphe.io","example.org")
+```
+API v1/asd/dns/domain/ns/exist : check whether one or more domains have an existing NS record (a live DNS lookup, distinct from dnsdomainexist's passive-DNS-history-or-brute-force check) - returns `{"domain":"...","exist":"true"|"false"}` per domain. Same bare `"domain"`-array body as `dnsdomainexist`, same param restrictions (no -IncludePattern/-ExcludePattern/-Untrusted).
+```
+    C:\PS> Get-OnypheASDInfo -ASDAPIType dnsdomainnsexist -Value @("onyphe.io","example.org")
+```
 API v1/asd/dns/domain/ns, /mx, /soa : live DNS lookups against a domain (same -Value shape, just swap -ASDAPIType)
 ```
     C:\PS> Get-OnypheASDInfo -ASDAPIType dnsdomainns -Value onyphe.io
 ```
-you can narrow results and disable Onyphe's backend false-positive filtering with -IncludePattern/-ExcludePattern/-Untrusted (not supported by `dnsdomainexist`), and request one-JSON-object-per-line output with -AsLines :
+API v1/asd/dns/domain/mstenantid : also a live DNS lookup - given a domain, returns every **other** domain sharing the same Microsoft 365 tenant (not the tenant ID value itself). Real, useful pivot for domains that actually are M365 tenants (e.g. `microsoft.com` -> 107 genuine sibling domains including `xbox.com`/`linkedin.com`/`github.com`) - but **does not apply to this project's own `sovcloud-*.fr` family**, none of which are themselves M365 tenant domains (confirmed live: `error 1006 "no result found"` for all of them tried).
+```
+    C:\PS> Get-OnypheASDInfo -ASDAPIType dnsdomainmstenantid -Value microsoft.com
+```
+API v1/asd/subnet/inventory : discover the subnet(s) belonging to one or more domains, rolled up as an attack-surface inventory - unlike the other ASD endpoints, the request body nests -Value under an "inventory" object server-side. **Known caveat (as of v2.2.4):** the request itself is confirmed correct (reaches the server, gets a real business-logic response rather than an auth/format error) but returned `error 1006 "search failed: no result found"` for every domain tried during live-testing, including large well-known domains - see the `Invoke-APIOnypheASDSubnetInventory` private wrapper's comment-based help for details before relying on this endpoint.
+```
+    C:\PS> Get-OnypheASDInfo -ASDAPIType subnetinventory -Value onyphe.io
+```
+API v1/asd/ip/inventory : discover the IP address(es) belonging to one or more domains, rolled up as an attack-surface inventory - same request-body nesting as subnetinventory above, but **live-verified working (v2.2.5)**, unlike that endpoint: returned real IPs cross-checked against independently-known subnets for the same domain. Large domains can time out server-side (`error 2`) rather than fail outright.
+```
+    C:\PS> Get-OnypheASDInfo -ASDAPIType ipinventory -Value onyphe.io
+```
+API v1/asd/org/inventory : discover the organization(s) associated with one or more domains, rolled up as an attack-surface inventory - same request-body nesting as above. Small domains return a clean empty success, not an error; large well-known domains return `error 1011 "too many results, you should create a task"` instead of results directly - see the "ASD task management" section below for how to retrieve those with `astask`/`Wait-OnypheASDTask` (implemented as of v2.3.0).
+```
+    C:\PS> Get-OnypheASDInfo -ASDAPIType orginventory -Value onyphe.io
+```
+API v1/asd/ip/certso : discover the IP address(es) belonging to a certificate subject.organization value - same `"certso"`-keyed body as `domaincertso`, not the nested `"inventory"` object.
+```
+    C:\PS> Get-OnypheASDInfo -ASDAPIType ipcertso -Value "DigiCert Inc"
+```
+API v1/asd/ip/domain : discover the IP address(es) belonging to one or more domains - same bare `"domain"`-array body as `domaintld`.
+```
+    C:\PS> Get-OnypheASDInfo -ASDAPIType ipdomain -Value sovcloud-core.fr
+```
+API v1/asd/vhost/inventory : discover the virtual host(s)/forward DNS hostname(s) belonging to one or more domains, rolled up as an attack-surface inventory - same nested `"inventory"` body as the other `*inventory` endpoints. Unlike `orginventory`, this one worked synchronously even on a large domain (`google.com`, 1,338 results) during testing.
+```
+    C:\PS> Get-OnypheASDInfo -ASDAPIType vhostinventory -Value sovcloud-core.fr
+```
+API v1/asd/score/inventory : discover risk-flagged findings for one or more domains (raw `riskscan`-shaped records), rolled up as an attack-surface inventory - same nested `"inventory"` body. Also worked synchronously on `google.com` (1,714 results) during testing, no `astask` needed.
+```
+    C:\PS> Get-OnypheASDInfo -ASDAPIType scoreinventory -Value sovcloud-core.fr
+```
+API v1/asd/web/subdomain/domain : discover subdomain(s)/hostname(s) for one or more domains from web crawl data, mixing `{"hostname":"..."}` entries with a trailing `{"domain":"..."}` echo of the query itself - same bare `"domain"`-array body as `domaintld`, and unlike the three `*Exist` endpoints, `-IncludePattern`/`-ExcludePattern`/`-Untrusted` genuinely filter server-side here. A domain with a large enough footprint can time out server-side (`error 2 "request timed out"`), same characteristic already seen on `ipinventory` - not an `astask` situation.
+```
+    C:\PS> Get-OnypheASDInfo -ASDAPIType websubdomaindomain -Value sovcloud-core.fr
+```
+API v1/asd/bootstrap/certso/wildcard : seeds a wildcard-domain search from a certificate subject.organization value, discovering wildcard domain pattern(s) linked to it - uses the `"certso"`-keyed body like `domaincertso`/`ipcertso` (**not** `"domain"`-keyed despite the "wildcard" name). Can hit `error 1011 "too many results, you should create a task"` for a large organization (e.g. `"Bleu SAS"` in testing) - needs the same `astask`/`Wait-OnypheASDTask` background-task mode as `orginventory`/`domainexist`, confirmed working end-to-end, though the eventual result can still turn out to be 0 records even after the size-estimate warning.
+```
+    C:\PS> Get-OnypheASDInfo -ASDAPIType bootstrapcertsowildcard -Value "DigiCert Inc"
+```
+you can narrow results and disable Onyphe's backend false-positive filtering with -IncludePattern/-ExcludePattern/-Untrusted (not supported by `dnsdomainexist`/`dnsdomainnsexist`/`domainexist`), and request one-JSON-object-per-line output with -AsLines :
 ```
     C:\PS> Get-OnypheASDInfo -ASDAPIType domaintld -Value onyphe.io -ExcludePattern "test" -Untrusted -AsLines
 ```
-Note: the "advanced" Pivot Query ASD API (`asd.advapis`) is not implemented yet in this module, and the ASD APIs' `astask` background-task mode is not exposed - see README.md's v2.2.0 notes for why.
+Note: the "advanced" Pivot Query ASD API (`asd.advapis`) is not implemented in this module (unlicensed on the account used for verification). All `stdapis` endpoints are now implemented. ASD task management **is** implemented (see below), so `orginventory`/`domainexist`/`bootstrapcertsowildcard` are fully usable on large-footprint values as of v2.3.0/v2.3.7/v2.3.9.
+
+### ASD task management
+
+Any ASD `*inventory` endpoint can hit `error 1011 "too many results, you should create a task"` for a large domain instead of returning results (confirmed on `google.com`/`github.com` with `orginventory`). Since `Get-OnypheASDInfo` doesn't currently expose an `-AsTask` switch itself, trigger the async task with a raw call, then manage it with the 4 task cmdlets:
+
+```
+    C:\PS> $r = Get-OnypheASDInfo -ASDAPIType orginventory -Value google.com   # error 1011, no .taskid yet - too large for a sync call
+    C:\PS> # re-send the same request with astask:"true" in its JSON body (needs a raw Invoke-OnypheAPIV2 call today)
+    C:\PS> $taskId = $r.taskid
+    C:\PS> Wait-OnypheASDTask -TaskId $taskId                    # blocks, polling every 5s (default) up to 300s, then returns the finished result
+    C:\PS> Get-OnypheASDTaskList                                 # see every task for the account, running or finished
+    C:\PS> Get-OnypheASDTask -TaskId $taskId                     # fetch a finished task's result directly, without waiting
+    C:\PS> Stop-OnypheASDTask -TaskId $taskId                    # kill/clear a task - required before starting a new one on this account (only one task at a time)
+```
+
+**Known account limitation (live-tested 2026-09-18):** this account allows only one ASD task at a time - a second `astask:true` call while one is still tracked fails with `error 1008 "creating task failed: a task is already running"`, even after the tracked task finished, until it's cleared with `Stop-OnypheASDTask`. `Get-OnypheASDTaskList` returns `error 1007 "task not found: empty list"` when there's nothing to show - treat that as an empty list, not a failure.
 
 ## E-mail alerting system
 Since a few weeks now, 3 new APIs (V2) are available to manage automatic e-mail alerts for your Onyphe account. It means you can automate search request at Onyphe server side and received an e-mail alerts when new events are available (especially when using timeline filter functions in your request).
@@ -594,6 +659,26 @@ to combine several wildcard or regexp conditions together (an OR between them), 
 ```
     C:\PS> Export-OnypheInfo -AdvancedSearch @("(","?domain:sovcloud-core.fr","?domain:sovcloud-api.fr",")","(","?tld:fr",")") -Category resolver -SaveInfoAsFile .\myexport.json
 ```
+## Sending the query as a POST body instead of a GET query string (long OQL)
+Onyphe's `/search` and `/export` endpoints normally take the OQL query as a `q=` GET query-string parameter, which can hit a URL-length limit for a very long query (many `?domain:X` OR-terms/exclusions). Add `-Post` to send the query as a POST request body instead - only the query itself moves, `-Page`/`-Size`/`-TrackQuery`/`-Calculated` still go in the query string either way :
+```
+    C:\PS> Search-OnypheInfo -AdvancedSearch @("?domain:sovcloud-core.fr","?domain:sovcloud-api.fr","?domain:sovcloud.fr") -Category resolver -Post
+    C:\PS> Export-OnypheInfo -AdvancedSearch @("?domain:sovcloud-core.fr","?domain:sovcloud-api.fr","?domain:sovcloud.fr") -Category resolver -SaveInfoAsFile .\myexport.json -Post
+```
+## Pivoting from a prior result set (auto-pivot)
+`Invoke-OnyphePivot` takes a prior Onyphe result set (e.g. piped in from `Search-OnypheInfo`) and fires one follow-up query per distinct value of a chosen field - for instance, take every `subject.organization` seen in a `ctl` result set and fire a follow-up `ctl` search for each one, to find every other certificate sharing that organization :
+```
+    C:\PS> Search-OnypheInfo -AdvancedSearch @("domain:example.com") -Category ctl | Invoke-OnyphePivot -PivotField "subject.organization" -PivotCategory ctl -PivotFilter "subject.organization"
+```
+`-PivotField` is the dotted property path read off each input object; `-PivotFilter` is the OQL filter name used in the follow-up query - they're separate parameters because the two names often differ across categories (e.g. reading `organization` off a `resolver` result but pivoting into `ctl` using its `subject.organization` filter) :
+```
+    C:\PS> Search-OnypheInfo -AdvancedSearch @("domain:example.com") -Category resolver | Invoke-OnyphePivot -PivotField organization -PivotCategory resolver -PivotFilter organization
+```
+One API call is made per distinct value found (not a single combined query), so this can fire many calls for a broad input set - use `-Wait` to add a delay between each one, and `-Size`/`-TrackQuery`/`-Calculated`/`-Post` are all passed through to every follow-up call the same way they work on `Search-OnypheInfo` directly :
+```
+    C:\PS> Search-OnypheInfo -AdvancedSearch @("domain:example.com") -Category ctl | Invoke-OnyphePivot -PivotField "subject.organization" -PivotCategory ctl -PivotFilter "subject.organization" -Wait 2 -Size 500
+```
+Every returned result is tagged with two extra properties, `cli-pivot_source_field` and `cli-pivot_source_value`, recording which pivot value produced it - useful when aggregating results from many distinct pivot values back into one set.
 ## Result size, matched-filter tracking, and calculated fields
 by default a search page returns 100 results; you can request a different page size (up to 10000) with -Size :
 ```

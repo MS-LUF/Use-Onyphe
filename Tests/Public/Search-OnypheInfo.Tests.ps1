@@ -81,4 +81,11 @@ Describe 'Search-OnypheInfo' -Tag 'Unit' {
 			($TrackQuery -eq $true) -and ($Calculated -eq $true)
 		}
 	}
+
+	It 'passes -Post through to Invoke-APIOnypheSearch' {
+		Search-OnypheInfo -SearchValue 'RU' -Category threatlist -SearchFilter country -Post | Out-Null
+		Should -Invoke -ModuleName Use-Onyphe Invoke-APIOnypheSearch -Times 1 -Exactly -ParameterFilter {
+			$Post -eq $true
+		}
+	}
 }

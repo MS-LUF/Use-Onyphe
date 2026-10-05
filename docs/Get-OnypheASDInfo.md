@@ -24,8 +24,12 @@ type available.
 The ASD APIs are BETA endpoints requiring a Griffin View or Griffin View ASM Edition
 subscription with a non-commercial use licence - see Get-OnypheUserInfo's asd.stdapis property to check
 whether they are licensed on your account.
-Only the 9 currently-licensable "standard" ASD APIs (stdapis)
-are implemented; the "advanced" Pivot Query API (advapis) is not yet implemented in this module.
+Only 21 of the ~21-22 "standard" ASD APIs (stdapis) documented by
+the official onyphe/cli are implemented so far; the "advanced" Pivot Query API (advapis) and the
+remaining stdapis inventory/existence-check endpoints are not yet implemented in this module.
+ASD task
+management (for results too large to return synchronously) is implemented separately - see
+Get-OnypheASDTask/Get-OnypheASDTaskList/Wait-OnypheASDTask/Stop-OnypheASDTask.
 
 ## EXAMPLES
 
@@ -53,13 +57,88 @@ check whether one or more domains exist (passive DNS history / live brute-force)
 C:\PS> Get-OnypheASDInfo -ASDAPIType dnsdomainexist -Value @("example.com","example.org")
 ```
 
+### EXAMPLE 5
+```
+discover the subnet(s) belonging to one or more domains, as an attack-surface inventory rollup
+C:\PS> Get-OnypheASDInfo -ASDAPIType subnetinventory -Value example.com
+```
+
+### EXAMPLE 6
+```
+discover the IP address(es) belonging to one or more domains, as an attack-surface inventory rollup
+C:\PS> Get-OnypheASDInfo -ASDAPIType ipinventory -Value example.com
+```
+
+### EXAMPLE 7
+```
+discover the organization(s) associated with one or more domains, as an attack-surface inventory rollup
+C:\PS> Get-OnypheASDInfo -ASDAPIType orginventory -Value example.com
+```
+
+### EXAMPLE 8
+```
+discover the IP address(es) belonging to a certificate subject.organization value
+C:\PS> Get-OnypheASDInfo -ASDAPIType ipcertso -Value "Example Organization"
+```
+
+### EXAMPLE 9
+```
+discover the IP address(es) belonging to one or more domains
+C:\PS> Get-OnypheASDInfo -ASDAPIType ipdomain -Value example.com
+```
+
+### EXAMPLE 10
+```
+discover the virtual host(s)/forward DNS hostname(s) belonging to one or more domains
+C:\PS> Get-OnypheASDInfo -ASDAPIType vhostinventory -Value example.com
+```
+
+### EXAMPLE 11
+```
+discover risk-flagged findings for one or more domains, as an attack-surface inventory rollup
+C:\PS> Get-OnypheASDInfo -ASDAPIType scoreinventory -Value example.com
+```
+
+### EXAMPLE 12
+```
+discover other domain(s) sharing the same Microsoft 365 tenant as one or more domains (a live DNS lookup)
+C:\PS> Get-OnypheASDInfo -ASDAPIType dnsdomainmstenantid -Value example.com
+```
+
+### EXAMPLE 13
+```
+check whether one or more domains have an existing NS record (a live DNS lookup)
+C:\PS> Get-OnypheASDInfo -ASDAPIType dnsdomainnsexist -Value @("example.com","example.org")
+```
+
+### EXAMPLE 14
+```
+check whether one or more domains exist - can return HTTP error 1011 "too many results, you should create a task" for domains with a large enough footprint, see Get-OnypheASDTask/Wait-OnypheASDTask
+C:\PS> Get-OnypheASDInfo -ASDAPIType domainexist -Value @("example.com","example.org")
+```
+
+### EXAMPLE 15
+```
+discover subdomain(s)/hostname(s) for one or more domains from web crawl data
+C:\PS> Get-OnypheASDInfo -ASDAPIType websubdomaindomain -Value example.com
+```
+
+### EXAMPLE 16
+```
+seed a wildcard-domain search from a certificate subject.organization value - can return HTTP error 1011 "too many results, you should create a task" for a large organization, see Get-OnypheASDTask/Wait-OnypheASDTask
+C:\PS> Get-OnypheASDInfo -ASDAPIType bootstrapcertsowildcard -Value "Example Organization"
+```
+
 ## PARAMETERS
 
 ### -Value
 -Value string\[\]
 one or more values to query.
-For every ASDAPIType except domaincertso this is one or more domains; for
-domaincertso this is one or more certificate subject.organization values.
+For domaincertso, ipcertso and bootstrapcertsowildcard this is one or more
+certificate subject.organization values; for subnetinventory/ipinventory/orginventory/vhostinventory/
+scoreinventory, the domain(s) are wrapped
+server-side into an inventory rollup rather than queried individually; for every other ASDAPIType this
+is one or more domains.
 
 ```yaml
 Type: String[]
@@ -75,7 +154,8 @@ Accept wildcard characters: False
 
 ### -IncludePattern
 -IncludePattern string\[\]
-patterns to grep and keep matching results (not supported by ASDAPIType dnsdomainexist)
+patterns to grep and keep matching results (not supported by ASDAPIType dnsdomainexist, dnsdomainnsexist,
+domainexist)
 
 ```yaml
 Type: String[]
@@ -91,7 +171,8 @@ Accept wildcard characters: False
 
 ### -ExcludePattern
 -ExcludePattern string\[\]
-patterns to grep and exclude from results (not supported by ASDAPIType dnsdomainexist)
+patterns to grep and exclude from results (not supported by ASDAPIType dnsdomainexist, dnsdomainnsexist,
+domainexist)
 
 ```yaml
 Type: String[]
@@ -108,7 +189,7 @@ Accept wildcard characters: False
 ### -Untrusted
 -Untrusted switch
 disable Onyphe's backend false-positive filtering, server default is enabled/trusted (not supported by
-ASDAPIType dnsdomainexist)
+ASDAPIType dnsdomainexist, dnsdomainnsexist, domainexist)
 
 ```yaml
 Type: SwitchParameter
